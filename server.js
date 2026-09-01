@@ -1,11 +1,11 @@
 const http = require('http');
 const https = require('https');
-const URL = require('url');
 
 const PORT = process.env.PORT || 8080;
+const TARGET_HOST = 're.new-redirect.online';
 
 const server = http.createServer((req, res) => {
-    // إعدادات CORS لتوافق أندرويد والمنصة
+    // 1. إعدادات الـ CORS لتوافق مشغل منصة App Creator 24 وهواتف أندرويد
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', '*');
@@ -16,40 +16,39 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // تبديل السيرفر المستهدف ديناميكياً بناءً على فحص البيانات
-    let targetHost = 're.new-redirect.online';
+    // 2. تتبع التحويلات التلقائية وسيرفرات البث الحقيقية المكتشفة في الفحص (h26.flavello.lol)
+    let currentHost = TARGET_HOST;
     if (req.url.includes('0021012254') || req.url.includes('.js')) {
-        targetHost = 'h26.flavello.lol';
+        currentHost = 'h26.flavello.lol';
     }
 
     const myHost = req.headers.host;
     const protocol = req.connection.encrypted ? 'https' : 'http';
 
-    // استخدام التشفير الكامل لمحاكاة الطلب الأصلي المكتشف في الـ Logs
+    // 3. الأوامر البرمجية التي تجعل السيرفر يبدو كمشغل تطبيق ياسين تي في الرسمي
     const options = {
-        hostname: targetHost,
-        port: 443, // التحويل إلى المنفذ المشفر الآمن 443 قسرياً
+        hostname: currentHost,
+        port: 443, // استخدام المنفذ الآمن المشفر قسرياً كما ظهر في الـ Request الأصلي
         path: req.url,
         method: req.method,
         headers: {
-            'Host': targetHost,
+            'Host': currentHost,
+            // نسخ بصمة المتصفح والمشغل الدقيقة من بيانات الفحص الخاصة بك
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
-            'Referer': 'https://x.com',
-            'Accept-Encoding': 'identity', // إلغاء الضغط لكي يتمكن السيرفر من قراءة وتعديل الروابط الداخلية
+            'Referer': 'https://x.com', // الموقع المحيل الإلزامي لتخطي الحظر
+            'Accept-Encoding': 'identity', // إجبار السيرفر على عدم ضغط البيانات لقراءة الروابط الداخلية
             'Connection': 'keep-alive'
         }
     };
 
-    // استخدام https.request بدلاً من http.request لفتح التشفير
+    // 4. فتح الاتصال المشفر ونقل تيار الفيديو بالنيابة عن التطبيق
     const proxyReq = https.request(options, (proxyRes) => {
         
-        // التعامل مع كود التحويل التلقائي (302 Found) المشفر
+        // معالجة كود التحويل (302 Found) قسرياً لتتبع روابط التشغيل
         if (proxyRes.statusCode === 302 || proxyRes.statusCode === 301) {
             let redirectUrl = proxyRes.headers.location;
-            redirectUrl = redirectUrl.replace('http://new-redirect.online', '');
-            redirectUrl = redirectUrl.replace('https://new-redirect.online', '');
-            redirectUrl = redirectUrl.replace('http://flavello.lol', '');
-            redirectUrl = redirectUrl.replace('https://flavello.lol', '');
+            redirectUrl = redirectUrl.replace(/https?:\/\/re\.new-redirect\.online/g, '');
+            redirectUrl = redirectUrl.replace(/https?:\/\/h26\.flavello\.lol/g, '');
             res.writeHead(302, { 'Location': `${protocol}://${myHost}${redirectUrl}` });
             res.end();
             return;
@@ -57,7 +56,7 @@ const server = http.createServer((req, res) => {
 
         let contentType = proxyRes.headers['content-type'] || '';
         
-        // تعديل روابط ملف الـ m3u8 والقطع المضللة (.js)
+        // 5. قراءة وتعديل الروابط والقطع المضللة (.js) داخل ملف الـ m3u8 لتعمل عبر السيرفر
         if (contentType.includes('mpegurl') || contentType.includes('x-mpegurl') || req.url.includes('.m3u8')) {
             let body = '';
             proxyRes.on('data', chunk => { body += chunk; });
@@ -69,26 +68,24 @@ const server = http.createServer((req, res) => {
                     }
                     return line;
                 });
-                
                 res.writeHead(proxyRes.statusCode, proxyRes.headers);
                 res.end(modifiedBody);
             });
         } else {
-            // ضخ قطع الفيديو المشفرة مباشرة وتمريرها للمشاهد
+            // 6. ضخ بيانات البث والفيديو مباشرة (Stream Piping) من منزلك إلى المشاهدين خارج الشبكة
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
             proxyRes.pipe(res, { end: true });
         }
     });
 
     proxyReq.on('error', (err) => {
-        console.error('❌ خطأ في الاتصال المشفر:', err.message);
         res.writeHead(500);
-        res.end('Secure Stream Proxy Error');
+        res.end('YTV Emulation Proxy Error');
     });
 
     req.pipe(proxyReq, { end: true });
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 سيرفر التشفير الكامل يعمل الآن بنجاح على المنفذ: ${PORT}`);
+    console.log(`🚀 سيرفر محاكاة مشغل ياسين تي في يعمل بنجاح الآن على المنفذ: ${PORT}`);
 });

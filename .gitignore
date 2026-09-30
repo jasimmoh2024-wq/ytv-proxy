@@ -1,53 +1,24 @@
-[
-  {"id": "1", "name": "beIN Sports 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677012"},
-  {"id": "2", "name": "beIN Sports 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677013"},
-  {"id": "3", "name": "beIN Sports 3", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677014"},
-  {"id": "4", "name": "beIN Sports 4", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677015"},
-  {"id": "5", "name": "beIN Sports 5", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677016"},
-  {"id": "6", "name": "beIN Sports 6", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677017"},
-  {"id": "7", "name": "beIN Sports 7", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677018"},
-  {"id": "8", "name": "beIN Sports 8", "url": "http://tyqw.site:2052/10675785266958/99039021857485/677019"},
-  {"id": "9", "name": "Alwan Sport 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649689"},
-  {"id": "10", "name": "Alwan Sport 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649690"},
-  {"id": "11", "name": "Alwan Sport 3", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649691"},
-  {"id": "12", "name": "Alwan Sport 4", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649692"},
-  {"id": "13", "name": "Alwan Sport 5", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649693"},
-  {"id": "14", "name": "Alwan Sport 6", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649694"},
-  {"id": "15", "name": "Alwan Sport 7", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649695"},
-  {"id": "16", "name": "Alwan Sport 8", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649696"}
-  {"id": "17", "name": "Thamanya Sport 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/646090"},
-  {"id": "18", "name": "Thamanya Sport 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/646091"},
-  {"id": "19", "name": "beIN movies 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/427"},
-  {"id": "20", "name": "beIN movies 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/428"},
-  {"id": "21", "name": "beIN movies 3", "url": "http://tyqw.site:2052/10675785266958/99039021857485/429"},
-  {"id": "22", "name": "beIN movies 4", "url": "http://tyqw.site:2052/10675785266958/99039021857485/430"},
-  {"id": "23", "name": "beIN SERIES 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/431"},
-  {"id": "24", "name": "beIN SERIES 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/432"},
-  {"id": "25", "name": "beIN دراما", "url": "http://tyqw.site:2052/10675785266958/99039021857485/433"},
-  {"id": "26", "name": "براعم", "url": "http://tyqw.site:2052/10675785266958/99039021857485/443"},
-  {"id": "27", "name": "جيم", "url": "http://tyqw.site:2052/10675785266958/99039021857485/444"},
-  {"id": "28", "name": "CN", "url": "http://tyqw.site:2052/10675785266958/99039021857485/426"},
-  {"id": "29", "name": "Baby tv", "url": "http://tyqw.site:2052/10675785266958/99039021857485/442"},
-  {"id": "30", "name": "ViVo OSCAR", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192835"},
-  {"id": "31", "name": "ViVo CLUB", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192834"},
-  {"id": "32", "name": "ViVo SHOWTIME", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192836"}
-  {"id": "33", "name": "ViVo PLUS +", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192837"},
-  {"id": "34", "name": "ViVo MOVIES", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192838"},
-  {"id": "35", "name": "CENTRAL", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192839"},
-  {"id": "36", "name": "ViVo WAR TIME", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192840"},
-  {"id": "37", "name": "ViVo ONLINE", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192842"},
-  {"id": "38", "name": "ViVo CRYSTAL", "url": "http://tyqw.site:2052/10675785266958/99039021857485/192843"},
-  {"id": "39", "name": "WILD", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625061"},
-  {"id": "40", "name": "travel", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625063"},
-  {"id": "41", "name": "National Geographic Abu Dhabi", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625058"},
-  {"id": "42", "name": "الشروق الوثائقية", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625067"},
-  {"id": "43", "name": "DISCOVERY", "url": "tyqw.site:2052/10675785266958/99039021857485/625069"},
-  {"id": "44", "name": "animal planet", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625075"},
-  {"id": "45", "name": "H HISORY", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625076"},
-  {"id": "46", "name": "Discovery", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625080"},
-  {"id": "47", "name": "ID", "url": "http://tyqw.site:2052/10675785266958/99039021857485/625081"},
-  {"id": "48", "name": "Nickelodeon 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/151195"}
-  {"id": "49", "name": "Nickelodeon 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/151192"},
-  {"id": "49", "name": "Alwan Movies 1", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649714"},
-  {"id": "49", "name": "Alwan Movies 2", "url": "http://tyqw.site:2052/10675785266958/99039021857485/649715"},
-]
+#EXTM3U
+#EXTINF:-1 tvg-name="beIN Sports 1 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 1 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677012
+
+#EXTINF:-1 tvg-name="beIN Sports 2 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 2 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677013
+
+#EXTINF:-1 tvg-name="beIN Sports 3 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 3 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677014
+
+#EXTINF:-1 tvg-name="beIN Sports 4 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 4 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677015
+
+#EXTINF:-1 tvg-name="beIN Sports 5 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 5 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677016
+
+#EXTINF:-1 tvg-name="beIN Sports 6 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 6 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677017
+
+#EXTINF:-1 tvg-name="beIN Sports 7 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 7 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677018
+
+#EXTINF:-1 tvg-name="beIN Sports 8 HD" tvg-logo="" group-title="beIN SPORTS",beIN Sports 8 HD
+http://tyqw.site:2052/10675785266958/99039021857485/677019

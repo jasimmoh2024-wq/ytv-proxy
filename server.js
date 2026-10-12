@@ -9,40 +9,53 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
-// 1. واجهة العرض الرئيسية (ستقرأ ملف index.html تلقائياً عند فتح السيرفر)
+// قراءة الواجهة
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 2. رابط لجلب القنوات المكتوبة داخل ملف channels.m3u المرفوع لديك
+// الكود الذكي المطور لقراءة القنوات بجميع صيغ الـ M3U
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ error: 'ملف channels.m3u غير موجود في السيرفر' });
+        return res.status(404).json({ error: 'ملف channels.m3u غير موجود' });
     }
 
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
     const channels = [];
-    let currentChannel = {};
+    let currentName = '';
 
-    // تحليل ملف M3U واستخراج أسماء القنوات وروابطها
-    lines.forEach(line => {
-        line = line.trim();
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        
         if (line.startsWith('#EXTINF:')) {
-            const nameMatch = line.match(/,(.+)\$/);
-            currentChannel.name = nameMatch ? nameMatch[1] : 'قناة غير مسمى';
+            // محاولة استخراج الاسم من tvg-name أولاً، وإذا لم يوجد يأخذ النص بعد الفاصلة الأخيرة
+            let nameMatch = line.match(/tvg-name="([^"]+)"/i);
+            if (nameMatch && nameMatch[1]) {
+                currentName = nameMatch[1];
+            } else {
+                let commaIndex = line.lastIndexOf(',');
+                if (commaIndex !== -1) {
+                    currentName = line.substring(commaIndex + 1).trim();
+                } else {
+                    currentName = 'قناة بدون اسم';
+                }
+            }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
-            currentChannel.url = line;
-            channels.push(currentChannel);
-            currentChannel = {};
+            if (currentName === '') currentName = 'قناة غير مسمّاة';
+            channels.push({
+                name: currentName,
+                url: line
+            });
+            currentName = ''; // إعادة التصفير للقناة التالية
         }
-    });
+    }
 
     res.json(channels);
 });
 
-// 3. الوسيط الذكي لتشغيل البث بدون تحميل وحل الحظر الأمني
+// وسيط البث (Proxy)
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -52,8 +65,10 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 10000,
-            headers: { 'User-Agent': 'Mozilla/5.0' }
+            timeout: 15000,
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' 
+            }
         });
 
         res.setHeader('Content-Type', 'video/mp2t');

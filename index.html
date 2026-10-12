@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق قنواتي IPTV المتطور</title>
-    <script src="https://jsdelivr.net"></script>
+    <title>تطبيق قنوات IPTV</title>
     <style>
         body { margin: 0; background: #0b0b0b; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: #141414; padding: 15px; text-align: center; font-size: 18px; color: #4ade80; border-bottom: 1px solid #222; }
@@ -19,18 +18,18 @@
 </head>
 <body>
 
-    <div class="header">📺 مشغل قنوات IPTV الذكي</div>
+    <div class="header">📺 تطبيق IPTV الذكي</div>
     
     <div class="main-content">
-        <!-- القائمة الجانبية -->
+        <!-- القائمة الجانبية المحدثة -->
         <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قائمة القنوات...</div>
+            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك المرفوعة...</div>
         </div>
         
-        <!-- مشغل الفيديو -->
+        <!-- مشغل الفيديو الافتراضي المتوافق مع الهواتف -->
         <div class="player-area">
-            <video id="videoPlayer" controls autoplay playsinline></video>
-            <div class="status" id="status">اختر قناة من القائمة الجانبية لبدء المشاهدة</div>
+            <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+            <div class="status" id="status">اختر قناة من القائمة لبدء العرض</div>
         </div>
     </div>
 
@@ -38,74 +37,50 @@
         const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
-        let playerInstance = null;
 
-        // 1. جلب قائمة القنوات تلقائياً عند فتح الصفحة
+        // 1. جلب قائمة القنوات تلقائياً
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 const playlistDiv = document.getElementById('playlist');
                 if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">الملف فارغ أو لم يتم التعرف على الروابط</div>';
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">قائمتك فارغة تماماً</div>';
                     return;
                 }
                 
-                playlistDiv.innerHTML = ''; 
+                playlistDiv.innerHTML = '';
                 
                 channels.forEach(channel => {
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     item.textContent = channel.name;
-                    item.onclick = () => startStreaming(channel.url, channel.name);
+                    item.onclick = () => playChannel(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
-                statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح. اختر قناة للتشغيل.`;
+                statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالملف الداخلي</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
             });
 
-        // 2. المحرك الذكي لتشغيل البث والتبديل التلقائي عند الحظر
-        function startStreaming(url, name) {
-            if (playerInstance) { playerInstance.destroy(); }
+        // 2. معالج تشغيل البث المباشر
+        function playChannel(url, name) {
+            statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
+            
+            // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS والـ HTTPS
+            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            
+            // الاعتماد على وسم الفيديو الأصلي للمتصفح/الهاتف لتجنب مشاكل فك التشفير البرمجي
+            videoElement.src = proxyUrl;
+            videoElement.load();
+            
+            videoElement.onplay = () => {
+                statusText.textContent = `يعرض الآن: ${name} ✅`;
+            };
 
-            // المحاولة الأولى: عبر خادم رندر الوسيط لتخطي حماية المتصفح
-            const primaryProxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            statusText.textContent = `المحاولة 1: الاتصال عبر رندر...`;
-            statusText.style.color = "#38bdf8";
-
-            tryPlay(primaryProxyUrl, name, () => {
-                // المحاولة الثانية (الخطة البديلة): إذا رفض السيرفر الأصلي رندر، يتم تشغيله مباشرة
-                statusText.textContent = `⚠️ رندر محجوب من سيرفر IPTV! تحويل إلى الاتصال المباشر...`;
-                statusText.style.color = "#f59e0b";
-                
-                tryPlay(url, name, () => {
-                    statusText.textContent = `❌ تعذر تشغيل (${name}). القناة متوقفة حالياً من المصدر.`;
-                    statusText.style.color = "#f87171";
-                });
-            });
-        }
-
-        // دالة التشغيل الفرعية
-        function tryPlay(streamUrl, name, onErrorCallback) {
-            if (mpegts.getFeatureList().mseLivePlayback) {
-                playerInstance = mpegts.createPlayer({ type: 'mse', isLive: true, url: streamUrl, cors: true });
-                playerInstance.attachMediaElement(videoElement);
-                playerInstance.load();
-                
-                playerInstance.on(mpegts.Events.INFO, () => {
-                    statusText.textContent = `يعرض الآن: ${name} ✅`;
-                    statusText.style.color = "#4ade80";
-                });
-                
-                playerInstance.on(mpegts.Events.ERROR, () => {
-                    if (onErrorCallback) onErrorCallback();
-                });
-
-                videoElement.play().catch(() => {
-                    statusText.textContent = `💡 انقر تشغيل وسط الشاشة لعرض القناة: ${name}`;
-                });
-            }
+            videoElement.onerror = () => {
+                statusText.textContent = `⚠️ تنبيه: إذا كنت على المتصفح، قد لا تعمل القناة بسبب التشفير. ستعمل فوراً عند تشغيلها داخل تطبيق الهاتف (APK).`;
+            };
         }
     </script>
 </body>

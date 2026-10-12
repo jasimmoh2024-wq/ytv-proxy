@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق قنواتي IPTV</title>
+    <title>تطبيق قنواتي IPTV المتطور</title>
     <script src="https://jsdelivr.net"></script>
     <style>
         body { margin: 0; background: #0b0b0b; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -19,12 +19,12 @@
 </head>
 <body>
 
-    <div class="header">📺 مشغل قنوات IPTV المتكامل</div>
+    <div class="header">📺 مشغل قنوات IPTV الذكي</div>
     
     <div class="main-content">
         <!-- القائمة الجانبية -->
         <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري جلب القنوات وفك التشفير...</div>
+            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قائمة القنوات...</div>
         </div>
         
         <!-- مشغل الفيديو -->
@@ -35,7 +35,6 @@
     </div>
 
     <script>
-        // التقاط رابط السيرفر المباشر الحالي تلقائياً
         const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
@@ -51,40 +50,46 @@
                     return;
                 }
                 
-                playlistDiv.innerHTML = ''; // مسح جملة التحميل
+                playlistDiv.innerHTML = ''; 
                 
                 channels.forEach(channel => {
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     item.textContent = channel.name;
-                    item.onclick = () => playChannel(channel.url, channel.name);
+                    item.onclick = () => startStreaming(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
                 statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح. اختر قناة للتشغيل.`;
             })
-            .catch((err) => {
+            .catch(() => {
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالملف الداخلي</div>';
             });
 
-        // 2. معالج تشغيل البث الحي وتحويل الروابط للـ Proxy لتعمل إجبارياً
-        function playChannel(url, name) {
-            statusText.textContent = `جاري الاتصال بالقناة المباشرة عبر رندر: ${name} ...`;
+        // 2. المحرك الذكي لتشغيل البث والتبديل التلقائي عند الحظر
+        function startStreaming(url, name) {
+            if (playerInstance) { playerInstance.destroy(); }
+
+            // المحاولة الأولى: عبر خادم رندر الوسيط لتخطي حماية المتصفح
+            const primaryProxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            statusText.textContent = `المحاولة 1: الاتصال عبر رندر...`;
             statusText.style.color = "#38bdf8";
-            
-            if (playerInstance) {
-                playerInstance.destroy();
-            }
 
-            // تعديل ذكي: إرسال الطلب لـ /stream الخاص بسيرفر رندر لحل مشكلة الـ Mixed Content
-            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-
-            if (mpegts.getFeatureList().mseLivePlayback) {
-                playerInstance = mpegts.createPlayer({ 
-                    type: 'mse', 
-                    isLive: true, 
-                    url: proxyUrl,
-                    cors: true
+            tryPlay(primaryProxyUrl, name, () => {
+                // المحاولة الثانية (الخطة البديلة): إذا رفض السيرفر الأصلي رندر، يتم تشغيله مباشرة
+                statusText.textContent = `⚠️ رندر محجوب من سيرفر IPTV! تحويل إلى الاتصال المباشر...`;
+                statusText.style.color = "#f59e0b";
+                
+                tryPlay(url, name, () => {
+                    statusText.textContent = `❌ تعذر تشغيل (${name}). القناة متوقفة حالياً من المصدر.`;
+                    statusText.style.color = "#f87171";
                 });
+            });
+        }
+
+        // دالة التشغيل الفرعية
+        function tryPlay(streamUrl, name, onErrorCallback) {
+            if (mpegts.getFeatureList().mseLivePlayback) {
+                playerInstance = mpegts.createPlayer({ type: 'mse', isLive: true, url: streamUrl, cors: true });
                 playerInstance.attachMediaElement(videoElement);
                 playerInstance.load();
                 
@@ -94,8 +99,7 @@
                 });
                 
                 playerInstance.on(mpegts.Events.ERROR, () => {
-                    statusText.textContent = `❌ تعذر تشغيل (${name}). قد يكون السيرفر الأصلي متوقف أو يمنع التمرير.`;
-                    statusText.style.color = "#f87171";
+                    if (onErrorCallback) onErrorCallback();
                 });
 
                 videoElement.play().catch(() => {

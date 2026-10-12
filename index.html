@@ -10,7 +10,7 @@
         .header { background: #141414; padding: 15px; text-align: center; font-size: 18px; color: #4ade80; border-bottom: 1px solid #222; }
         .main-content { display: flex; flex: 1; overflow: hidden; }
         .playlist { width: 30%; max-width: 320px; background: #111; overflow-y: auto; border-left: 1px solid #222; }
-        .channel-item { padding: 12px 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: right; }
+        .channel-item { padding: 12px 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .channel-item:hover { background: #1c1c1c; color: #4ade80; }
         .player-area { width: 70%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; }
@@ -35,7 +35,8 @@
     </div>
 
     <script>
-        const host = window.location.origin;
+        // التقاط رابط السيرفر المباشر الحالي تلقائياً
+        const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let playerInstance = null;
@@ -65,19 +66,25 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالملف الداخلي</div>';
             });
 
-        // 2. معالج تشغيل البث الحي
+        // 2. معالج تشغيل البث الحي وتحويل الروابط للـ Proxy لتعمل إجبارياً
         function playChannel(url, name) {
-            statusText.textContent = `جاري الاتصال بالقناة المباشرة: ${name} ...`;
+            statusText.textContent = `جاري الاتصال بالقناة المباشرة عبر رندر: ${name} ...`;
             statusText.style.color = "#38bdf8";
             
             if (playerInstance) {
                 playerInstance.destroy();
             }
 
+            // تعديل ذكي: إرسال الطلب لـ /stream الخاص بسيرفر رندر لحل مشكلة الـ Mixed Content
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
             if (mpegts.getFeatureList().mseLivePlayback) {
-                playerInstance = mpegts.createPlayer({ type: 'mse', isLive: true, url: proxyUrl });
+                playerInstance = mpegts.createPlayer({ 
+                    type: 'mse', 
+                    isLive: true, 
+                    url: proxyUrl,
+                    cors: true
+                });
                 playerInstance.attachMediaElement(videoElement);
                 playerInstance.load();
                 
@@ -87,7 +94,7 @@
                 });
                 
                 playerInstance.on(mpegts.Events.ERROR, () => {
-                    statusText.textContent = `❌ تعذر تشغيل (${name}). قد تكون القناة متوقفة مؤقتاً.`;
+                    statusText.textContent = `❌ تعذر تشغيل (${name}). قد يكون السيرفر الأصلي متوقف أو يمنع التمرير.`;
                     statusText.style.color = "#f87171";
                 });
 

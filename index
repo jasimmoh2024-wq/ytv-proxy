@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق قنواتي IPTV</title>
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        body { margin: 0; background: #111; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #1f1f1f; padding: 15px; text-align: center; font-size: 20px; color: #4ade80; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        .playlist { width: 30%; background: #181818; overflow-y: auto; border-left: 1px solid #2b2b2b; }
+        .channel-item { padding: 15px; border-bottom: 1px solid #252525; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .channel-item:hover { background: #222; color: #4ade80; }
+        .player-area { width: 70%; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
+        video { width: 100%; aspect-ratio: 16/9; }
+        .status { padding: 10px; background: #141414; text-align: center; font-size: 12px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+    <div class="header">📺 تطبيق IPTV الخاص بي</div>
+    
+    <div class="main-content">
+        <!-- قائمة القنوات القادمة من السيرفر -->
+        <div class="playlist" id="playlist">
+            <div style="padding:20px; text-align:center; color:#888;">جاري تحميل قائمة القنوات...</div>
+        </div>
+        
+        <!-- منطقة مشغل الفيديو -->
+        <div class="player-area">
+            <video id="videoPlayer" controls autoplay playsinline></video>
+            <div class="status" id="status">اختر قناة من القائمة الجانبية لبدء البث</div>
+        </div>
+    </div>
+
+    <script>
+        const host = window.location.origin;
+        const videoElement = document.getElementById('videoPlayer');
+        const statusText = document.getElementById('status');
+        let playerInstance = null;
+
+        // 1. جلب قائمة القنوات تلقائياً من ملف الـ m3u المرفوع بالسيرفر
+        fetch(`${host}/api/channels`)
+            .then(res => res.json())
+            .then(channels => {
+                const playlistDiv = document.getElementById('playlist');
+                playlistDiv.innerHTML = ''; // تفريغ نص التحميل
+                
+                channels.forEach(channel => {
+                    const item = document.createElement('div');
+                    item.className = 'channel-item';
+                    item.textContent = channel.name;
+                    item.onclick = () => playChannel(channel.url, channel.name);
+                    playlistDiv.appendChild(item);
+                });
+            })
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444;">فشل تحميل الملف، تأكد من تسميته channels.m3u</div>';
+            });
+
+        // 2. وظيفة تشغيل القناة المحددة عبر السيرفر الوسيط
+        function playChannel(url, name) {
+            statusText.textContent = `جاري الاتصال بـ: ${name} ...`;
+            
+            if (playerInstance) {
+                playerInstance.destroy();
+            }
+
+            // تجهيز رابط التمرير الآمن عبر السيرفر
+            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+
+            if (mpegts.getFeatureList().mseLivePlayback) {
+                playerInstance = mpegts.createPlayer({ type: 'mse', isLive: true, url: proxyUrl });
+                playerInstance.attachMediaElement(videoElement);
+                playerInstance.load();
+                
+                playerInstance.on(mpegts.Events.INFO, () => {
+                    statusText.textContent = `عرض الآن: ${name} ✅`;
+                });
+                
+                playerInstance.on(mpegts.Events.ERROR, () => {
+                    statusText.textContent = `❌ تعذر تشغيل ${name} (قد تكون متوقفة من المصدر أو السيرفر نائم)`;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

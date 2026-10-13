@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تطبيق قنوات IPTV</title>
+    <!-- تضمين مكتبة HLS.js لتشغيل البث المباشر والروابط بدون امتداد على المتصفح -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body { margin: 0; background: #0b0b0b; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: #141414; padding: 15px; text-align: center; font-size: 18px; color: #4ade80; border-bottom: 1px solid #222; }
@@ -21,12 +23,12 @@
     <div class="header">📺 تطبيق IPTV الذكي</div>
     
     <div class="main-content">
-        <!-- القائمة الجانبية المحدثة -->
+        <!-- القائمة الجانبية -->
         <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك المرفوعة...</div>
+            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك המرفوعة...</div>
         </div>
         
-        <!-- مشغل الفيديو الافتراضي المتوافق مع الهواتف -->
+        <!-- مشغل الفيديو الافتراضي المتوافق مع المتصفحات والهواتف -->
         <div class="player-area">
             <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
             <div class="status" id="status">اختر قناة من القائمة لبدء العرض</div>
@@ -37,8 +39,9 @@
         const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
+        let hlsInstance = null; // متغير لحفظ مشغل HLS الحركي
 
-        // 1. جلب قائمة القنوات تلقائياً
+        // 1. جلب قائمة القنوات تلقائياً من سيرفر رندر الخاص بك
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -63,24 +66,52 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
             });
 
-        // 2. معالج تشغيل البث المباشر
+        // 2. معالج تشغيل البث المباشر (يدعم الروابط العادية وبدون امتداد)
         function playChannel(url, name) {
             statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
             
-            // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS والـ HTTPS
+            // تمرير الرابط من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
-            // الاعتماد على وسم الفيديو الأصلي للمتصفح/الهاتف لتجنب مشاكل فك التشفير البرمجي
-            videoElement.src = proxyUrl;
-            videoElement.load();
-            
-            videoElement.onplay = () => {
-                statusText.textContent = `يعرض الآن: ${name} ✅`;
-            };
+            // تنظيف أي بث قديم لتجنب تداخل الصوت وتجميد المتصفح
+            if (hlsInstance) {
+                hlsInstance.destroy();
+            }
 
-            videoElement.onerror = () => {
-                statusText.textContent = `⚠️ تنبيه: إذا كنت على المتصفح، قد لا تعمل القناة بسبب التشفير. ستعمل فوراً عند تشغيلها داخل تطبيق الهاتف (APK).`;
-            };
+            // فحص إذا كانت مكتبة HLS.js مدعومة في المتصفح الحالي (مثل كروم، أندرويد، فايرفوكس)
+            if (Hls.isSupported()) {
+                hlsInstance = new Hls({
+                    maxFullAVSyncDuration: 5,
+                    waitingWatchdogTimeout: 5000
+                });
+                hlsInstance.loadSource(proxyUrl);
+                hlsInstance.attachMedia(videoElement);
+                
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoElement.play();
+                    statusText.textContent = `يعرض الآن: ${name} ✅ (عبر HLS)`;
+                });
+
+                hlsInstance.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        statusText.textContent = `⚠️ خطأ في تشغيل البث، قد يكون الرابط متوقفاً حالياً.`;
+                    }
+                });
+
+            } 
+            // دعم متصفحات سفاري (Safari / iPhone) لأنها تدعم تشغيل HLS تلقائياً بدون مكتبات خارجية
+            else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElement.src = proxyUrl;
+                videoElement.load();
+                videoElement.onplay = () => {
+                    statusText.textContent = `يعرض الآن: ${name} ✅ (بث مباشر)`;
+                };
+                videoElement.onerror = () => {
+                    statusText.textContent = `⚠️ عذراً، تعذر تشغيل هذا الرابط على متصفحك.`;
+                };
+            } else {
+                statusText.textContent = `⚠️ متصفحك لا يدعم فك تشفير هذا النوع من البث المباشر.`;
+            }
         }
     </script>
 </body>

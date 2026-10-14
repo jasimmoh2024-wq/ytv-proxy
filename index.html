@@ -11,13 +11,10 @@
         .playlist { width: 30%; max-width: 320px; background: #111; overflow-y: auto; border-left: 1px solid #222; }
         .channel-item { padding: 12px 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .channel-item:hover { background: #1c1c1c; color: #4ade80; }
-        .channel-item.active { background: #222; color: #4ade80; border-right: 4px solid #4ade80; }
         .player-area { width: 70%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; }
         .status { padding: 12px; background: #111; text-align: center; font-size: 13px; color: #888; border-top: 1px solid #222; }
     </style>
-    <!-- استدعاء مشغل البث المباشر فائق التوافق لقهر الروابط بدون امتداد -->
-    <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
@@ -40,7 +37,6 @@
         const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
-        let hlsEngine = null; // محرك تشغيل الـ HLS المباشر
 
         // 1. جلب قائمة القنوات تلقائياً
         fetch(`${host}/api/channels`)
@@ -58,76 +54,32 @@
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     item.textContent = channel.name;
-                    item.onclick = () => {
-                        // إضافة تمييز مرئي للقناة النشطة
-                        document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-                        item.classList.add('active');
-                        playChannel(channel.url, channel.name);
-                    };
+                    item.onclick = () => playChannel(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
                 statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح.`;
-                
-                // تشغيل أول قناة تلقائياً عند فتح السيرفر
-                if(channels.length > 0) {
-                    playlistDiv.children[0].click();
-                }
             })
             .catch(() => {
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
             });
 
-        // 2. معالج تشغيل البث المباشر والبروكسي (المطور 🛠️)
+        // 2. معالج تشغيل البث المباشر
         function playChannel(url, name) {
             statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
             
             // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS والـ HTTPS
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
-            // تنظيف أي بث سابق لتجنب تعليق الذاكرة وتداخل الصوت
-            if (hlsEngine) {
-                hlsEngine.destroy();
-            }
-
-            // تفعيل فك التشفير الذكي لروابط البث المباشر (HLS) بدون امتداد
-            if (Hls.isSupported()) {
-                hlsEngine = new Hls({
-                    strictCslManifest: false,
-                    overrideNative: true,
-                    enableWorker: true
-                });
-                hlsEngine.loadSource(proxyUrl);
-                hlsEngine.attachMedia(videoElement);
-                
-                hlsEngine.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoElement.play().catch(() => {
-                        statusText.textContent = `يعرض الآن: ${name} ✅ (اضغط تشغيل إذا لم يبدأ تلقائياً)`;
-                    });
-                });
-
-                hlsEngine.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        console.log("خطأ في تشغيل البث المباشر البروكسي:", data);
-                    }
-                });
-            } 
-            // دعم أجهزة آبل (آيفون/سفاري) التي تدعم قراءة البث المباشر بدون مكتبات خارجية
-            else if (videoElement.canPlayType('application/vnd.apple.mpegurl') || videoElement.canPlayType('application/x-mpegURL')) {
-                videoElement.src = proxyUrl;
-                videoElement.load();
-            } 
-            // تشغيل مقاطع الفيديوهات والملفات الاحتياطية الأخرى مثل MKV
-            else {
-                videoElement.src = proxyUrl;
-                videoElement.load();
-            }
+            // الاعتماد على وسم الفيديو الأصلي للمتصفح/الهاتف لتجنب مشاكل فك التشفير البرمجي
+            videoElement.src = proxyUrl;
+            videoElement.load();
             
             videoElement.onplay = () => {
                 statusText.textContent = `يعرض الآن: ${name} ✅`;
             };
 
             videoElement.onerror = () => {
-                statusText.textContent = `⚠️ تنبيه: تعذر فك تشفير هذا الرابط على المتصفح، سيعمل فوراً عند تشغيله داخل تطبيق الهاتف (APK).`;
+                statusText.textContent = `⚠️ تنبيه: إذا كنت على المتصفح، قد لا تعمل القناة بسبب التشفير. ستعمل فوراً عند تشغيلها داخل تطبيق الهاتف (APK).`;
             };
         }
     </script>

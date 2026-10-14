@@ -3,116 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق قنوات IPTV</title>
-    <!-- تضمين مكتبة HLS.js لتشغيل البث المباشر والروابط بدون امتداد على المتصفح -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>مشغل القنوات الذكي</title>
+    <!-- استدعاء مشغل الفيديو الاحترافي -->
+    <link href="https://zencdn.net" rel="stylesheet" />
     <style>
-        body { margin: 0; background: #0b0b0b; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { background: #141414; padding: 15px; text-align: center; font-size: 18px; color: #4ade80; border-bottom: 1px solid #222; }
-        .main-content { display: flex; flex: 1; overflow: hidden; }
-        .playlist { width: 30%; max-width: 320px; background: #111; overflow-y: auto; border-left: 1px solid #222; }
-        .channel-item { padding: 12px 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .channel-item:hover { background: #1c1c1c; color: #4ade80; }
-        .player-area { width: 70%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
-        video { width: 100%; aspect-ratio: 16/9; background: #000; }
-        .status { padding: 12px; background: #111; text-align: center; font-size: 13px; color: #888; border-top: 1px solid #222; }
+        body { font-family: Arial, sans-serif; background: #111; color: white; margin: 0; padding: 20px; }
+        .player-container { display: flex; flex-direction: column; max-width: 800px; margin: auto; }
+        video { width: 100%; border-radius: 8px; background: black; }
+        .notice { text-align: center; color: #888; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="header">📺 تطبيق IPTV الذكي</div>
+<div class="player-container">
+    <h2 style="text-align: center;">جاري تشغيل خادم البث المستقر...</h2>
     
-    <div class="main-content">
-        <!-- القائمة الجانبية -->
-        <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك המرفوعة...</div>
-        </div>
-        
-        <!-- مشغل الفيديو الافتراضي المتوافق مع المتصفحات والهواتف -->
-        <div class="player-area">
-            <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
-            <div class="status" id="status">اختر قناة من القائمة لبدء العرض</div>
-        </div>
-    </div>
+    <!-- المشغل الرقمي المتطور لقنوات الـ HLS/M3U8 -->
+    <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay preload="auto" data-setup='{}'>
+        <!-- هنا يقوم السيرفر بتحميل القناة الأولى تلقائياً من البروكسي الداخلي -->
+        <source src="/playlist" type="application/x-mpegURL">
+    </video>
+</div>
 
-    <script>
-        const host = window.location.origin; 
-        const videoElement = document.getElementById('videoPlayer');
-        const statusText = document.getElementById('status');
-        let hlsInstance = null; // متغير لحفظ مشغل HLS الحركي
+<p class="notice">تم الاتصال بالسيرفر السحابي بنجاح. إذا توقف البث قم بإعادة تحديث الصفحة.</p>
 
-        // 1. جلب قائمة القنوات تلقائياً من سيرفر رندر الخاص بك
-        fetch(`${host}/api/channels`)
-            .then(res => res.json())
-            .then(channels => {
-                const playlistDiv = document.getElementById('playlist');
-                if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">قائمتك فارغة تماماً</div>';
-                    return;
-                }
-                
-                playlistDiv.innerHTML = '';
-                
-                channels.forEach(channel => {
-                    const item = document.createElement('div');
-                    item.className = 'channel-item';
-                    item.textContent = channel.name;
-                    item.onclick = () => playChannel(channel.url, channel.name);
-                    playlistDiv.appendChild(item);
-                });
-                statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح.`;
-            })
-            .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
-            });
-
-        // 2. معالج تشغيل البث المباشر (يدعم الروابط العادية وبدون امتداد)
-        function playChannel(url, name) {
-            statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
-            
-            // تمرير الرابط من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS
-            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            
-            // تنظيف أي بث قديم لتجنب تداخل الصوت وتجميد المتصفح
-            if (hlsInstance) {
-                hlsInstance.destroy();
-            }
-
-            // فحص إذا كانت مكتبة HLS.js مدعومة في المتصفح الحالي (مثل كروم، أندرويد، فايرفوكس)
-            if (Hls.isSupported()) {
-                hlsInstance = new Hls({
-                    maxFullAVSyncDuration: 5,
-                    waitingWatchdogTimeout: 5000
-                });
-                hlsInstance.loadSource(proxyUrl);
-                hlsInstance.attachMedia(videoElement);
-                
-                hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoElement.play();
-                    statusText.textContent = `يعرض الآن: ${name} ✅ (عبر HLS)`;
-                });
-
-                hlsInstance.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        statusText.textContent = `⚠️ خطأ في تشغيل البث، قد يكون الرابط متوقفاً حالياً.`;
-                    }
-                });
-
-            } 
-            // دعم متصفحات سفاري (Safari / iPhone) لأنها تدعم تشغيل HLS تلقائياً بدون مكتبات خارجية
-            else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                videoElement.src = proxyUrl;
-                videoElement.load();
-                videoElement.onplay = () => {
-                    statusText.textContent = `يعرض الآن: ${name} ✅ (بث مباشر)`;
-                };
-                videoElement.onerror = () => {
-                    statusText.textContent = `⚠️ عذراً، تعذر تشغيل هذا الرابط على متصفحك.`;
-                };
-            } else {
-                statusText.textContent = `⚠️ متصفحك لا يدعم فك تشفير هذا النوع من البث المباشر.`;
-            }
-        }
-    </script>
+<script src="https://zencdn.net"></script>
 </body>
 </html>

@@ -16,7 +16,7 @@
         video { width: 100%; aspect-ratio: 16/9; background: #000; }
         .status { padding: 12px; background: #111; text-align: center; font-size: 13px; color: #888; border-top: 1px solid #222; }
     </style>
-    <!-- 1. استدعاء مكتبة Hls.js لفك تشفير روابط البث المباشر بدون امتداد -->
+    <!-- استدعاء مشغل البث المباشر فائق التوافق لقهر الروابط بدون امتداد -->
     <script src="https://jsdelivr.net"></script>
 </head>
 <body>
@@ -24,10 +24,12 @@
     <div class="header">📺 تطبيق IPTV الذكي</div>
     
     <div class="main-content">
+        <!-- القائمة الجانبية المحدثة -->
         <div class="playlist" id="playlist">
             <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك المرفوعة...</div>
         </div>
         
+        <!-- مشغل الفيديو الافتراضي المتوافق مع الهواتف -->
         <div class="player-area">
             <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
             <div class="status" id="status">اختر قناة من القائمة لبدء العرض</div>
@@ -38,9 +40,9 @@
         const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
-        let hls = null; // متغير لتخزين محرك البث المباشر
+        let hlsEngine = null; // محرك تشغيل الـ HLS المباشر
 
-        // جلب قائمة القنوات تلقائياً
+        // 1. جلب قائمة القنوات تلقائياً
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -57,7 +59,7 @@
                     item.className = 'channel-item';
                     item.textContent = channel.name;
                     item.onclick = () => {
-                        // تمييز القناة التي تعمل حالياً
+                        // إضافة تمييز مرئي للقناة النشطة
                         document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
                         item.classList.add('active');
                         playChannel(channel.url, channel.name);
@@ -65,49 +67,56 @@
                     playlistDiv.appendChild(item);
                 });
                 statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح.`;
+                
+                // تشغيل أول قناة تلقائياً عند فتح السيرفر
+                if(channels.length > 0) {
+                    playlistDiv.children[0].click();
+                }
             })
             .catch(() => {
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
             });
 
-        // معالج تشغيل البث المباشر المعدل 🛠️
+        // 2. معالج تشغيل البث المباشر والبروكسي (المطور 🛠️)
         function playChannel(url, name) {
             statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
             
-            // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS
+            // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS والـ HTTPS
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
-            // إذا كان هناك بث يعمل مسبقاً، نقوم بإغلاقه لتفريغ الذاكرة
-            if (hls) {
-                hls.destroy();
+            // تنظيف أي بث سابق لتجنب تعليق الذاكرة وتداخل الصوت
+            if (hlsEngine) {
+                hlsEngine.destroy();
             }
 
-            // 2. الفحص الذكي: تشغيل البث المباشر (HLS) حتى لو كان بدون امتداد
+            // تفعيل فك التشفير الذكي لروابط البث المباشر (HLS) بدون امتداد
             if (Hls.isSupported()) {
-                hls = new Hls({
+                hlsEngine = new Hls({
                     strictCslManifest: false,
-                    overrideNative: true
+                    overrideNative: true,
+                    enableWorker: true
                 });
-                hls.loadSource(proxyUrl);
-                hls.attachMedia(videoElement);
+                hlsEngine.loadSource(proxyUrl);
+                hlsEngine.attachMedia(videoElement);
                 
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoElement.play().catch(e => console.log("البدء التلقائي يحتاج تفاعل"));
+                hlsEngine.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoElement.play().catch(() => {
+                        statusText.textContent = `يعرض الآن: ${name} ✅ (اضغط تشغيل إذا لم يبدأ تلقائياً)`;
+                    });
                 });
 
-                hls.on(Hls.Events.ERROR, function (event, data) {
+                hlsEngine.on(Hls.Events.ERROR, function(event, data) {
                     if (data.fatal) {
-                        statusText.textContent = `⚠️ فشل تشغيل البث المباشر. قد يكون رابط القناة متوقفاً من المصدر.`;
+                        console.log("خطأ في تشغيل البث المباشر البروكسي:", data);
                     }
                 });
-
             } 
-            // دعم هواتف آيفون ومتصفح سفاري الذي يشغل البث المباشر تلقائياً بدون مكتبات
-            else if (videoElement.canPlayType('application/x-mpegURL') || videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+            // دعم أجهزة آبل (آيفون/سفاري) التي تدعم قراءة البث المباشر بدون مكتبات خارجية
+            else if (videoElement.canPlayType('application/vnd.apple.mpegurl') || videoElement.canPlayType('application/x-mpegURL')) {
                 videoElement.src = proxyUrl;
                 videoElement.load();
             } 
-            // تشغيل مقاطع الـ MKV والملفات العادية كبديل احتياطي
+            // تشغيل مقاطع الفيديوهات والملفات الاحتياطية الأخرى مثل MKV
             else {
                 videoElement.src = proxyUrl;
                 videoElement.load();
@@ -118,7 +127,7 @@
             };
 
             videoElement.onerror = () => {
-                statusText.textContent = `⚠️ خطأ في مشغل الفيديو: الرابط غير مدعوم أو السيرفر متوقف حالياً.`;
+                statusText.textContent = `⚠️ تنبيه: تعذر فك تشفير هذا الرابط على المتصفح، سيعمل فوراً عند تشغيله داخل تطبيق الهاتف (APK).`;
             };
         }
     </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎬 تطبيق السينما الشاملة - مكتبة الأفلام الذكية</title>
+    <title>🎬 تطبيق قائمة القنوات الذكية - ExoPlayer</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { margin: 0; background: #0f172a; color: #f8fafc; padding-bottom: 20px; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -11,19 +11,19 @@
         
         .main-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         
-        /* منطقة مشغل الفيديو المدمج */
+        /* منطقة مشغل الفيديو المدمج للـ Web */
         .player-area { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; aspect-ratio: 16/9; border-bottom: 1px solid #334155; }
         video { width: 100%; height: 100%; background: #000; max-height: 240px; }
         
-        /* قائمة السينما الشاملة */
+        /* قائمة القنوات المحدثة */
         .playlist { width: 100%; background: #0f172a; overflow-y: auto; padding: 12px; flex: 1; }
         .movie-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; margin-bottom: 10px; border-radius: 12px; background: #1e293b; cursor: pointer; transition: all 0.2s ease; border: 1px solid #334155; }
         .movie-item:hover { background: #2d3748; border-color: #38bdf8; }
         .movie-info { display: flex; align-items: center; gap: 15px; }
         
-        /* تصميم بوستر الفيلم الطولي الاحترافي */
-        .movie-logo { width: 50px; height: 70px; border-radius: 6px; object-fit: cover; background: #111; border: 1px solid #475569; display: block; }
-        .movie-name { font-size: 14px; font-weight: 600; color: #f1f5f9; text-align: right; line-height: 1.4; max-width: 180px; }
+        /* تصميم شعار القناة / الفيلم بشكل دائري أو مربع متناسق */
+        .movie-logo { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #111; border: 1px solid #475569; display: block; }
+        .movie-name { font-size: 14px; font-weight: 600; color: #f1f5f9; text-align: right; line-height: 1.4; max-width: 200px; }
         .play-badge { background: #38bdf8; color: #0f172a; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         
         /* حاويات إعلانات Adsterra المعزولة */
@@ -35,11 +35,11 @@
 </head>
 <body>
 
-    <div class="header">🎬 تطبيق السينما والمكتبة الشاملة</div>
+    <div class="header">🎬 مستودع القنوات الذكي (ExoPlayer Stream)</div>
     
-    <!-- مشغل الفيديو المدمج التلقائي الخفيف (ExoPlayer) -->
+    <!-- مشغل الفيديو المدمج لمعاينة البث -->
     <div class="player-area">
-        <video id="globalVideoPlayer" controls poster="https://unsplash.com" playsinline preload="auto"></video>
+        <video id="globalVideoPlayer" controls poster="https://placehold.co" playsinline preload="auto"></video>
     </div>
 
     <!-- 1. المساحة الإعلانية العلوية لشبكة Adsterra -->
@@ -49,7 +49,7 @@
 
     <div class="main-content">
         <div class="playlist" id="movieList">
-            <!-- سيتم تحميل القائمة من هنا فوراً وبدون تأخير القرص الدائري -->
+            <div style="text-align: center; color: #94a3b8; padding: 20px;">جاري جلب قائمة القنوات من سيرفر Render...</div>
         </div>
     </div>
 
@@ -58,59 +58,59 @@
         <span style="color:#475569; font-size:11px;">مساحة إعلانية مأجورة</span>
     </div>
 
-    <div class="status" id="statusLabel">اختر فيلماً من القائمة للبدء الفوري بالمشاهدة</div>
+    <div class="status" id="statusLabel">اختر قناة لبدء البث المباشر فوراً</div>
 
     <script>
         const statusLabel = document.getElementById('statusLabel');
         const videoElement = document.getElementById('globalVideoPlayer');
-
-        // 💡 حل مشكلة القرص الدائري وحظر الاتصال: دمج الأفلام والبوسترات مباشرة في الكود
-        // يمكنك إضافة وتعديل أي فيلم هنا مباشرة (الاسم، رابط البوستر، رابط الفيديو المباشر)
-        const globalMovies = [
-            {
-                name: "فيلم الأنمي والمغامرة الكوميدي - Big Buck Bunny",
-                logo: "https://wikimedia.org",
-                url: "https://googleapis.com"
-            },
-            {
-                name: "فيلم الخيال العلمي القصير - Sintel",
-                logo: "https://wikimedia.org",
-                url: "https://googleapis.com"
-            },
-            {
-                name: "فيلم الرسوم المتحركة والدراما - Tears of Steel",
-                logo: "https://wikimedia.org",
-                url: "https://googleapis.com"
-            }
-        ];
-
-        // دالة بناء وعرض القائمة والشعارات تلقائياً وفوراً
-        function loadLocalMovies() {
+        
+        // 🛠️ ضع هنا رابط سيرفر Render الخاص بك بعد رفعه (مثال: https://onrender.com)
+        const RENDER_SERVER_URL = "https://onrender.com"; 
+        
+        // دالة جلب البيانات تلقائياً من السيرفر المتصل بـ GitHub
+        async function fetchChannelsFromServer() {
             const playlistDiv = document.getElementById('movieList');
-            playlistDiv.innerHTML = '';
-            
-            globalMovies.forEach(movie => {
-                const item = document.createElement('div');
-                item.className = 'movie-item';
+            try {
+                const response = await fetch(RENDER_SERVER_URL);
+                if (!response.ok) throw new Error("فشل في الاتصال بالسيرفر");
                 
-                const posterImg = movie.logo ? movie.logo : 'https://unsplash.com';
+                const channels = await response.json();
+                playlistDiv.innerHTML = '';
                 
-                item.innerHTML = `
-                    <div class="movie-info">
-                        <img class="movie-logo" src="${posterImg}" onerror="this.src='https://unsplash.com';">
-                        <span class="movie-name">${movie.name}</span>
-                    </div>
-                    <span class="play-badge">مشاهدة ▶</span>
-                `;
+                if(channels.length === 0) {
+                    playlistDiv.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 20px;">لا توجد قنوات متاحة حالياً.</div>';
+                    return;
+                }
+
+                channels.forEach(channel => {
+                    const item = document.createElement('div');
+                    item.className = 'movie-item';
+                    
+                    // استخدام شعار افتراضي في حال عدم وجود لوجو للقناة
+                    const posterImg = channel.logo ? channel.logo : 'https://placehold.co';
+                    
+                    item.innerHTML = `
+                        <div class="movie-info">
+                            <img class="movie-logo" src="${posterImg}" onerror="this.src='https://placehold.co';">
+                            <span class="movie-name">${channel.name}</span>
+                        </div>
+                        <span class="play-badge">بث ▶</span>
+                    `;
+                    
+                    item.onclick = () => playGlobalMovie(channel.url, channel.name, posterImg);
+                    playlistDiv.appendChild(item);
+                });
                 
-                item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
-                playlistDiv.appendChild(item);
-            });
-            statusLabel.textContent = `تم تحميل المكتبة الشاملة وعرض ${globalMovies.length} فيلم بنجاح.`;
+                statusLabel.textContent = `تم جلب المتجر بنجاح. القنوات المتاحة: ${channels.length}`;
+            } catch (error) {
+                console.error(error);
+                statusLabel.textContent = "خطأ: تعذر جلب القنوات من سيرفر Render. تأكد من تشغيل السيرفر والرابط.";
+                playlistDiv.innerHTML = '<div style="text-align: center; color: #ef4444; padding: 20px;">فشل تحميل القنوات. يرجى التحقق من اتصال السيرفر.</div>';
+            }
         }
 
         function playGlobalMovie(videoUrl, name, poster) {
-            statusLabel.textContent = `جاري تحضير البث للفيلم: ${name}...`;
+            statusLabel.textContent = `جاري تشغيل القناة: ${name}...`;
             
             videoElement.poster = poster;
             videoElement.src = videoUrl;
@@ -118,15 +118,15 @@
             
             videoElement.play()
                 .then(() => {
-                    statusLabel.textContent = `شغال الآن 🍿: ${name}`;
+                    statusLabel.textContent = `بث حي الآن 📡: ${name}`;
                 })
                 .catch(() => {
-                    statusLabel.textContent = `انقر على زر التشغيل لبدء عرض: ${name}`;
+                    statusLabel.textContent = `اضغط تشغيل لبدء بث: ${name}`;
                 });
         }
 
-        // تشغيل الدالة فور فتح الصفحة
-        loadLocalMovies();
+        // تشغيل الجلب التلقائي فور تحميل الصفحة
+        fetchChannelsFromServer();
     </script>
 </body>
 </html>

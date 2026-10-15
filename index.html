@@ -1,142 +1,3 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📺 مشغل قنوات Netflix & VIP - ExoPlayer</title>
-    <style>
-        :root {
-            --bg-main: #0b0f19;
-            --bg-card: #151f32;
-            --bg-header: #1e293b;
-            --accent-color: #38bdf8;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --glow-color: rgba(56, 189, 248, 0.25);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            margin: 0; 
-            background: var(--bg-main); 
-            color: var(--text-primary); 
-            font-family: system-ui, -apple-system, sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
-
-        .header { 
-            background: linear-gradient(135deg, var(--bg-header), var(--bg-main));
-            padding: 18px; 
-            text-align: center; 
-            font-size: 20px; 
-            color: var(--accent-color); 
-            border-bottom: 2px solid #223147; 
-            font-weight: 800; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            text-shadow: 0 0 8px var(--glow-color);
-        }
-        
-        .main-content { 
-            display: flex; 
-            flex-direction: column; 
-            flex: 1; 
-            overflow: hidden; 
-        }
-        
-        .playlist { 
-            width: 100%; 
-            background: var(--bg-main); 
-            overflow-y: auto; 
-            padding: 14px; 
-            flex: 1; 
-        }
-
-        /* تصميم كروت القنوات بشكل خرافي وعرض شعار أنيق */
-        .channel-item { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 12px 16px; 
-            margin-bottom: 10px; 
-            border-radius: 14px; 
-            background: var(--bg-card); 
-            cursor: pointer; 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: 1px solid #223147; 
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        .channel-item:hover { 
-            background: #1e2d4a; 
-            border-color: var(--accent-color); 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px var(--glow-color);
-        }
-
-        .channel-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
-        
-        /* أبعاد اللوجو بشكل طولي فخم ومتناسق */
-        .channel-logo { 
-            width: 50px; 
-            height: 65px; 
-            border-radius: 8px; 
-            object-fit: cover; 
-            background: #111b2b; 
-            border: 1px solid #334563; 
-            display: block; 
-        }
-
-        .channel-name { 
-            font-size: 15px; 
-            font-weight: 600; 
-            color: #f1f5f9; 
-            text-align: right; 
-        }
-
-        .play-badge { 
-            background: linear-gradient(135deg, #0ea5e9, #38bdf8); 
-            color: #0f172a; 
-            padding: 7px 14px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3);
-        }
-        
-        /* مساحات إعلانية معزولة بالكامل لحقن أكواد Adsterra */
-        .adsterra-box { 
-            width: 100%; 
-            min-height: 65px;
-            text-align: center; 
-            background: #060912; 
-            padding: 6px 0; 
-            border-bottom: 1px solid #1e293b; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-        }
-        .ad-bottom { border-top: 1px solid #1e293b; border-bottom: none; }
-        .ad-title { color: #475569; font-size: 10px; margin-bottom: 2px; font-weight: bold; }
-        
-        .status { 
-            padding: 12px; 
-            background: #111827; 
-            text-align: center; 
-            font-size: 13px; 
-            color: var(--text-secondary); 
-            border-top: 1px solid #1e293b; 
-        }
-    </style>
-</head>
 <body>
 
     <div class="header">📺 مشغل قنوات Netflix & VIP</div>
@@ -159,7 +20,7 @@
         <!-- ضع كود الـ Script الإعلاني هنا مستقبلاً -->
     </div>
 
-    <div class="status" id="status">اختر قناة لفتحها فوراً عبر مشغل ExoPlayer الذكي</div>
+    <div class="status" id="status">اختر قناة لفتحها فوراً عبر المشغلات الخارجية</div>
 
     <script>
         const host = window.location.origin; 
@@ -192,8 +53,8 @@
                         <span class="play-badge">تشغيل ▶</span>
                     `;
                     
-                    // تمرير البيانات للمشغل
-                    item.onclick = () => launchExoPlayer(channel.url, channel.name);
+                    // تمرير البيانات عند الضغط للتشغيل
+                    item.onclick = () => launchPlayer(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
                 statusText.textContent = `تم بنجاح جلب وتأمين ${channels.length} قناة بث حية ومحمية بالكامل.`;
@@ -203,30 +64,35 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">عطل في الاتصال بالسيرفر الرئيسي، تأكد من رفع ملف الـ M3U</div>';
             });
 
-        // 🛠️ الدالة المطورة والجاهزة لتشغيل الروابط على تطبيقات الـ ExoPlayer الفعلية للهواتف
-        function launchExoPlayer(url, name) {
-            statusText.textContent = `جاري إرسال الإشارة وتشغيل: ${name}...`;
+        // 🛠️ الدالة القياسية المحدثة لتشغيل روابط البث على أجهزة الأندرويد والآيفون بدون حظر
+        function launchPlayer(url, name) {
+            statusText.textContent = `جاري تجهيز البث لـ ${name}...`;
             
-            // الرابط المشفر عبر البروكسي الخاص بك لحمايته من السرقة وتوجيهه لإعلاناتك
+            // الرابط المشفر والمحمي عبر سيرفر البروكسي الخاص بك لحمايته وحقن الإعلانات
             const protectedStreamUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
             /* 
-               🤖 تم التعديل إلى حزمة مشغل احترافي يعتمد على ExoPlayer ومتوفر بكثرة (مثل نيو بلاير أو المشغلات العامة)
-               إذا كنت تستخدم تطبيقك الخاص المطور بـ ExoPlayer، قم بتغيير اسم الـ package (مثال: com.your.exoplayer.app)
+               🤖 كود الـ Intent القياسي المفتوح: 
+               يقوم بفتح الروابط مباشرة وتوجيهها لنظام التشغيل بالأندرويد لفتح أي مشغل فيديو 
+               يدعم الـ ExoPlayer أو البث المباشر (مثل MX, VLC, أو مشغلات IPTV المدعومة)
             */
-            const intentUri = `intent:${protectedStreamUrl}#Intent;type=video/*;package=com.exoplayer.video.player;S.title=${encodeURIComponent(name)};end`;
+            const intentUri = `intent:${protectedStreamUrl}#Intent;action=android.intent.action.VIEW;type=video/*;S.title=${encodeURIComponent(name)};end`;
             
-            // محاولة فتح المشغل الخارجي، وفي حال عدم استجابته يتم تشغيله داخل المتصفح كخيار احتياطي لضمان العمل
+            // تشغيل الرابط عبر متصفح الهاتف
             try {
+                // محاولة إطلاق التطبيق الخارجي عبر النظام
                 window.location.href = intentUri;
                 
-                // مهلة آمنة: إذا بقي في الصفحة ولم يخرج للتطبيق خلال ثانيتين، يفتح الفيديو مباشرة
+                // حل احترافي: إذا لم يخرج المتصفح للمشغل الخارجي خلال 1.5 ثانية، يتم تشغيل البث كصفحة مستقلة مباشرة لضمان العمل
                 setTimeout(() => {
-                    statusText.textContent = `جاري التشغيل الاحتياطي المباشر لـ ${name}...`;
-                    window.open(protectedStreamUrl, '_blank');
-                }, 2000);
+                    if (!document.hidden) {
+                        statusText.textContent = `جاري التشغيل المباشر لـ ${name}...`;
+                        window.location.href = protectedStreamUrl;
+                    }
+                }, 1500);
             } catch(e) {
-                window.open(protectedStreamUrl, '_blank');
+                // فتح مباشر في حال حدوث أي خطأ أمان بالمتصفح
+                window.location.href = protectedStreamUrl;
             }
         }
     </script>

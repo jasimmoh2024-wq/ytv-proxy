@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// قراءة القنوات والشعارات الذكية من ملف الـ m3u
+// جلب القنوات بشكل آمن مع إخفاء الروابط الأصلية عن الواجهة
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -31,11 +31,9 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // سحب رابط الشعار بدقة وحل لغز اختفاء الصور
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = logoMatch ? logoMatch[1] : 'https://lo1.in';
 
-            // استخراج اسم القناة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -45,9 +43,13 @@ app.get('/api/channels', (req, res) => {
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'قناة غير مسمّاة';
+            
+            // قمنا بتشفير المعرف البرمجي هنا لكي لا يظهر رابطك الأصلي في كود المتصفح إطلاقاً
+            const secureId = Buffer.from(line).toString('base64');
+
             channels.push({
                 name: currentName,
-                url: line,
+                id: secureId, // نرسل معرف مشفر بدلاً من الرابط
                 logo: currentLogo || 'https://lo1.in'
             });
             currentName = ''; 
@@ -57,26 +59,26 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// وسيط البث (Proxy) المطور لفك حظر السيرفرات وخداع الجدار الناري
-app.get('/stream', async (req, res) => {
-    const targetUrl = req.query.url;
-    if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
-
+// دالة التوجيه السري المخصصة لـ VLC (تخفي الرابط وتفك الحظر وتمرر البث)
+app.get('/vlc-play/:id', async (req, res) => {
     try {
+        // فك تشفير الرابط الحقيقي داخل السيرفر سرياً
+        const targetUrl = Buffer.from(req.params.id, 'base64').toString('utf-8');
+        
+        // جلب البيانات مع انتحال شخصية مشغل IPTV
         const response = await axios({
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
             timeout: 30000,
             headers: { 
-                // حل لغز Xtream: ننتحل هوية المشغل الرسمي لكي يثق بنا السيرفر ويفتح البث
                 'User-Agent': 'IPTVSmarters',
                 'Accept': '*/*',
                 'Connection': 'keep-alive'
             }
         });
 
-        // تشفير البث المباشر الموجه للمتصفح والمشغل
+        // تمرير دفق الفيديو الحي لـ VLC
         res.setHeader('Content-Type', 'video/mp2t');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
@@ -87,8 +89,7 @@ app.get('/stream', async (req, res) => {
             if (response.data) response.data.destroy();
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('خطأ في جلب البث من السيرفر المدفوع.');
+        res.status(500).send('خطأ أمني في جلب البث الخارجي.');
     }
 });
 

@@ -8,33 +8,33 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
-// قراءة الواجهة الرئيسية المحدثة لمكتبة الأفلام
+// قراءة الواجهة الرئيسية للسينما الشاملة
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// قاعدة بيانات الأفلام (الـ API الذكي)
-// يمكنك إضافة وتحديث أفلامك هنا بسهولة (الاسم، رابط البوستر/الشعار، رابط الفيلم المباشر)
+// قاعدة بيانات مكتبة الأفلام الشاملة (الـ API)
+// يمكنك إضافة وتعديل أي فيلم هنا (الاسم، رابط البوستر الحقيقي للفيلم، رابط الفيديو المباشر)
 app.get('/api/movies', (req, res) => {
-    const moviesData = [
+    const globalMovies = [
         {
-            name: "فيلم الأكشن والإثارة - نتفليكس 1",
-            logo: "https://lo1.in", // يمكنك وضع رابط بوستر الفيلم هنا
-            url: "https://googleapis.com" // رابط الفيلم المباشر (يدعم mp4, mkv, webm وغيرها)
+            name: "فيلم الأنمي والمغامرة الكوميدي - Big Buck Bunny",
+            logo: "https://wikimedia.org", // بوستر حقيقي شغال
+            url: "https://googleapis.com" // رابط الفيديو المباشر
         },
         {
-            name: "فيلم الرعب والغموض - نتفليكس 2",
-            logo: "https://lo1.in",
+            name: "فيلم الخيال العلمي القصير - Sintel",
+            logo: "https://wikimedia.org", // بوستر حقيقي شغال
             url: "https://googleapis.com"
         },
         {
-            name: "فيلم الخيال العلمي - نتفليكس 3",
-            logo: "https://lo1.in",
+            name: "فيلم الرسوم المتحركة والدراما - Tears of Steel",
+            logo: "https://wikimedia.org", // بوستر حقيقي شغال
             url: "https://googleapis.com"
         }
     ];
 
-    res.json(moviesData);
+    res.json(globalMovies);
 });
 
-app.listen(PORT, () => console.log(`Movies Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Cinema Global Server running on port ${PORT}`));

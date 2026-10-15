@@ -181,7 +181,6 @@
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     
-                    // صورة بوستر فخمة وافتراضية في حال عدم توفر لوجو في الملف للفيلم/القناة
                     const defaultLogo = 'https://unsplash.com';
                     const currentLogo = channel.logo ? channel.logo : defaultLogo;
                     
@@ -193,7 +192,7 @@
                         <span class="play-badge">تشغيل ▶</span>
                     `;
                     
-                    // تمرير البيانات للمشغل الخارجي (ExoPlayer)
+                    // تمرير البيانات للمشغل
                     item.onclick = () => launchExoPlayer(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
@@ -204,21 +203,31 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">عطل في الاتصال بالسيرفر الرئيسي، تأكد من رفع ملف الـ M3U</div>';
             });
 
-        // دالة تحويل وتشغيل البث إجبارياً على مشغل ExoPlayer المتطور
+        // 🛠️ الدالة المطورة والجاهزة لتشغيل الروابط على تطبيقات الـ ExoPlayer الفعلية للهواتف
         function launchExoPlayer(url, name) {
             statusText.textContent = `جاري إرسال الإشارة وتشغيل: ${name}...`;
             
-            // الرابط المشفر المحمي عبر سيرفر البروكسي الخاص بك لحمايته من السرقة وتوجيهه لإعلاناتك
+            // الرابط المشفر عبر البروكسي الخاص بك لحمايته من السرقة وتوجيهه لإعلاناتك
             const protectedStreamUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
             /* 
-               🤖 كود الـ Intent المتطور والمعياري المتوافق تماماً مع مشغلات الأندرويد القائمة على ExoPlayer 
-               (يقوم برمي البث الخارجي للمشغل ليعمل فوراً بأعلى كفاءة وثبات)
+               🤖 تم التعديل إلى حزمة مشغل احترافي يعتمد على ExoPlayer ومتوفر بكثرة (مثل نيو بلاير أو المشغلات العامة)
+               إذا كنت تستخدم تطبيقك الخاص المطور بـ ExoPlayer، قم بتغيير اسم الـ package (مثال: com.your.exoplayer.app)
             */
-            const intentUri = `intent:${protectedStreamUrl}#Intent;type=video/*;package=com.google.android.exoplayer2.demo;S.title=${encodeURIComponent(name)};end`;
+            const intentUri = `intent:${protectedStreamUrl}#Intent;type=video/*;package=com.exoplayer.video.player;S.title=${encodeURIComponent(name)};end`;
             
-            // إطلاق المشغل فوراً
-            window.location.href = intentUri;
+            // محاولة فتح المشغل الخارجي، وفي حال عدم استجابته يتم تشغيله داخل المتصفح كخيار احتياطي لضمان العمل
+            try {
+                window.location.href = intentUri;
+                
+                // مهلة آمنة: إذا بقي في الصفحة ولم يخرج للتطبيق خلال ثانيتين، يفتح الفيديو مباشرة
+                setTimeout(() => {
+                    statusText.textContent = `جاري التشغيل الاحتياطي المباشر لـ ${name}...`;
+                    window.open(protectedStreamUrl, '_blank');
+                }, 2000);
+            } catch(e) {
+                window.open(protectedStreamUrl, '_blank');
+            }
         }
     </script>
 </body>

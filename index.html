@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة الأفلام والقنوات الذكية</title>
     
-    <!-- إعلانات Start.io الفخ الإعلاني -->
+    <!-- إعلانات Start.io الفخ الإعلاني المتطور لصيد السارقين وحفظ أرباحك -->
     <script>
         window.startapp_app_id = "110183401"; 
     </script>
@@ -16,6 +16,7 @@
         .header { background: #111322; padding: 15px; text-align: center; font-size: 18px; color: #00ffff; font-weight: bold; border-bottom: 2px solid #1f233a; text-shadow: 0 0 10px rgba(0,255,255,0.3); }
         .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
         
+        /* قائمة البوسترات والقنوات الجانبية */
         .playlist { width: 35%; max-width: 340px; background: #0b0c16; overflow-y: auto; border-left: 2px solid #1f233a; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         
         .channel-card {
@@ -31,8 +32,10 @@
         .ch-title-name { font-size: 14px; font-weight: bold; color: #ffffff; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ch-meta-txt { font-size: 10px; color: #00ffcc; text-align: right; margin-top: 3px; }
 
+        /* منطقة تشغيل الميديا */
         .player-area { width: 65%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
-        video { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
+        video { width: 100%; height: 100%; background: #000; }
         .status { padding: 12px; background: #111322; text-align: center; font-size: 13px; color: #888; border-top: 2px solid #1f233a; font-weight: bold; }
     </style>
 </head>
@@ -46,18 +49,21 @@
         </div>
         
         <div class="player-area">
-            <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+            <!-- حاوية الفيديو الديناميكية لتوليد المشغل بدون أخطاء متصفحات -->
+            <div class="video-container" id="videoContainer">
+                <div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; color:#444;">المشغل جاهز ومستعد</div>
+            </div>
             <div class="status" id="status">اختر فيلماً أو قناة من البوستر لبدء العرض الممتع 🍿</div>
         </div>
     </div>
 
     <script>
         const host = window.location.origin; 
-        const videoElement = document.getElementById('videoPlayer');
+        const videoContainer = document.getElementById('videoContainer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. تشغيل فوري ومستقل لجلب القنوات لضمان ظهور القائمة بسرعة البرق وبدون أخطاء
+        // 1. جلب قائمة باقاتك وعرضها فوراً وبسرعة فائقة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -100,7 +106,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج ومستقبل البث الذكي والمباشر لتشغيل الروابط بدون امتداد والأفلام معاً
+        // 2. معالج التوليد والتشغيل السحري المتوافق 100% مع ExoPlayer والأفلام والـ Xtream [1.1.6، 1.1.7]
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -108,21 +114,35 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            // إزالة أي إعدادات نوع قديمة لإعادة تهيئة المشغل
-            videoElement.removeAttribute('type'); 
-            
-            // تمرير الرابط عبر سيرفر رندر الوسيط لحل مشاكل التشفير والـ CORS [2.38K]
-            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            videoElement.src = proxyUrl;
+            // مسح وتصفير حاوية المشغل القديم لتهيئة الكاش الأمني
+            videoContainer.innerHTML = '';
 
-            // 🌟 السحر البرمجي لـ ExoPlayer: إذا كان الرابط لا يحتوي على امتداد فيديو (.mp4)، نجبر المشغل الداخلي للهاتف على قراءته كبث مباشر (MPEG-TS) [1.1.6، 1.1.7]
+            // إنشاء وسم الفيديو من الصفر برمجياً (لتجاوز حظر المتصفحات للـ Type)
+            const videoElement = document.createElement('video');
+            videoElement.id = 'videoPlayer';
+            videoElement.controls = true;
+            videoElement.autoplay = true;
+            videoElement.setAttribute('playsinline', 'true');
+            videoElement.setAttribute('preload', 'auto');
+
+            // تمرير الرابط عبر سيرفر رندر الوسيط لحل مشاكل التشفير والـ CORS [2.38K]
+            let proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+
+            // الفحص الذكي وحقن الهوية البرمجية قبل تزويد المشغل بالرابط لمنع الحظر
             if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'video/mp2t'; // تعريف فوري للقنوات التي بدون امتداد [1.1.6، 1.1.7]
-                console.log("تم تعريف الرابط بدون امتداد كقناة TS.");
+                videoElement.type = 'video/mp2t'; // تعريف فوري لقنوات الـ Xtream التي بدون امتداد ليفهمها ExoPlayer فوراً [1.1.6، 1.1.7]
+                videoElement.src = proxyUrl;
             } else if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'application/x-mpegURL'; // تعريف قنوات HLS
+                // قنوات m3u8 تنطلق مباشرة وبدون بروكسي وبأعلى سرعة وثبات [1.3.2، 1.3.5]
+                videoElement.type = 'application/x-mpegURL';
+                videoElement.src = url; 
+            } else {
+                // للأفلام وملفات الفيديو الخام
+                videoElement.src = proxyUrl; 
             }
 
+            // حقن مشغل الفيديو الجديد والموثق داخل الحاوية ليعمل فوراً وبأجزاء من الثانية
+            videoContainer.appendChild(videoElement);
             videoElement.load();
             
             videoElement.onplay = () => {

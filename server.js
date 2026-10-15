@@ -14,10 +14,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 🛠️ 2. مسار عرض ملف التحقق لشركة الإعلانات لتوثيق حسابك وإزالة التحذيرات
+// 🛠️ 2. مسار ملف التحقق المدمج والمطور ليعرض سطري الشركتين معاً في سطور منفصلة تلقائياً لقفل التحذيرات ورفع الأرباح
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
-    res.send('start.io, 110183401, DIRECT');
+    res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
 // 3. مسار قراءة القنوات والأفلام من ملف الـ M3U وبناء البوسترات تلقائياً
@@ -39,7 +39,7 @@ app.get('/api/channels', (req, res) => {
         if (line.startsWith('#EXTINF:')) {
             // استخراج اللوجو أو البوستر تلقائياً إن وجد داخل ملف القنوات
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
+            currentLogo = (logoMatch && logoMatch) ? logoMatch[1] : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
@@ -67,7 +67,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// 4. وسيط البث (Proxy) المطور والمتوافق تماماً مع مشغل ExoPlayer للأندرويد [2.38K]
+// 4. وسيط البث (Proxy) المتوافق تماماً مع مشغل ExoPlayer للأندرويد
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -83,7 +83,7 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // جلب نوع الملف الحقيقي (Content-Type) وحجمه وتمريره للمشغل لضمان عمل الأفلام وقنوات الـ TS معاً [1.1.6، 1.1.7]
+        // جلب نوع الملف الحقيقي وحجمه وتمريره للمشغل لضمان عمل الأفلام وقنوات الـ TS والـ m3u8 بدون أخطاء
         const contentType = response.headers['content-type'] || 'video/mp2t';
         res.setHeader('Content-Type', contentType);
         res.setHeader('Connection', 'keep-alive');

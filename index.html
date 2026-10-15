@@ -21,7 +21,7 @@
         .movie-item:hover { background: #2d3748; border-color: #38bdf8; }
         .movie-info { display: flex; align-items: center; gap: 15px; }
         
-        /* تصميم شعار القناة / الفيلم بشكل دائري أو مربع متناسق */
+        /* تصميم شعار القناة / الفيلم */
         .movie-logo { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #111; border: 1px solid #475569; display: block; }
         .movie-name { font-size: 14px; font-weight: 600; color: #f1f5f9; text-align: right; line-height: 1.4; max-width: 200px; }
         .play-badge { background: #38bdf8; color: #0f172a; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -39,7 +39,7 @@
     
     <!-- مشغل الفيديو المدمج لمعاينة البث -->
     <div class="player-area">
-        <video id="globalVideoPlayer" controls poster="https://placehold.co" playsinline preload="auto"></video>
+        <video id="globalVideoPlayer" controls poster="https://unsplash.com" playsinline preload="auto"></video>
     </div>
 
     <!-- 1. المساحة الإعلانية العلوية لشبكة Adsterra -->
@@ -49,7 +49,7 @@
 
     <div class="main-content">
         <div class="playlist" id="movieList">
-            <div style="text-align: center; color: #94a3b8; padding: 20px;">جاري جلب قائمة القنوات من سيرفر Render...</div>
+            <!-- سيتم تحميل البيانات هنا فوراً -->
         </div>
     </div>
 
@@ -58,54 +58,87 @@
         <span style="color:#475569; font-size:11px;">مساحة إعلانية مأجورة</span>
     </div>
 
-    <div class="status" id="statusLabel">اختر قناة لبدء البث المباشر فوراً</div>
+    <div class="status" id="statusLabel">جاري جلب القنوات الذكية...</div>
 
     <script>
         const statusLabel = document.getElementById('statusLabel');
         const videoElement = document.getElementById('globalVideoPlayer');
         
-        // 🛠️ ضع هنا رابط سيرفر Render الخاص بك بعد رفعه (مثال: https://onrender.com)
+        // ⚠️ استبدل هذا الرابط برابط سيرفر Render الفعلي الخاص بك بعد تشغيله تماماً
         const RENDER_SERVER_URL = "https://onrender.com"; 
-        
-        // دالة جلب البيانات تلقائياً من السيرفر المتصل بـ GitHub
-        async function fetchChannelsFromServer() {
-            const playlistDiv = document.getElementById('movieList');
-            try {
-                const response = await fetch(RENDER_SERVER_URL);
-                if (!response.ok) throw new Error("فشل في الاتصال بالسيرفر");
-                
-                const channels = await response.json();
-                playlistDiv.innerHTML = '';
-                
-                if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 20px;">لا توجد قنوات متاحة حالياً.</div>';
-                    return;
-                }
 
-                channels.forEach(channel => {
-                    const item = document.createElement('div');
-                    item.className = 'movie-item';
-                    
-                    // استخدام شعار افتراضي في حال عدم وجود لوجو للقناة
-                    const posterImg = channel.logo ? channel.logo : 'https://placehold.co';
-                    
-                    item.innerHTML = `
-                        <div class="movie-info">
-                            <img class="movie-logo" src="${posterImg}" onerror="this.src='https://placehold.co';">
-                            <span class="movie-name">${channel.name}</span>
-                        </div>
-                        <span class="play-badge">بث ▶</span>
-                    `;
-                    
-                    item.onclick = () => playGlobalMovie(channel.url, channel.name, posterImg);
-                    playlistDiv.appendChild(item);
-                });
+        // القائمة الاحتياطية المدمجة لضمان ظهور القنوات فوراً ولا ينتظر المستخدم استيقاظ السيرفر
+        const localBackupChannels = [
+            {
+                name: "قناة الأنمي والمغامرة الكوميدي - Big Buck Bunny",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            },
+            {
+                name: "قناة الخيال العلمي القصير - Sintel",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            },
+            {
+                name: "قناة الرسوم المتحركة والدراما - Tears of Steel",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            }
+        ];
+
+        // دالة بناء وعرض عناصر القائمة بالـ HTML
+        function displayChannels(channels, isServerSource = false) {
+            const playlistDiv = document.getElementById('movieList');
+            playlistDiv.innerHTML = '';
+            
+            channels.forEach(channel => {
+                const item = document.createElement('div');
+                item.className = 'movie-item';
                 
-                statusLabel.textContent = `تم جلب المتجر بنجاح. القنوات المتاحة: ${channels.length}`;
+                const posterImg = channel.logo ? channel.logo : 'https://unsplash.com';
+                
+                item.innerHTML = `
+                    <div class="movie-info">
+                        <img class="movie-logo" src="${posterImg}" onerror="this.src='https://unsplash.com';">
+                        <span class="movie-name">${channel.name}</span>
+                    </div>
+                    <span class="play-badge">بث ▶</span>
+                `;
+                
+                item.onclick = () => playGlobalMovie(channel.url, channel.name, posterImg);
+                playlistDiv.appendChild(item);
+            });
+
+            if (isServerSource) {
+                statusLabel.textContent = `مستصل بالسيرفر الحي 📡. تم تحديث ${channels.length} قناة بنجاح.`;
+            } else {
+                statusLabel.textContent = `يعمل بالوضع الاحتياطي (سيرفر Render مستيقظ قريباً...).`;
+            }
+        }
+        
+        // دالة جلب البيانات الذكية التي تدمج التزامن بين المحلي والسيرفر خارجي
+        async function fetchChannels() {
+            // خطوة 1: اعرض القائمة المحلية فوراً بدون أي تأخير
+            displayChannels(localBackupChannels, false);
+
+            // خطوة 2: حاول سحب البيانات المحدثة من سيرفر Render بالخلفية
+            try {
+                // نضع مهلة زمنية 8 ثواني وإذا لم يستجب السيرفر نبقى على القائمة المحلية
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+                const response = await fetch(RENDER_SERVER_URL, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const serverChannels = await response.json();
+                    if (serverChannels && serverChannels.length > 0) {
+                        // تحديث القائمة فوراً بالبيانات الحية القادمة من السيرفر
+                        displayChannels(serverChannels, true);
+                    }
+                }
             } catch (error) {
-                console.error(error);
-                statusLabel.textContent = "خطأ: تعذر جلب القنوات من سيرفر Render. تأكد من تشغيل السيرفر والرابط.";
-                playlistDiv.innerHTML = '<div style="text-align: center; color: #ef4444; padding: 20px;">فشل تحميل القنوات. يرجى التحقق من اتصال السيرفر.</div>';
+                console.log("السيرفر حالياً قيد الاستيقاظ أو لم يتم ربط الرابط بعد. مستمر بالوضع المحلي الآمن.");
             }
         }
 
@@ -125,8 +158,8 @@
                 });
         }
 
-        // تشغيل الجلب التلقائي فور تحميل الصفحة
-        fetchChannelsFromServer();
+        // تشغيل البناء الفوري عند الإقلاع
+        fetchChannels();
     </script>
 </body>
 </html>

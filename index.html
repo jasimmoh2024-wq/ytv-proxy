@@ -1,38 +1,38 @@
 <body>
 
-    <div class="header">📺 مشغل قنوات Netflix & VIP</div>
+    <div class="header">🎬 مستودع قنوات وأفلام Netflix & VIP</div>
     
-    <!-- 🌐 مساحة إعلانية علوية جاهزة لحقن سكربت Adsterra -->
+    <!-- 🌐 مساحة إعلانية علوية جاهزة لحقن سكربت Adsterra مستقبلاً -->
     <div class="adsterra-box" id="ad-top">
         <div class="ad-title">مساحة إعلانية مأجورة</div>
-        <!-- ضع كود الـ Script الإعلاني هنا مستقبلاً -->
+        <!-- ضع كود الـ Script الإعلاني الخاص بـ Adsterra هنا مستقبلاً -->
     </div>
 
     <div class="main-content">
         <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:var(--text-secondary);">جاري سحب مستودع القنوات الذكي...</div>
+            <div style="padding:20px; text-align:center; color:var(--text-secondary);">جاري سحب الملفات والشعارات من المستودع السحابي...</div>
         </div>
     </div>
 
-    <!-- 🌐 مساحة إعلانية سفلية جاهزة لحقن سكربت Adsterra -->
+    <!-- 🌐 مساحة إعلانية سفلية جاهزة لحقن سكربت Adsterra مستقبلاً -->
     <div class="adsterra-box ad-bottom" id="ad-bottom">
         <div class="ad-title">مساحة إعلانية مأجورة</div>
-        <!-- ضع كود الـ Script الإعلاني هنا مستقبلاً -->
+        <!-- ضع كود الـ Script الإعلاني الخاص بـ Adsterra هنا مستقبلاً -->
     </div>
 
-    <div class="status" id="status">اختر قناة لفتحها فوراً عبر المشغلات الخارجية</div>
+    <div class="status" id="status">اضغط على زر التحميل لحفظ الملف مباشرة على جهازك</div>
 
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
 
-        // جلب قائمة القنوات وعرض شعاراتها ديناميكياً من السيرفر المحدث
+        // 1. جلب قائمة الملفات وعرض شعاراتها وأسمائها ديناميكياً من السيرفر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 const playlistDiv = document.getElementById('playlist');
                 if(!channels || channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لم يتم العثور على أي قنوات داخل ملف channels.m3u</div>';
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لم يتم العثور على أي ملفات داخل المستودع</div>';
                     return;
                 }
                 
@@ -42,6 +42,7 @@
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     
+                    // بوستر سينمائي افتراضي فخم في حال لم يتوفر لوجو للمادة
                     const defaultLogo = 'https://unsplash.com';
                     const currentLogo = channel.logo ? channel.logo : defaultLogo;
                     
@@ -50,50 +51,39 @@
                             <img class="channel-logo" src="${currentLogo}" onerror="this.src='${defaultLogo}';">
                             <span class="channel-name">${channel.name}</span>
                         </div>
-                        <span class="play-badge">تشغيل ▶</span>
+                        <span class="play-badge" style="background: linear-gradient(135deg, #22c55e, #4ade80); color: #000;">تحميل 📥</span>
                     `;
                     
-                    // تمرير البيانات عند الضغط للتشغيل
-                    item.onclick = () => launchPlayer(channel.url, channel.name);
+                    // عند النقر على البطاقة بالكامل أو الزر يتم بدء التنزيل الآمن
+                    item.onclick = () => downloadFile(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
-                statusText.textContent = `تم بنجاح جلب وتأمين ${channels.length} قناة بث حية ومحمية بالكامل.`;
+                statusText.textContent = `تم تحميل القائمة بنجاح. المتوفر الآن: ${channels.length} ملف جاهز للتنزيل.`;
             })
             .catch((err) => {
                 console.error(err);
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">عطل في الاتصال بالسيرفر الرئيسي، تأكد من رفع ملف الـ M3U</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">عطل في الاتصال بالسيرفر، تأكد من رفع كود server.js بنجاح</div>';
             });
 
-        // 🛠️ الدالة القياسية المحدثة لتشغيل روابط البث على أجهزة الأندرويد والآيفون بدون حظر
-        function launchPlayer(url, name) {
-            statusText.textContent = `جاري تجهيز البث لـ ${name}...`;
+        // 🛠️ دالة تحميل الملفات الفورية مع إجبار المرور عبر البروكسي لحقن أرباح إعلاناتك
+        function downloadFile(url, name) {
+            statusText.textContent = `جاري تحضير رابط تحميل ملف: ${name}...`;
             
-            // الرابط المشفر والمحمي عبر سيرفر البروكسي الخاص بك لحمايته وحقن الإعلانات
-            const protectedStreamUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            // الرابط يمر إجبارياً عبر سيرفر البروكسي الخاص بك لتفعيل كود إعلانات Adsterra واحتساب الأرباح لك
+            const protectedDownloadUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
-            /* 
-               🤖 كود الـ Intent القياسي المفتوح: 
-               يقوم بفتح الروابط مباشرة وتوجيهها لنظام التشغيل بالأندرويد لفتح أي مشغل فيديو 
-               يدعم الـ ExoPlayer أو البث المباشر (مثل MX, VLC, أو مشغلات IPTV المدعومة)
-            */
-            const intentUri = `intent:${protectedStreamUrl}#Intent;action=android.intent.action.VIEW;type=video/*;S.title=${encodeURIComponent(name)};end`;
+            // بناء عنصر تحميل وهمي لإجبار المتصفح على تنزيل وحفظ الملف فوراً بدلاً من تشغيله
+            const link = document.createElement('a');
+            link.href = protectedDownloadUrl;
             
-            // تشغيل الرابط عبر متصفح الهاتف
-            try {
-                // محاولة إطلاق التطبيق الخارجي عبر النظام
-                window.location.href = intentUri;
-                
-                // حل احترافي: إذا لم يخرج المتصفح للمشغل الخارجي خلال 1.5 ثانية، يتم تشغيل البث كصفحة مستقلة مباشرة لضمان العمل
-                setTimeout(() => {
-                    if (!document.hidden) {
-                        statusText.textContent = `جاري التشغيل المباشر لـ ${name}...`;
-                        window.location.href = protectedStreamUrl;
-                    }
-                }, 1500);
-            } catch(e) {
-                // فتح مباشر في حال حدوث أي خطأ أمان بالمتصفح
-                window.location.href = protectedStreamUrl;
-            }
+            // تسمية الملف تلقائياً باسم الفيلم أو القناة عند تحميله
+            link.setAttribute('download', `${name}.mp4`); 
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            statusText.textContent = `بدأ تحميل ملف [ ${name} ] بنجاح!🍿`;
         }
     </script>
 </body>

@@ -24,7 +24,7 @@
 </head>
 <body>
 
-    <div class="header">🍿 منصة قنوات VIP المباشرة المدعومة بالـ VLC</div>
+    <div class="header">🍿 منصة قنوات VIP المباشرة المؤمنة سحابياً</div>
     
     <div class="main-content">
         <div class="playlist" id="playlist">
@@ -37,7 +37,6 @@
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
 
-        // 1. جلب البيانات من السيرفر المأمن
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -60,10 +59,9 @@
                             <img class="channel-logo" src="${imgLogo}" onerror="this.src='https://lo1.in';">
                             <span class="channel-name">${channel.name}</span>
                         </div>
-                        <span class="play-badge">تشغيل الملاحة</span>
+                        <span class="play-badge">تشغيل VLC</span>
                     `;
                     
-                    // نمرر الـ id المشفر فقط للواجهة لضمان عدم كشف الرابط الأصلي
                     item.onclick = () => openSecureVlc(channel.id, channel.name);
                     playlistDiv.appendChild(item);
                 });
@@ -73,14 +71,12 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالسيرفر المحمي لـ Render</div>';
             });
 
-        // 2. دالة التمرير المشفرة كلياً لبرنامج VLC لإخفاء سيرفراتك السنوية
         function openSecureVlc(secureId, name) {
-            statusText.textContent = `جاري تشفير مسار البث لـ ${name}...`;
+            statusText.textContent = `جاري استدعاء البث السحابي لـ ${name}...`;
             
-            // الرابط الممرر لـ VLC هو رابط وهمي وداخلي يخص خادم رندر المساعد فقط!
+            // البث يمر عبر رابط سيرفر رندر فقط، والـ URL الأصلي محمي تماماً في السحابة
             const secureProxyUrl = `${host.replace(/^https?:\/\//, "")}/vlc-play/${secureId}`;
             
-            // استدعاء VLC بالرابط الوهمي المشفر
             window.location.href = `vlc://${secureProxyUrl}`;
         }
     </script>

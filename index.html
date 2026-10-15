@@ -1,54 +1,87 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تشغيل البث المباشر</title>
+    <title>تطبيق قنوات IPTV</title>
     <style>
-        body {
-            margin: 0; padding: 0; background-color: #0c0c0c; color: #fff;
-            font-family: Arial, sans-serif; display: flex; justify-content: center;
-            align-items: center; height: 100vh; text-align: center;
-        }
-        .box { padding: 25px; border-radius: 12px; background: #1a1a1a; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .play-btn {
-            display: inline-block; background-color: #ff9800; color: #000;
-            padding: 15px 40px; font-size: 20px; font-weight: bold;
-            text-decoration: none; border-radius: 30px; box-shadow: 0 4px 10px rgba(255,152,0,0.4);
-            transition: 0.3s;
-        }
-        .play-btn:hover { background-color: #e68a00; transform: scale(1.05); }
-        p { font-size: 14px; color: #888; margin-top: 15px; }
+        body { margin: 0; background: #0b0b0b; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { background: #141414; padding: 15px; text-align: center; font-size: 18px; color: #4ade80; border-bottom: 1px solid #222; }
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        .playlist { width: 30%; max-width: 320px; background: #111; overflow-y: auto; border-left: 1px solid #222; }
+        .channel-item { padding: 12px 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .channel-item:hover { background: #1c1c1c; color: #4ade80; }
+        .player-area { width: 70%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
+        video { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .status { padding: 12px; background: #111; text-align: center; font-size: 13px; color: #888; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>📡 جاري تحضير رابط البث...</h2>
-    <p>اضغط أدناه إذا لم يفتح المشغل تلقائياً</p>
-    <br>
+    <div class="header">📺 تطبيق IPTV الذكي</div>
     
-    <!-- هنا قمنا بتغيير الرابط إلى صيغة فيديو خام تجبر النظام على فتح المشغلات الخارجية -->
-    <!-- استبدل الرابط أدناه برابط قناتك المدفوع الحقيقي -->
-    <a id="streamLink" class="play-btn" href="https://example.com" type="video/mp4">
-        ▶ تشغيل القناة الآن
-    </a>
-</div>
+    <div class="main-content">
+        <!-- القائمة الجانبية المحدثة -->
+        <div class="playlist" id="playlist">
+            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك المرفوعة...</div>
+        </div>
+        
+        <!-- مشغل الفيديو الافتراضي المتوافق مع الهواتف -->
+        <div class="player-area">
+            <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+            <div class="status" id="status">اختر قناة من القائمة لبدء العرض</div>
+        </div>
+    </div>
 
-<script>
-    window.onload = function() {
-        // محاولة تشغيل تلقائي بعد ثانية واحدة
-        setTimeout(function() {
-            var url = document.getElementById('streamLink').href;
+    <script>
+        const host = window.location.origin; 
+        const videoElement = document.getElementById('videoPlayer');
+        const statusText = document.getElementById('status');
+
+        // 1. جلب قائمة القنوات تلقائياً
+        fetch(`${host}/api/channels`)
+            .then(res => res.json())
+            .then(channels => {
+                const playlistDiv = document.getElementById('playlist');
+                if(channels.length === 0) {
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">قائمتك فارغة تماماً</div>';
+                    return;
+                }
+                
+                playlistDiv.innerHTML = '';
+                
+                channels.forEach(channel => {
+                    const item = document.createElement('div');
+                    item.className = 'channel-item';
+                    item.textContent = channel.name;
+                    item.onclick = () => playChannel(channel.url, channel.name);
+                    playlistDiv.appendChild(item);
+                });
+                statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح.`;
+            })
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
+            });
+
+        // 2. معالج تشغيل البث المباشر
+        function playChannel(url, name) {
+            statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
             
-            // هذه الخدعة البرمجية تخبر المتصفح الداخلي بالتخلي عن الرابط ورميه للنظام الخارجي
-            var link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('target', '_blank'); // فتح في نافذة خارجية
-            link.click();
-        }, 1000);
-    };
-</script>
+            // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS والـ HTTPS
+            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            
+            // الاعتماد على وسم الفيديو الأصلي للمتصفح/الهاتف لتجنب مشاكل فك التشفير البرمجي
+            videoElement.src = proxyUrl;
+            videoElement.load();
+            
+            videoElement.onplay = () => {
+                statusText.textContent = `يعرض الآن: ${name} ✅`;
+            };
 
+            videoElement.onerror = () => {
+                statusText.textContent = `⚠️ تنبيه: إذا كنت على المتصفح، قد لا تعمل القناة بسبب التشفير. ستعمل فوراً عند تشغيلها داخل تطبيق الهاتف (APK).`;
+            };
+        }
+    </script>
 </body>
 </html>

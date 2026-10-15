@@ -3,49 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق قنوات IPTV الاحترافي</title>
+    <title>🍿 منصة بث نتفليكس الذكية</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { margin: 0; background: #141414; color: #fff; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { background: #000000; padding: 18px; text-align: center; font-size: 20px; color: #e50914; border-bottom: 2px solid #222; font-weight: bold; letter-spacing: 1px; }
+        .header { background: #000000; padding: 18px; text-align: center; font-size: 20px; color: #e50914; border-bottom: 2px solid #222; font-weight: bold; }
         .main-content { display: flex; flex: 1; overflow: hidden; }
         .playlist { width: 100%; background: #181818; overflow-y: auto; padding: 10px; }
         
-        /* تصميم كرت القناة الاحترافي مع الشعار والاسم */
+        /* تصميم الكروت المطور */
         .channel-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; margin-bottom: 8px; border-radius: 8px; background: #2f2f2f; cursor: pointer; transition: all 0.2s ease; border: 1px solid #3c3c3c; }
         .channel-item:hover { background: #3e3e3e; border-color: #e50914; }
         .channel-info { display: flex; align-items: center; gap: 15px; }
         
-        /* تصميم شعار القناة الدائري المخصص */
-        .channel-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #000; border: 2px solid #e50914; padding: 4px; }
+        /* إظهار الشعار بوضوح */
+        .channel-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #000; border: 2px solid #e50914; padding: 2px; display: block; }
         .channel-name { font-size: 15px; font-weight: 600; color: #f5f5f7; }
         
-        .play-badge { background: #e50914; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .play-badge { background: #e50914; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
         .status { padding: 14px; background: #000000; text-align: center; font-size: 13px; color: #aaa; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <div class="header">🍿 المنصة الذكية للبث المباشر</div>
+    <div class="header">🍿 منصة قنوات VIP المباشرة</div>
     
     <div class="main-content">
         <div class="playlist" id="playlist">
-            <div style="padding:30px; text-align:center; color:#888; font-size:15px;">جاري تشفير وجلب قنوات VIP و Netflix...</div>
+            <div style="padding:30px; text-align:center; color:#888;">جاري جلب القنوات والشعارات...</div>
         </div>
     </div>
-    <div class="status" id="status">اختر قناة من القائمة لفتحها الفوري داخل تطبيق MX Player</div>
+    <div class="status" id="status">انقر على أي قناة لفتحها مباشرة داخل تطبيق MX Player</div>
 
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
 
-        // 1. قراءة السيرفر الخلفي وجلب البيانات ديناميكياً مع الشعارات والأسماء
+        // 1. جلب البيانات من السيرفر المحدث
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 const playlistDiv = document.getElementById('playlist');
                 if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لا توجد قنوات متاحة في ملف channels.m3u</div>';
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لا توجد قنوات في الملف</div>';
                     return;
                 }
                 
@@ -55,37 +55,37 @@
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     
-                    // شعار افتراضي في حال واجه التطبيق مشكلة في تحميل صورة الشعار المرفوعة
-                    const logoUrl = channel.logo || 'https://lo1.in';
+                    // استخدام الرابط القادم من السيرفر أو وضع الشعار الافتراضي الذكي لنتفليكس
+                    const imgLogo = channel.logo ? channel.logo : 'https://lo1.in';
                     
-                    // بناء التصميم الاحترافي المرتب (شعار + اسم القناة + زر تشغيل)
                     item.innerHTML = `
                         <div class="channel-info">
-                            <img class="channel-logo" src="${logoUrl}" onerror="this.src='https://lo1.in';" alt="Logo">
+                            <img class="channel-logo" src="${imgLogo}" onerror="this.src='https://lo1.in';">
                             <span class="channel-name">${channel.name}</span>
                         </div>
                         <span class="play-badge">تشغيل ▶</span>
                     `;
                     
-                    // إرسال الرابط المباشر للمشغل لتفادي شاشات التحميل الصفحية
-                    item.onclick = () => launchDirectToMX(channel.url, channel.name);
+                    item.onclick = () => openInMxPlayer(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
-                statusText.textContent = `تم مزامنة وبناء واجهة ${channels.length} قناة بنجاح.`;
+                statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح مع الشعارات.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالسيرفر الخلفي لـ Render</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من Render</div>';
             });
 
-        // 2. دالة الإرسال النظيف والمباشر للمشغل الخارجي لمنع صفحات تحميل الويب
-        function launchDirectToMX(rawUrl, name) {
-            statusText.textContent = `جاري استدعاء تطبيق MX Player لتشغيل: ${name}...`;
+        // 2. الكود البرمجي القياسي والنهائي لفتح مشغل MX Player من المتصفح الخارجي دون تحميل
+        function openInMxPlayer(streamUrl, name) {
+            statusText.textContent = `جاري توجيه البث لـ ${name} إلى MX Player...`;
             
-            // تنظيف الرابط وإجبار نظام أندرويد على تخطي التصفح نهائياً وبدء بث الفيديو الحي
-            const cleanUrl = rawUrl.replace(/^https?:\/\//, "");
-            const intentUrl = `intent://${cleanUrl}#Intent;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;end`;
+            // تنظيف وإعداد رابط الـ Intent القياسي لأندرويد المتوافق مع كروم 100%
+            const cleanUrl = streamUrl.replace(/^https?:\/\//, "");
             
-            window.location.href = intentUrl;
+            // هذه هي الصياغة الرسمية التي تجعل متصفح جوجل كروم يفتح تطبيق MX مجبراً ويمرر له الرابط بدون امتداد
+            const androidIntent = `intent://${cleanUrl}#Intent;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(name)};end`;
+            
+            window.location.href = androidIntent;
         }
     </script>
 </body>

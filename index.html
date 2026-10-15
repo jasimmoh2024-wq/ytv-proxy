@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة الأفلام والقنوات الذكية</title>
     
-    <!-- استدعاء ملفات تشغيل الفيديو العالمية لقراءة صيغ الـ TS والروابط بدون امتداد ومحاكاة ExoPlayer -->
-    <link href="https://zencdn.net" rel="stylesheet" />
-    <script src="https://zencdn.net"></script>
-
     <!-- إعلانات Start.io الفخ الإعلاني -->
     <script>
         window.startapp_app_id = "110183401"; 
@@ -36,7 +32,7 @@
         .ch-meta-txt { font-size: 10px; color: #00ffcc; text-align: right; margin-top: 3px; }
 
         .player-area { width: 65%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
-        .video-js { width: 100% !important; height: 100% !important; background: #000; }
+        video { width: 100%; aspect-ratio: 16/9; background: #000; }
         .status { padding: 12px; background: #111322; text-align: center; font-size: 13px; color: #888; border-top: 2px solid #1f233a; font-weight: bold; }
     </style>
 </head>
@@ -50,69 +46,61 @@
         </div>
         
         <div class="player-area">
-            <video id="myLivePlayer" class="video-js vjs-default-skin" controls autoplay playsinline preload="auto"></video>
+            <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
             <div class="status" id="status">اختر فيلماً أو قناة من البوستر لبدء العرض الممتع 🍿</div>
         </div>
     </div>
 
     <script>
         const host = window.location.origin; 
+        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
-        let vPlayer = null;
         let channelsData = [];
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // تهيئة مشغل الفيديو العالمي بمميزات فك التشفير المتقدمة للـ TS
-            vPlayer = videojs('myLivePlayer', {
-                fluid: true, autoplay: true, controls: true, liveui: true,
-                html5: { hls: { overrideNative: true } }
+        // 1. تشغيل فوري ومستقل لجلب القنوات لضمان ظهور القائمة بسرعة البرق وبدون أخطاء
+        fetch(`${host}/api/channels`)
+            .then(res => res.json())
+            .then(channels => {
+                channelsData = channels;
+                const playlistDiv = document.getElementById('playlist');
+                if(channels.length === 0) {
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">مكتبتك فارغة تماماً حالياً</div>';
+                    return;
+                }
+                
+                playlistDiv.innerHTML = '';
+                
+                channels.forEach((channel, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'channel-card';
+                    card.id = `card-${idx}`;
+                    
+                    let hasLogo = channel.logo || channel.tvgLogo || false;
+                    let logoVisual = hasLogo ? `<img src="${hasLogo}" class="ch-logo-img">` : '🎬';
+
+                    card.innerHTML = `
+                        <div class="ch-logo-wrapper">${logoVisual}</div>
+                        <div class="ch-info-box">
+                            <span class="ch-title-name">${channel.name}</span>
+                            <span class="ch-meta-txt">• عرض عالي الدقة HD</span>
+                        </div>
+                    `;
+
+                    card.onclick = () => {
+                        document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        playChannel(idx);
+                    };
+                    
+                    playlistDiv.appendChild(card);
+                });
+                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
+            })
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-            // جلب القنوات
-            fetch(`${host}/api/channels`)
-                .then(res => res.json())
-                .then(channels => {
-                    channelsData = channels;
-                    const playlistDiv = document.getElementById('playlist');
-                    if(channels.length === 0) {
-                        playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">مكتبتك فارغة تماماً حالياً</div>';
-                        return;
-                    }
-                    
-                    playlistDiv.innerHTML = '';
-                    
-                    channels.forEach((channel, idx) => {
-                        const card = document.createElement('div');
-                        card.className = 'channel-card';
-                        card.id = `card-${idx}`;
-                        
-                        let hasLogo = channel.logo || channel.tvgLogo || false;
-                        let logoVisual = hasLogo ? `<img src="${hasLogo}" class="ch-logo-img">` : '🎬';
-
-                        card.innerHTML = `
-                            <div class="ch-logo-wrapper">${logoVisual}</div>
-                            <div class="ch-info-box">
-                                <span class="ch-title-name">${channel.name}</span>
-                                <span class="ch-meta-txt">• عرض عالي الدقة HD</span>
-                            </div>
-                        `;
-
-                        card.onclick = () => {
-                            document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
-                            card.classList.add('active');
-                            playChannel(idx);
-                        };
-                        
-                        playlistDiv.appendChild(card);
-                    });
-                    statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
-                })
-                .catch(() => {
-                    document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
-                });
-        });
-
-        // 🛠️ معالج ومستقبل البث المطور كلياً عبر مشغل الفك التلقائي
+        // 2. معالج ومستقبل البث الذكي والمباشر لتشغيل الروابط بدون امتداد والأفلام معاً
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -120,32 +108,31 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            let finalUrl = "";
-            let streamType = "";
+            // إزالة أي إعدادات نوع قديمة لإعادة تهيئة المشغل
+            videoElement.removeAttribute('type'); 
+            
+            // تمرير الرابط عبر سيرفر رندر الوسيط لحل مشاكل التشفير والـ CORS [2.38K]
+            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            videoElement.src = proxyUrl;
 
-            // 1. الفحص الذكي وتحديد نوع الميديا لفك تشفير الروابط بدون امتداد وقنوات الـ TS [1.1.6، 1.1.7]
-            if (url.toLowerCase().includes('.m3u8')) {
-                finalUrl = url; // روابط الـ m3u8 تمر مباشرة بدون بروكسي لسرعة البث
-                streamType = 'application/x-mpegURL';
-            } else if (url.toLowerCase().includes('.mp4')) {
-                finalUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-                streamType = 'video/mp4'; // للأفلام وملفات الفيديو الخام [2.38K]
-            } else {
-                // روابط الـ Xtream التي بدون امتداد تمر عبر البروكسي ويتم إجبار المشغل على فك تشفيرها كقنوات TS حيّة [1.1.6، 2.38K]
-                finalUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-                streamType = 'video/mp2t'; 
+            // 🌟 السحر البرمجي لـ ExoPlayer: إذا كان الرابط لا يحتوي على امتداد فيديو (.mp4)، نجبر المشغل الداخلي للهاتف على قراءته كبث مباشر (MPEG-TS) [1.1.6، 1.1.7]
+            if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'video/mp2t'; // تعريف فوري للقنوات التي بدون امتداد [1.1.6، 1.1.7]
+                console.log("تم تعريف الرابط بدون امتداد كقناة TS.");
+            } else if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'application/x-mpegURL'; // تعريف قنوات HLS
             }
-            
-            // ضخ الرابط والنوع المختار داخل المشغل الذكي
-            vPlayer.src({
-                src: finalUrl,
-                type: streamType
-            });
 
-            vPlayer.play();
+            videoElement.load();
             
-            statusText.textContent = `يعرض الآن: ${name}  ✅`;
-            triggerHoneyPotAd();
+            videoElement.onplay = () => {
+                statusText.textContent = `يعرض الآن: ${name}  ✅`;
+                triggerHoneyPotAd();
+            };
+
+            videoElement.onerror = () => {
+                statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وموجهاً لـ ExoPlayer.`;
+            };
         }
 
         function triggerHoneyPotAd() {

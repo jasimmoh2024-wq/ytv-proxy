@@ -11,16 +11,16 @@
         .main-content { display: flex; flex: 1; overflow: hidden; }
         .playlist { width: 100%; background: #181818; overflow-y: auto; padding: 10px; }
         
-        /* كروت القنوات الاحترافية */
+        /* تصميم الكروت الخرافية */
         .channel-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; margin-bottom: 8px; border-radius: 8px; background: #2f2f2f; cursor: pointer; transition: all 0.2s ease; border: 1px solid #3c3c3c; }
         .channel-item:hover { background: #3e3e3e; border-color: #e50914; }
         .channel-info { display: flex; align-items: center; gap: 15px; }
         
-        /* صورة شعار القناة */
+        /* صورة شعار القناة لنتفليكس */
         .channel-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #000; border: 2px solid #e50914; padding: 2px; display: block; }
         .channel-name { font-size: 15px; font-weight: 600; color: #f5f5f7; }
         
-        .play-badge { background: #e50914; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .play-badge { background: #4ade80; color: #000; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
         .status { padding: 14px; background: #000000; text-align: center; font-size: 13px; color: #aaa; border-top: 1px solid #222; }
     </style>
 </head>
@@ -33,7 +33,7 @@
             <div style="padding:30px; text-align:center; color:#888;">جاري فك تشفير السيرفر وجلب القنوات والشعارات...</div>
         </div>
     </div>
-    <div class="status" id="status">انقر على أي قناة لفتحها مباشرة داخل تطبيق MX Player</div>
+    <div class="status" id="status">تأكد من تثبيت تطبيق VLC للأندرويد على هاتفك لبدء البث الفوري</div>
 
     <script>
         const host = window.location.origin; 
@@ -62,11 +62,11 @@
                             <img class="channel-logo" src="${imgLogo}" onerror="this.src='https://lo1.in';">
                             <span class="channel-name">${channel.name}</span>
                         </div>
-                        <span class="play-badge">تشغيل ▶</span>
+                        <span class="play-badge">تشغيل VLC</span>
                     `;
                     
-                    // نقوم بتمرير رابط القناة الأصلي والمباشر تماماً
-                    item.onclick = () => openInMxPlayerDirect(channel.url, channel.name);
+                    // التمرير المباشر الموثق لبروتوكول VLC المفتوح
+                    item.onclick = () => openInVlcPlayerDirect(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
                 statusText.textContent = `تم تحديث وبناء واجهة ${channels.length} قناة بنجاح.`;
@@ -75,19 +75,15 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالخادم المساعد لـ Render</div>';
             });
 
-        // 2. معالج التمرير المباشر والمحمي لـ MX Player لحل مشكلة توقف البث وقراءة الامتدادات
-        function openInMxPlayerDirect(streamUrl, name) {
-            statusText.textContent = `جاري تجاوز جدار الحماية وتشغيل القناة: ${name}...`;
+        // 2. كود الاستدعاء المباشر والحاسم لتطبيق VLC وتخطي قيود الـ Intent والمستعرض الداخلي
+        function openInVlcPlayerDirect(streamUrl, name) {
+            statusText.textContent = `جاري فتح القناة: ${name} مباشرة على تطبيق VLC...`;
             
-            // تنظيف الرابط الأصلي المباشر للسيرفر المدفوع الخاص بك
-            const cleanUrl = streamUrl.replace(/^https?:\/\//, "");
+            // بروتوكول vlc:// السحري يقوم بفتح مشغل VLC الأصلي وتمرير رابط البث بدون امتداد وبأعلى ثبات واستقرار
+            const vlcIntentUrl = `vlc://${streamUrl}`;
             
-            // الكود الحاسم: نقوم بحقن ترويسة الـ User-Agent الخاصة بـ IPTVSmarters داخل الـ Intent نفسه!
-            // هذا الأمر يجبر مشغل MX Player على طلب الرابط من السيرفر بهوية مشغل IPTV رسمي، ليفك السيرفر الحظر فوراً وبدون رندر
-            const androidIntent = `intent://${cleanUrl}#Intent;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(name)};S.User-Agent=IPTVSmarters;end`;
-            
-            // القفز المباشر وتفادي صفحات التحميل أو قيود السيرفر
-            window.location.href = androidIntent;
+            // إطلاق البث المباشر
+            window.location.href = vlcIntentUrl;
         }
     </script>
 </body>

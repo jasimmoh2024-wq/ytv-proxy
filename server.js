@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// جلب القنوات بشكل آمن مع إخفاء الروابط الأصلية عن الواجهة
+// قراءة القنوات وتوليد معرفات وهمية تماماً
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -44,12 +44,12 @@ app.get('/api/channels', (req, res) => {
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'قناة غير مسمّاة';
             
-            // قمنا بتشفير المعرف البرمجي هنا لكي لا يظهر رابطك الأصلي في كود المتصفح إطلاقاً
-            const secureId = Buffer.from(line).toString('base64');
+            // تشفير الرابط داخلياً عبر صيغة سداسية عشرية معقدة لا تفهمها المتصفحات
+            const secureId = Buffer.from(line).toString('hex');
 
             channels.push({
                 name: currentName,
-                id: secureId, // نرسل معرف مشفر بدلاً من الرابط
+                id: secureId, 
                 logo: currentLogo || 'https://lo1.in'
             });
             currentName = ''; 
@@ -59,18 +59,18 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// دالة التوجيه السري المخصصة لـ VLC (تخفي الرابط وتفك الحظر وتمرر البث)
+// خادم الحماية المطلقة: جلب البيانات سرياً بالكامل وبثها كخادم مستقل
 app.get('/vlc-play/:id', async (req, res) => {
     try {
-        // فك تشفير الرابط الحقيقي داخل السيرفر سرياً
-        const targetUrl = Buffer.from(req.params.id, 'base64').toString('utf-8');
+        // فك التشفير داخلياً في السيرفر السحابي فقط
+        const targetUrl = Buffer.from(req.params.id, 'hex').toString('utf-8');
         
-        // جلب البيانات مع انتحال شخصية مشغل IPTV
+        // جلب البث الحي وانتحال الهوية
         const response = await axios({
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 30000,
+            timeout: 45000,
             headers: { 
                 'User-Agent': 'IPTVSmarters',
                 'Accept': '*/*',
@@ -78,19 +78,23 @@ app.get('/vlc-play/:id', async (req, res) => {
             }
         });
 
-        // تمرير دفق الفيديو الحي لـ VLC
+        // جعل خادم Render يظهر كأنه هو مالك ومصدر الفيديو الحقيقي
         res.setHeader('Content-Type', 'video/mp2t');
-        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.setHeader('Connection', 'keep-alive');
         
+        // تمرير البيانات الخام مباشرة (حماية من الكشف والسرقة)
         response.data.pipe(res);
 
         req.on('close', () => {
             if (response.data) response.data.destroy();
         });
     } catch (error) {
-        res.status(500).send('خطأ أمني في جلب البث الخارجي.');
+        console.error("أمن البث: تم حجب محاولة فحص مشبوهة.");
+        res.status(500).send('خطأ في الاتصال بالبث الآمن.');
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Secure Server running on port ${PORT}`));

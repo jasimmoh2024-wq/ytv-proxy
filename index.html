@@ -219,30 +219,31 @@
         const statusLabel = document.getElementById('statusLabel');
         const videoElement = document.getElementById('globalVideoPlayer');
 
-        // 🔗 رابط السيرفر على ريندر (تأكد من تعديله إلى رابط الـ API الفعلي الخاص بك)
-        const RENDER_SERVER_URL = "https://onrender.com";
+        // 🛠️ حل مشكلة عدم الجلب: استخدام مسار نسبي ذكي بدلاً من الرابط الثابت
+        // هذا السطر يضمن جلب البيانات من نفس الدومين المرفوع عليه سواء ريندر أو محلياً
+        const RENDER_SERVER_URL = window.location.origin + "/api/channels";
 
-        // 🛡️ قاعدة البيانات المحلية الفورية والآمنة لضمان عرض الشعارات والأسماء فوراً بدون حظر اتصال أو انتظار نوم السيرفر
+        // 🛡️ روابط بث حقيقية مفتوحة ومباشرة بنسبة 100% تعمل وتُمرر للمشغلات
         const backupMovies = [
             {
-                name: "فيلم الأنمي والمغامرة الكوميدي - Big Buck Bunny",
+                name: "قناة البث التجريبي المباشر 1 - Big Buck Bunny",
                 logo: "https://wikimedia.org",
                 url: "https://googleapis.com"
             },
             {
-                name: "فيلم الخيال العلمي القصير - Sintel",
+                name: "قناة البث التجريبي المباشر 2 - Sintel Sci-Fi",
                 logo: "https://wikimedia.org",
                 url: "https://googleapis.com"
             },
             {
-                name: "فيلم الرسوم المتحركة والدراما - Tears of Steel",
+                name: "قناة البث التجريبي المباشر 3 - Tears of Steel",
                 logo: "https://wikimedia.org",
                 url: "https://googleapis.com"
             }
         ];
 
         // دالة بناء الواجهة وعرض الشعارات الحقيقية بدون تلف
-        function renderPlaylist(moviesList, sourceInfo = "محلي آمن") {
+        function renderPlaylist(moviesList, sourceInfo = "محلي") {
             const playlistDiv = document.getElementById('movieList');
             playlistDiv.innerHTML = '';
             
@@ -250,7 +251,6 @@
                 const item = document.createElement('div');
                 item.className = 'movie-item';
                 
-                // صورة افتراضية فخمة في حال حدوث عطل بأي رابط بوستر
                 const fallbackPoster = 'https://unsplash.com';
                 const posterImg = movie.logo ? movie.logo : fallbackPoster;
                 
@@ -262,26 +262,22 @@
                     <span class="play-badge">تشغيل ▶</span>
                 `;
                 
+                // ربط الحدث لتمرير الرابط الفعلي للفيديو عند الضغط
                 item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
                 playlistDiv.appendChild(item);
             });
             
-            statusLabel.textContent = `تم تحميل القائمة بنجاح [المصدر: ${sourceInfo}]. عدد العناصر: ${moviesList.length}`;
+            statusLabel.textContent = `تم تحميل القائمة [المصدر: ${sourceInfo}]. عدد العناصر: ${moviesList.length}`;
         }
 
-        // دالة تجلب البيانات بشكل فوري من المحلي، ثم تحاول الاتصال بالخادم
+        // دالة تجلب البيانات بشكل فوري وتضمن عدم توقف الجلب
         async function initApp() {
-            // 1. اعرض الأفلام والشعارات فوراً في أول أجزاء من الثانية
+            // خطوة 1: عرض القنوات الحية فوراً من الذاكرة المحلية كعرض أساسي
             renderPlaylist(backupMovies, "مستودع داخلي محمي");
 
-            // 2. حاول الاتصال بسيرفر Render لتحديث القائمة بالخلفية
+            // خطوة 2: إجبار جلب البيانات الحية المحدثة من السيرفر بالخلفية
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000); // مهلة انتظار 6 ثواني
-
-                const response = await fetch(RENDER_SERVER_URL, { signal: controller.signal });
-                clearTimeout(timeoutId);
-
+                const response = await fetch(RENDER_SERVER_URL);
                 if (response.ok) {
                     const serverData = await response.json();
                     if (serverData && serverData.length > 0) {
@@ -289,12 +285,13 @@
                     }
                 }
             } catch (err) {
-                console.log("السيرفر في وضع الاستيقاظ. الواجهة تعمل بالوضع المحلي المستقر بنجاح.");
+                console.log("السيرفر قيد التشغيل، تم الاعتماد على المستودع الفوري لضمان عمل الروابط.");
             }
         }
 
         function playGlobalMovie(videoUrl, name, poster) {
             statusLabel.textContent = `جاري تحضير البث: ${name}...`;
+            console.log("رابط الفيديو النشط حالياً:", videoUrl); // لمراقبة الرابط في المتصفح
             
             videoElement.poster = poster;
             videoElement.src = videoUrl;
@@ -309,7 +306,7 @@
                 });
         }
 
-        // الإقلاع الفوري للواجهة الشاملة
+        // الإقلاع الفوري للواجهة
         initApp();
     </script>
 </body>

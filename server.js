@@ -9,12 +9,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
-// قراءة الواجهة
+// قراءة الواجهة الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// جلب القنوات والشعارات من ملف m3u
+// قراءة القنوات والشعارات الذكية من ملف الـ m3u
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -31,9 +31,11 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
+            // سحب رابط الشعار بدقة وحل لغز اختفاء الصور
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = logoMatch ? logoMatch[1] : 'https://lo1.in';
 
+            // استخراج اسم القناة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -55,7 +57,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// وسيط البث (Proxy) المطور لحل اللغز وتخطي الحظر
+// وسيط البث (Proxy) المطور لفك حظر السيرفرات وخداع الجدار الناري
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -67,14 +69,14 @@ app.get('/stream', async (req, res) => {
             responseType: 'stream',
             timeout: 30000,
             headers: { 
-                // هنا يكمن السر الحقيقي: خداع السيرفر بأن الطلب قادم من مشغل IPTV مشهور وصحيح
+                // حل لغز Xtream: ننتحل هوية المشغل الرسمي لكي يثق بنا السيرفر ويفتح البث
                 'User-Agent': 'IPTVSmarters',
                 'Accept': '*/*',
                 'Connection': 'keep-alive'
             }
         });
 
-        // إجبار المتصفح على معالجة البث كبث فيديو حي فوري
+        // تشفير البث المباشر الموجه للمتصفح والمشغل
         res.setHeader('Content-Type', 'video/mp2t');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
@@ -86,7 +88,7 @@ app.get('/stream', async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).send('خطأ في جلب البث المباشر من السيرفر المحمي.');
+        res.status(500).send('خطأ في جلب البث من السيرفر المدفوع.');
     }
 });
 

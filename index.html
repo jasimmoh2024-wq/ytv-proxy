@@ -3,85 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق قنوات IPTV</title>
+    <title>🎬 تطبيق السينما والمستودع الذكي</title>
     <style>
-        body { margin: 0; background: #0b0b0b; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { background: #141414; padding: 15px; text-align: center; font-size: 18px; color: #4ade80; border-bottom: 1px solid #222; }
-        .main-content { display: flex; flex: 1; overflow: hidden; }
-        .playlist { width: 30%; max-width: 320px; background: #111; overflow-y: auto; border-left: 1px solid #222; }
-        .channel-item { padding: 12px 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .channel-item:hover { background: #1c1c1c; color: #4ade80; }
-        .player-area { width: 70%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
-        video { width: 100%; aspect-ratio: 16/9; background: #000; }
-        .status { padding: 12px; background: #111; text-align: center; font-size: 13px; color: #888; border-top: 1px solid #222; }
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #151f32;
+            --bg-header: #1e293b;
+            --accent-color: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glow-color: rgba(56, 189, 248, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            margin: 0; 
+            background: var(--bg-main); 
+            color: var(--text-primary); 
+            font-family: system-ui, -apple-system, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* هيدر خرافي احترافي */
+        .header { 
+            background: linear-gradient(135deg, var(--bg-header), var(--bg-main));
+            padding: 20px; 
+            text-align: center; 
+            font-size: 22px; 
+            color: var(--accent-color); 
+            border-bottom: 2px solid #223147; 
+            font-weight: 800; 
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+        
+        .main-content { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1; 
+            overflow: hidden; 
+        }
+        
+        /* منطقة مشغل الفيديو مدمجة بشكل سينمائي غامر */
+        .player-area { 
+            width: 100%; 
+            background: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            aspect-ratio: 16/9; 
+            border-bottom: 2px solid #223147;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+        }
+        
+        video { 
+            width: 100%; 
+            height: 100%; 
+            background: #000; 
+            max-height: 265px; 
+        }
+        
+        /* قائمة القنوات المحدثة بشكل بطاقات خرافي */
+        .playlist { 
+            width: 100%; 
+            background: var(--bg-main); 
+            overflow-y: auto; 
+            padding: 15px; 
+            flex: 1; 
+        }
+
+        /* تصميم بطاقة فيلم/قناة انسيابي مع تأثير حركي */
+        .movie-item { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 14px 16px; 
+            margin-bottom: 12px; 
+            border-radius: 16px; 
+            background: var(--bg-card); 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid #223147; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .movie-item:hover { 
+            background: #1e2d4a; 
+            border-color: var(--accent-color); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--glow-color);
+        }
+
+        .movie-item:active {
+            transform: translateY(1px);
+        }
+
+        .movie-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        
+        /* تصميم بوستر طولي احترافي جداً يظهر دائماً */
+        .movie-logo { 
+            width: 55px; 
+            height: 75px; 
+            border-radius: 8px; 
+            object-fit: cover; 
+            background: #111b2b; 
+            border: 1px solid #334563; 
+            display: block; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .movie-name { 
+            font-size: 15px; 
+            font-weight: 600; 
+            color: #f1f5f9; 
+            text-align: right; 
+            line-height: 1.5; 
+            max-width: 210px; 
+        }
+
+        /* زر تشغيل متوهج وعصري */
+        .play-badge { 
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8); 
+            color: #0f172a; 
+            padding: 8px 16px; 
+            border-radius: 30px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(56, 189, 248, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .movie-item:hover .play-badge {
+            background: linear-gradient(135deg, #38bdf8, #7dd3fc);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.6);
+        }
+        
+        /* خانات جاهزة ومعزولة تماماً لحقن إعلانات Adsterra مستقبلاً */
+        .adsterra-holder { 
+            width: 100%; 
+            min-height: 60px;
+            text-align: center; 
+            background: #05070f; 
+            padding: 8px 0; 
+            border-bottom: 1px solid #1e293b; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+        }
+        .ad-bottom { 
+            border-top: 1px solid #1e293b; 
+            border-bottom: none; 
+        }
+        .ad-label {
+            color: #475569; 
+            font-size: 10px; 
+            margin-bottom: 4px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        /* شريط حالة متناسق وسفلي */
+        .status { 
+            padding: 14px; 
+            background: #111827; 
+            text-align: center; 
+            font-size: 13px; 
+            color: var(--text-secondary); 
+            border-top: 1px solid #1e293b; 
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">📺 تطبيق IPTV الذكي</div>
+    <div class="header">🎬 تطبيق السينما والمستودع الشامل</div>
     
-    <div class="main-content">
-        <!-- القائمة الجانبية المحدثة -->
-        <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري جلب قنواتك المرفوعة...</div>
-        </div>
+    <!-- مشغل الفيديو السينمائي المدمج (للمعاينة المتوافقة مع ExoPlayer) -->
+    <div class="player-area">
+        <video id="globalVideoPlayer" controls poster="https://unsplash.com" playsinline preload="auto"></video>
+    </div>
+
+    <!-- 🌐 خانة الإعلانات العلوية 1 (جاهزة لحقن سكربت Adsterra هنا) -->
+    <div class="adsterra-holder" id="adsterra-top">
+        <div class="ad-label">مساحة إعلانية مأجورة</div>
+        <!-- ضع كود الـ Script الخاص بـ Adsterra أسفل هذا السطر مباشرة مستقبلاً -->
         
-        <!-- مشغل الفيديو الافتراضي المتوافق مع الهواتف -->
-        <div class="player-area">
-            <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
-            <div class="status" id="status">اختر قناة من القائمة لبدء العرض</div>
+    </div>
+
+    <div class="main-content">
+        <div class="playlist" id="movieList">
+            <!-- يتم حقن بطاقات الأفلام الذكية هنا عبر الجافاسكربت فوراً -->
         </div>
     </div>
 
+    <!-- 🌐 خانة الإعلانات السفلية 2 (جاهزة لحقن سكربت Adsterra هنا) -->
+    <div class="adsterra-holder ad-bottom" id="adsterra-bottom">
+        <div class="ad-label">مساحة إعلانية مأجورة</div>
+        <!-- ضع كود الـ Script الخاص بـ Adsterra أسفل هذا السطر مباشرة مستقبلاً -->
+        
+    </div>
+
+    <div class="status" id="statusLabel">اختر مساراً لبدء العرض الفوري المستقر</div>
+
     <script>
-        const host = window.location.origin; 
-        const videoElement = document.getElementById('videoPlayer');
-        const statusText = document.getElementById('status');
+        const statusLabel = document.getElementById('statusLabel');
+        const videoElement = document.getElementById('globalVideoPlayer');
 
-        // 1. جلب قائمة القنوات تلقائياً
-        fetch(`${host}/api/channels`)
-            .then(res => res.json())
-            .then(channels => {
-                const playlistDiv = document.getElementById('playlist');
-                if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">قائمتك فارغة تماماً</div>';
-                    return;
-                }
+        // 🔗 رابط السيرفر على ريندر (تأكد من تعديله إلى رابط الـ API الفعلي الخاص بك)
+        const RENDER_SERVER_URL = "https://onrender.com";
+
+        // 🛡️ قاعدة البيانات المحلية الفورية والآمنة لضمان عرض الشعارات والأسماء فوراً بدون حظر اتصال أو انتظار نوم السيرفر
+        const backupMovies = [
+            {
+                name: "فيلم الأنمي والمغامرة الكوميدي - Big Buck Bunny",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            },
+            {
+                name: "فيلم الخيال العلمي القصير - Sintel",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            },
+            {
+                name: "فيلم الرسوم المتحركة والدراما - Tears of Steel",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            }
+        ];
+
+        // دالة بناء الواجهة وعرض الشعارات الحقيقية بدون تلف
+        function renderPlaylist(moviesList, sourceInfo = "محلي آمن") {
+            const playlistDiv = document.getElementById('movieList');
+            playlistDiv.innerHTML = '';
+            
+            moviesList.forEach(movie => {
+                const item = document.createElement('div');
+                item.className = 'movie-item';
                 
-                playlistDiv.innerHTML = '';
+                // صورة افتراضية فخمة في حال حدوث عطل بأي رابط بوستر
+                const fallbackPoster = 'https://unsplash.com';
+                const posterImg = movie.logo ? movie.logo : fallbackPoster;
                 
-                channels.forEach(channel => {
-                    const item = document.createElement('div');
-                    item.className = 'channel-item';
-                    item.textContent = channel.name;
-                    item.onclick = () => playChannel(channel.url, channel.name);
-                    playlistDiv.appendChild(item);
-                });
-                statusText.textContent = `تم تحميل ${channels.length} قناة بنجاح.`;
-            })
-            .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بقاعدة القنوات</div>';
+                item.innerHTML = `
+                    <div class="movie-info">
+                        <img class="movie-logo" src="${posterImg}" onerror="this.src='${fallbackPoster}';">
+                        <span class="movie-name">${movie.name}</span>
+                    </div>
+                    <span class="play-badge">تشغيل ▶</span>
+                `;
+                
+                item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
+                playlistDiv.appendChild(item);
             });
+            
+            statusLabel.textContent = `تم تحميل القائمة بنجاح [المصدر: ${sourceInfo}]. عدد العناصر: ${moviesList.length}`;
+        }
 
-        // 2. معالج تشغيل البث المباشر
-        function playChannel(url, name) {
-            statusText.textContent = `جاري الاتصال بالقناة: ${name} ...`;
+        // دالة تجلب البيانات بشكل فوري من المحلي، ثم تحاول الاتصال بالخادم
+        async function initApp() {
+            // 1. اعرض الأفلام والشعارات فوراً في أول أجزاء من الثانية
+            renderPlaylist(backupMovies, "مستودع داخلي محمي");
+
+            // 2. حاول الاتصال بسيرفر Render لتحديث القائمة بالخلفية
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000); // مهلة انتظار 6 ثواني
+
+                const response = await fetch(RENDER_SERVER_URL, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const serverData = await response.json();
+                    if (serverData && serverData.length > 0) {
+                        renderPlaylist(serverData, "سيرفر Render الحي");
+                    }
+                }
+            } catch (err) {
+                console.log("السيرفر في وضع الاستيقاظ. الواجهة تعمل بالوضع المحلي المستقر بنجاح.");
+            }
+        }
+
+        function playGlobalMovie(videoUrl, name, poster) {
+            statusLabel.textContent = `جاري تحضير البث: ${name}...`;
             
-            // تمرير الرابط المباشر من خلال سيرفر رندر الوسيط لحل مشاكل الـ CORS والـ HTTPS
-            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            
-            // الاعتماد على وسم الفيديو الأصلي للمتصفح/الهاتف لتجنب مشاكل فك التشفير البرمجي
-            videoElement.src = proxyUrl;
+            videoElement.poster = poster;
+            videoElement.src = videoUrl;
             videoElement.load();
             
-            videoElement.onplay = () => {
-                statusText.textContent = `يعرض الآن: ${name} ✅`;
-            };
-
-            videoElement.onerror = () => {
-                statusText.textContent = `⚠️ تنبيه: إذا كنت على المتصفح، قد لا تعمل القناة بسبب التشفير. ستعمل فوراً عند تشغيلها داخل تطبيق الهاتف (APK).`;
-            };
+            videoElement.play()
+                .then(() => {
+                    statusLabel.textContent = `شغال الآن 🍿: ${name}`;
+                })
+                .catch(() => {
+                    statusLabel.textContent = `اضغط على زر التشغيل لبدء عرض: ${name}`;
+                });
         }
+
+        // الإقلاع الفوري للواجهة الشاملة
+        initApp();
     </script>
 </body>
 </html>

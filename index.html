@@ -202,7 +202,7 @@
 
     <div class="main-content">
         <div class="playlist" id="movieList">
-            <!-- يتم حقن بطاقات الأفلام الذكية هنا عبر الجافاسكربت فوراً -->
+            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">جاري الاتصال بالمستودع السحابي وجلب قائمة القنوات...</div>
         </div>
     </div>
 
@@ -213,46 +213,43 @@
         
     </div>
 
-    <div class="status" id="statusLabel">اختر مساراً لبدء العرض الفوري المستقر</div>
+    <div class="status" id="statusLabel">جاري تهيئة النظام...</div>
 
     <script>
         const statusLabel = document.getElementById('statusLabel');
         const videoElement = document.getElementById('globalVideoPlayer');
 
-        // 🛠️ حل مشكلة عدم الجلب: استخدام مسار نسبي ذكي بدلاً من الرابط الثابت
-        // هذا السطر يضمن جلب البيانات من نفس الدومين المرفوع عليه سواء ريندر أو محلياً
-        const RENDER_SERVER_URL = window.location.origin + "/api/channels";
+        /* 
+          🛠️ التعديل الجوهري: ربط الرابط تلقائياً بمسار السيرفر الحقيقي الخاص بك (/api/movies)
+          حسب الكود الذي أرسلته لي لكي تنتهي مشكلة عدم ظهور القائمة للأبد.
+        */
+        const RENDER_SERVER_URL = window.location.origin + "/api/movies";
 
-        // 🛡️ روابط بث حقيقية مفتوحة ومباشرة بنسبة 100% تعمل وتُمرر للمشغلات
-        const backupMovies = [
-            {
-                name: "قناة البث التجريبي المباشر 1 - Big Buck Bunny",
-                logo: "https://wikimedia.org",
-                url: "https://googleapis.com"
-            },
-            {
-                name: "قناة البث التجريبي المباشر 2 - Sintel Sci-Fi",
-                logo: "https://wikimedia.org",
-                url: "https://googleapis.com"
-            },
-            {
-                name: "قناة البث التجريبي المباشر 3 - Tears of Steel",
-                logo: "https://wikimedia.org",
-                url: "https://googleapis.com"
-            }
-        ];
-
-        // دالة بناء الواجهة وعرض الشعارات الحقيقية بدون تلف
-        function renderPlaylist(moviesList, sourceInfo = "محلي") {
+        // دالة بناء القائمة وشعارات الفيديو ديناميكياً
+        function renderPlaylist(moviesList, sourceInfo = "سيرفر Render") {
             const playlistDiv = document.getElementById('movieList');
             playlistDiv.innerHTML = '';
             
+            if (!moviesList || moviesList.length === 0) {
+                playlistDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">القائمة فارغة، تأكد من ملف server.js</div>';
+                return;
+            }
+
             moviesList.forEach(movie => {
                 const item = document.createElement('div');
                 item.className = 'movie-item';
                 
+                // بوستر حقيقي أنيق يُعرض في حال تعطل رابط اللوجو الأصلي
                 const fallbackPoster = 'https://unsplash.com';
-                const posterImg = movie.logo ? movie.logo : fallbackPoster;
+                
+                /*
+                  إصلاح مشكلة عدم ظهور اللوجوهات القديمة: 
+                  إذا كان السيرفر يعطي رابط "https://wikimedia.org" غير المباشر، سيقوم الكود باستبداله تلقائياً بشعار فخم وثابت
+                */
+                let posterImg = movie.logo;
+                if (!posterImg || posterImg === "https://wikimedia.org") {
+                    posterImg = 'https://unsplash.com';
+                }
                 
                 item.innerHTML = `
                     <div class="movie-info">
@@ -262,39 +259,43 @@
                     <span class="play-badge">تشغيل ▶</span>
                 `;
                 
-                // ربط الحدث لتمرير الرابط الفعلي للفيديو عند الضغط
+                // عند الضغط يتم تمرير رابط البث الفردي
                 item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
                 playlistDiv.appendChild(item);
             });
             
-            statusLabel.textContent = `تم تحميل القائمة [المصدر: ${sourceInfo}]. عدد العناصر: ${moviesList.length}`;
+            statusLabel.textContent = `تم تحديث المكتبة بنجاح [المصدر: ${sourceInfo}]. عدد العناصر: ${moviesList.length}`;
         }
 
-        // دالة تجلب البيانات بشكل فوري وتضمن عدم توقف الجلب
+        // دالة جلب البيانات المباشرة والمتوافقة مع API السيرفر
         async function initApp() {
-            // خطوة 1: عرض القنوات الحية فوراً من الذاكرة المحلية كعرض أساسي
-            renderPlaylist(backupMovies, "مستودع داخلي محمي");
-
-            // خطوة 2: إجبار جلب البيانات الحية المحدثة من السيرفر بالخلفية
+            statusLabel.textContent = "جاري جلب القنوات من خادم المستودع الرئيسي...";
             try {
                 const response = await fetch(RENDER_SERVER_URL);
                 if (response.ok) {
                     const serverData = await response.json();
-                    if (serverData && serverData.length > 0) {
-                        renderPlaylist(serverData, "سيرفر Render الحي");
-                    }
+                    renderPlaylist(serverData, "سيرفر Render الحي");
+                } else {
+                    throw new Error("فشل استجابة السيرفر");
                 }
             } catch (err) {
-                console.log("السيرفر قيد التشغيل، تم الاعتماد على المستودع الفوري لضمان عمل الروابط.");
+                console.error("خطأ في الاتصال:", err);
+                statusLabel.textContent = "تنبيه: تعذر الاتصال بالسيرفر. تأكد من رفع ملف server.js وتشغيل الخدمة على Render.";
+                document.getElementById('movieList').innerHTML = '<div style="text-align: center; color: #ef4444; padding: 20px;">فشل تحميل القنوات. يرجى التحقق من تشغيل السيرفر.</div>';
             }
         }
 
         function playGlobalMovie(videoUrl, name, poster) {
-            statusLabel.textContent = `جاري تحضير البث: ${name}...`;
-            console.log("رابط الفيديو النشط حالياً:", videoUrl); // لمراقبة الرابط في المتصفح
+            statusLabel.textContent = `جاري تحضير البث للفيلم: ${name}...`;
+            
+            // إصلاح الروابط الوهمية القادمة من السيرفر (googleapis.com) لتجربة التشغيل الفوري بنجاح
+            let activeUrl = videoUrl;
+            if (activeUrl === "https://googleapis.com") {
+                activeUrl = "https://googleapis.com";
+            }
             
             videoElement.poster = poster;
-            videoElement.src = videoUrl;
+            videoElement.src = activeUrl;
             videoElement.load();
             
             videoElement.play()
@@ -306,7 +307,7 @@
                 });
         }
 
-        // الإقلاع الفوري للواجهة
+        // إقلاع النظام وجلب البيانات فوراً عند فتح الصفحة
         initApp();
     </script>
 </body>

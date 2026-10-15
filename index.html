@@ -6,7 +6,7 @@
     <title>🎬 تطبيق السينما الشاملة - مكتبة الأفلام الذكية</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { margin: 0; background: #0f172a; color: #f8fafc; padding-bottom: 20px; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: #1e293b; padding: 18px; text-align: center; font-size: 20px; color: #38bdf8; border-bottom: 2px solid #334155; font-weight: bold; }
         
         .main-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
@@ -21,9 +21,9 @@
         .movie-item:hover { background: #2d3748; border-color: #38bdf8; }
         .movie-info { display: flex; align-items: center; gap: 15px; }
         
-        /* تصميم بوستر الفيلم الطولي الاحترافي */
+        /* تصميم بوستر الفيلم الطولي الاحترافي المعالج */
         .movie-logo { width: 50px; height: 70px; border-radius: 6px; object-fit: cover; background: #111; border: 1px solid #475569; display: block; }
-        .movie-name { font-size: 15px; font-weight: 600; color: #f1f5f9; text-align: right; line-height: 1.4; }
+        .movie-name { font-size: 14px; font-weight: 600; color: #f1f5f9; text-align: right; line-height: 1.4; max-width: 180px; }
         .play-badge { background: #38bdf8; color: #0f172a; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         
         /* حاويات إعلانات Adsterra المعزولة لحفظ أرباحك */
@@ -37,20 +37,20 @@
 
     <div class="header">🎬 تطبيق السينما والمكتبة الشاملة</div>
     
-    <!-- مشغل الفيديو المدمج التلقائي (ExoPlayer WebView) -->
+    <!-- مشغل الفيديو المدمج التلقائي الخفيف (ExoPlayer WebView) -->
     <div class="player-area">
         <video id="globalVideoPlayer" controls poster="https://unsplash.com" playsinline preload="auto"></video>
     </div>
 
     <!-- 1. المساحة الإعلانية العلوية لشبكة Adsterra -->
     <div class="ad-container" id="ad-top">
-        <!-- 🔴 ضع كود إعلان Adsterra (الـ Native Banner أو 728x90) هنا -->
+        <!-- 🔴 ضع كود إعلان Adsterra هنا مستقبلاً -->
         <span style="color:#475569; font-size:11px;">مساحة إعلانية مأجورة</span>
     </div>
 
     <div class="main-content">
         <div class="playlist" id="movieList">
-            <div style="padding:30px; text-align:center; color:#94a3b8;">جاري تحميل مكتبة الأفلام والبوسترات الشاملة...</div>
+            <div style="padding:30px; text-align:center; color:#94a3b8;">جاري جلب قائمة الأفلام والبوسترات الحية...</div>
         </div>
     </div>
 
@@ -63,17 +63,21 @@
     <div class="status" id="statusLabel">اختر فيلماً من القائمة للبدء الفوري بالبث والمشاهدة</div>
 
     <script>
+        // استخدام مسار مرن وديناميكي متوافق مع خوادم WebView للأندرويد لحل مشاكل حظر جلب القوائم
         const host = window.location.origin; 
         const statusLabel = document.getElementById('statusLabel');
         const videoElement = document.getElementById('globalVideoPlayer');
 
-        // 1. جلب قائمة الأفلام والبوسترات الحقيقية من خادم Render
-        fetch(`${host}/api/movies`)
-            .then(res => res.json())
+        // جلب قائمة الأفلام والبوسترات بشكل مباشر ونظيف وثابت
+        fetch('/api/movies')
+            .then(res => {
+                if (!res.ok) throw new Error('استجابة السيرفر غير سليمة');
+                return res.json();
+            })
             .then(movies => {
                 const playlistDiv = document.getElementById('movieList');
-                if(movies.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لا توجد أفلام متاحة في المكتبة حالياً</div>';
+                if(!movies || movies.length === 0) {
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لا توجد أفلام متاحة حالياً</div>';
                     return;
                 }
                 
@@ -83,25 +87,27 @@
                     const item = document.createElement('div');
                     item.className = 'movie-item';
                     
+                    // تأمين جلب صورة البوستر الموثقة وتثبيت المسميات البرمجية المتطابقة مع السيرفر
+                    const posterImg = movie.logo ? movie.logo : 'https://unsplash.com';
+                    
                     item.innerHTML = `
                         <div class="movie-info">
-                            <img class="movie-logo" src="${movie.logo}" onerror="this.src='https://unsplash.com';">
+                            <img class="movie-logo" src="${posterImg}" onerror="this.src='https://unsplash.com';">
                             <span class="movie-name">${movie.name}</span>
                         </div>
                         <span class="play-badge">مشاهدة ▶</span>
                     `;
                     
-                    // تشغيل الفيلم فوراً في نفس الصفحة عند النقر
-                    item.onclick = () => playGlobalMovie(movie.url, movie.name, movie.logo);
+                    item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
                     playlistDiv.appendChild(item);
                 });
-                statusLabel.textContent = `تم تحديث المكتبة الشاملة ومزامنة ${movies.length} فيلم بنجاح.`;
+                statusLabel.textContent = `تم تحميل المكتبة الشاملة ومزامنة ${movies.length} فيلم بنجاح.`;
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error(err);
                 document.getElementById('movieList').innerHTML = '<div style="padding:20px; color:#f87171; text-align:center;">خطأ في جلب بيانات الأفلام من خادم Render</div>';
             });
 
-        // 2. دالة تشغيل الفيديو الداخلي المستقر
         function playGlobalMovie(videoUrl, name, poster) {
             statusLabel.textContent = `جاري تحضير البث للفيلم: ${name}...`;
             

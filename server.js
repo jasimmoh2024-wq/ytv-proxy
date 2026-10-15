@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
 
 const app = express();
@@ -8,28 +7,30 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
+// إتاحة قراءة ملفات الواجهة والملفات الاستاتيكية
+app.use(express.static(path.join(__dirname)));
+
 // قراءة الواجهة الرئيسية للسينما الشاملة
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// قاعدة بيانات مكتبة الأفلام الشاملة (الـ API)
-// يمكنك إضافة وتعديل أي فيلم هنا (الاسم، رابط البوستر الحقيقي للفيلم، رابط الفيديو المباشر)
+// قاعدة بيانات مكتبة الأفلام الشاملة (الـ API الموثق)
 app.get('/api/movies', (req, res) => {
     const globalMovies = [
         {
             name: "فيلم الأنمي والمغامرة الكوميدي - Big Buck Bunny",
-            logo: "https://wikimedia.org", // بوستر حقيقي شغال
-            url: "https://googleapis.com" // رابط الفيديو المباشر
+            logo: "https://wikimedia.org",
+            url: "https://googleapis.com"
         },
         {
             name: "فيلم الخيال العلمي القصير - Sintel",
-            logo: "https://wikimedia.org", // بوستر حقيقي شغال
+            logo: "https://wikimedia.org",
             url: "https://googleapis.com"
         },
         {
             name: "فيلم الرسوم المتحركة والدراما - Tears of Steel",
-            logo: "https://wikimedia.org", // بوستر حقيقي شغال
+            logo: "https://wikimedia.org",
             url: "https://googleapis.com"
         }
     ];

@@ -9,12 +9,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
-// قراءة الواجهة الرئيسية
+// 1. مسار قراءة الواجهة السينمائية الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// قراءة القنوات والشعارات الذكية من ملف الـ m3u
+// 🛠️ 2. مسار عرض ملف التحقق لشركة الإعلانات لتوثيق حسابك وإزالة التحذيرات
+app.get('/app-ads.txt', (req, res) => {
+    res.type('text/plain');
+    res.send('start.io, 110183401, DIRECT');
+});
+
+// 3. مسار قراءة القنوات والأفلام من ملف الـ M3U وبناء البوسترات تلقائياً
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -31,33 +37,37 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // سحب رابط الشعار بدقة وحل لغز اختفاء الصور
+            // استخراج اللوجو أو البوستر تلقائياً إن وجد داخل ملف القنوات
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            currentLogo = logoMatch ? logoMatch[1] : 'https://lo1.in';
+            currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
-            // استخراج اسم القناة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
             } else {
                 let commaIndex = line.lastIndexOf(',');
-                currentName = commaIndex !== -1 ? line.substring(commaIndex + 1).trim() : 'قناة بدون اسم';
+                if (commaIndex !== -1) {
+                    currentName = line.substring(commaIndex + 1).trim();
+                } else {
+                    currentName = 'عرض بدون اسم';
+                }
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
-            if (currentName === '') currentName = 'قناة غير مسمّاة';
+            if (currentName === '') currentName = 'عرض غير مسمّى';
             channels.push({
                 name: currentName,
-                url: line,
-                logo: currentLogo || 'https://lo1.in'
+                logo: currentLogo,
+                url: line
             });
-            currentName = ''; 
+            currentName = '';
             currentLogo = '';
         }
     }
+
     res.json(channels);
 });
 
-// وسيط البث (Proxy) المطور لفك حظر السيرفرات وخداع الجدار الناري
+// 4. وسيط البث (Proxy) المطور والمتوافق تماماً مع مشغل ExoPlayer للأندرويد [2.38K]
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -67,28 +77,26 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 30000,
+            timeout: 15000,
             headers: { 
-                // حل لغز Xtream: ننتحل هوية المشغل الرسمي لكي يثق بنا السيرفر ويفتح البث
-                'User-Agent': 'IPTVSmarters',
-                'Accept': '*/*',
-                'Connection': 'keep-alive'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' 
             }
         });
 
-        // تشفير البث المباشر الموجه للمتصفح والمشغل
-        res.setHeader('Content-Type', 'video/mp2t');
-        res.setHeader('Cache-Control', 'no-cache');
+        // جلب نوع الملف الحقيقي (Content-Type) وحجمه وتمريره للمشغل لضمان عمل الأفلام وقنوات الـ TS معاً [1.1.6، 1.1.7]
+        const contentType = response.headers['content-type'] || 'video/mp2t';
+        res.setHeader('Content-Type', contentType);
         res.setHeader('Connection', 'keep-alive');
         
+        if (response.headers['content-length']) {
+            res.setHeader('Content-Length', response.headers['content-length']);
+        }
+
         response.data.pipe(res);
 
-        req.on('close', () => {
-            if (response.data) response.data.destroy();
-        });
+        req.on('close', () => response.data.destroy());
     } catch (error) {
-        console.error(error);
-        res.status(500).send('خطأ في جلب البث من السيرفر المدفوع.');
+        res.status(500).send('خطأ في جلب البث المباشر.');
     }
 });
 

@@ -6,12 +6,12 @@
     <title>🎬 تطبيق السينما الشاملة - مكتبة الأفلام الذكية</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { margin: 0; background: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: #0f172a; color: #f8fafc; padding-bottom: 20px; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: #1e293b; padding: 18px; text-align: center; font-size: 20px; color: #38bdf8; border-bottom: 2px solid #334155; font-weight: bold; }
         
         .main-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         
-        /* منطقة مشغل الفيديو المدمج المتوافق مع ExoPlayer للهواتف */
+        /* منطقة مشغل الفيديو المدمج */
         .player-area { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; aspect-ratio: 16/9; border-bottom: 1px solid #334155; }
         video { width: 100%; height: 100%; background: #000; max-height: 240px; }
         
@@ -21,12 +21,12 @@
         .movie-item:hover { background: #2d3748; border-color: #38bdf8; }
         .movie-info { display: flex; align-items: center; gap: 15px; }
         
-        /* تصميم بوستر الفيلم الطولي الاحترافي المعالج */
+        /* تصميم بوستر الفيلم الطولي الاحترافي */
         .movie-logo { width: 50px; height: 70px; border-radius: 6px; object-fit: cover; background: #111; border: 1px solid #475569; display: block; }
         .movie-name { font-size: 14px; font-weight: 600; color: #f1f5f9; text-align: right; line-height: 1.4; max-width: 180px; }
         .play-badge { background: #38bdf8; color: #0f172a; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         
-        /* حاويات إعلانات Adsterra المعزولة لحفظ أرباحك */
+        /* حاويات إعلانات Adsterra المعزولة */
         .ad-container { width: 100%; text-align: center; background: #000; padding: 6px 0; border-bottom: 1px solid #334155; display: flex; justify-content: center; align-items: center; }
         .ad-bottom { border-top: 1px solid #334155; border-bottom: none; }
         
@@ -37,76 +37,77 @@
 
     <div class="header">🎬 تطبيق السينما والمكتبة الشاملة</div>
     
-    <!-- مشغل الفيديو المدمج التلقائي الخفيف (ExoPlayer WebView) -->
+    <!-- مشغل الفيديو المدمج التلقائي الخفيف (ExoPlayer) -->
     <div class="player-area">
         <video id="globalVideoPlayer" controls poster="https://unsplash.com" playsinline preload="auto"></video>
     </div>
 
     <!-- 1. المساحة الإعلانية العلوية لشبكة Adsterra -->
     <div class="ad-container" id="ad-top">
-        <!-- 🔴 ضع كود إعلان Adsterra هنا مستقبلاً -->
         <span style="color:#475569; font-size:11px;">مساحة إعلانية مأجورة</span>
     </div>
 
     <div class="main-content">
         <div class="playlist" id="movieList">
-            <div style="padding:30px; text-align:center; color:#94a3b8;">جاري جلب قائمة الأفلام والبوسترات الحية...</div>
+            <!-- سيتم تحميل القائمة من هنا فوراً وبدون تأخير القرص الدائري -->
         </div>
     </div>
 
     <!-- 2. المساحة الإعلانية السفلية لشبكة Adsterra -->
     <div class="ad-container ad-bottom" id="ad-bottom">
-        <!-- 🔴 ضع كود إعلان Adsterra الثاني هنا لمضاعفة أرباحك -->
         <span style="color:#475569; font-size:11px;">مساحة إعلانية مأجورة</span>
     </div>
 
-    <div class="status" id="statusLabel">اختر فيلماً من القائمة للبدء الفوري بالبث والمشاهدة</div>
+    <div class="status" id="statusLabel">اختر فيلماً من القائمة للبدء الفوري بالمشاهدة</div>
 
     <script>
-        // استخدام مسار مرن وديناميكي متوافق مع خوادم WebView للأندرويد لحل مشاكل حظر جلب القوائم
-        const host = window.location.origin; 
         const statusLabel = document.getElementById('statusLabel');
         const videoElement = document.getElementById('globalVideoPlayer');
 
-        // جلب قائمة الأفلام والبوسترات بشكل مباشر ونظيف وثابت
-        fetch('/api/movies')
-            .then(res => {
-                if (!res.ok) throw new Error('استجابة السيرفر غير سليمة');
-                return res.json();
-            })
-            .then(movies => {
-                const playlistDiv = document.getElementById('movieList');
-                if(!movies || movies.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">لا توجد أفلام متاحة حالياً</div>';
-                    return;
-                }
+        // 💡 حل مشكلة القرص الدائري وحظر الاتصال: دمج الأفلام والبوسترات مباشرة في الكود
+        // يمكنك إضافة وتعديل أي فيلم هنا مباشرة (الاسم، رابط البوستر، رابط الفيديو المباشر)
+        const globalMovies = [
+            {
+                name: "فيلم الأنمي والمغامرة الكوميدي - Big Buck Bunny",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            },
+            {
+                name: "فيلم الخيال العلمي القصير - Sintel",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            },
+            {
+                name: "فيلم الرسوم المتحركة والدراما - Tears of Steel",
+                logo: "https://wikimedia.org",
+                url: "https://googleapis.com"
+            }
+        ];
+
+        // دالة بناء وعرض القائمة والشعارات تلقائياً وفوراً
+        function loadLocalMovies() {
+            const playlistDiv = document.getElementById('movieList');
+            playlistDiv.innerHTML = '';
+            
+            globalMovies.forEach(movie => {
+                const item = document.createElement('div');
+                item.className = 'movie-item';
                 
-                playlistDiv.innerHTML = '';
+                const posterImg = movie.logo ? movie.logo : 'https://unsplash.com';
                 
-                movies.forEach(movie => {
-                    const item = document.createElement('div');
-                    item.className = 'movie-item';
-                    
-                    // تأمين جلب صورة البوستر الموثقة وتثبيت المسميات البرمجية المتطابقة مع السيرفر
-                    const posterImg = movie.logo ? movie.logo : 'https://unsplash.com';
-                    
-                    item.innerHTML = `
-                        <div class="movie-info">
-                            <img class="movie-logo" src="${posterImg}" onerror="this.src='https://unsplash.com';">
-                            <span class="movie-name">${movie.name}</span>
-                        </div>
-                        <span class="play-badge">مشاهدة ▶</span>
-                    `;
-                    
-                    item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
-                    playlistDiv.appendChild(item);
-                });
-                statusLabel.textContent = `تم تحميل المكتبة الشاملة ومزامنة ${movies.length} فيلم بنجاح.`;
-            })
-            .catch((err) => {
-                console.error(err);
-                document.getElementById('movieList').innerHTML = '<div style="padding:20px; color:#f87171; text-align:center;">خطأ في جلب بيانات الأفلام من خادم Render</div>';
+                item.innerHTML = `
+                    <div class="movie-info">
+                        <img class="movie-logo" src="${posterImg}" onerror="this.src='https://unsplash.com';">
+                        <span class="movie-name">${movie.name}</span>
+                    </div>
+                    <span class="play-badge">مشاهدة ▶</span>
+                `;
+                
+                item.onclick = () => playGlobalMovie(movie.url, movie.name, posterImg);
+                playlistDiv.appendChild(item);
             });
+            statusLabel.textContent = `تم تحميل المكتبة الشاملة وعرض ${globalMovies.length} فيلم بنجاح.`;
+        }
 
         function playGlobalMovie(videoUrl, name, poster) {
             statusLabel.textContent = `جاري تحضير البث للفيلم: ${name}...`;
@@ -123,6 +124,9 @@
                     statusLabel.textContent = `انقر على زر التشغيل لبدء عرض: ${name}`;
                 });
         }
+
+        // تشغيل الدالة فور فتح الصفحة
+        loadLocalMovies();
     </script>
 </body>
 </html>

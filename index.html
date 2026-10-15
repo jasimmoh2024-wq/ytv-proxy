@@ -11,12 +11,12 @@
         .main-content { display: flex; flex: 1; overflow: hidden; }
         .playlist { width: 100%; background: #181818; overflow-y: auto; padding: 10px; }
         
-        /* كروت القنوات الفخمة */
+        /* كروت القنوات الاحترافية */
         .channel-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; margin-bottom: 8px; border-radius: 8px; background: #2f2f2f; cursor: pointer; transition: all 0.2s ease; border: 1px solid #3c3c3c; }
         .channel-item:hover { background: #3e3e3e; border-color: #e50914; }
         .channel-info { display: flex; align-items: center; gap: 15px; }
         
-        /* صورة شعار القناة لنتفليكس */
+        /* صورة شعار القناة */
         .channel-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #000; border: 2px solid #e50914; padding: 2px; display: block; }
         .channel-name { font-size: 15px; font-weight: 600; color: #f5f5f7; }
         
@@ -39,7 +39,7 @@
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
 
-        // 1. جلب البيانات والشعارات والأسماء من السيرفر المحدث
+        // 1. جلب البيانات والشعارات والأسماء من السيرفر المساعد لـ Render
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -55,7 +55,6 @@
                     const item = document.createElement('div');
                     item.className = 'channel-item';
                     
-                    // التحقق من الرابط وإظهار شعار نتفليكس المرفوع
                     const imgLogo = channel.logo ? channel.logo : 'https://lo1.in';
                     
                     item.innerHTML = `
@@ -66,8 +65,8 @@
                         <span class="play-badge">تشغيل ▶</span>
                     `;
                     
-                    // استدعاء دالة التشغيل الذكية عبر بروكسي رندر لكسر الحماية
-                    item.onclick = () => openInMxPlayer(channel.url, channel.name);
+                    // نقوم بتمرير رابط القناة الأصلي والمباشر تماماً
+                    item.onclick = () => openInMxPlayerDirect(channel.url, channel.name);
                     playlistDiv.appendChild(item);
                 });
                 statusText.textContent = `تم تحديث وبناء واجهة ${channels.length} قناة بنجاح.`;
@@ -76,17 +75,18 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في الاتصال بالخادم المساعد لـ Render</div>';
             });
 
-        // 2. الكود البرمجي الذي يدمج البروكسي ويجبر نظام أندرويد على التحويل لـ MX Player
-        function openInMxPlayer(streamUrl, name) {
-            statusText.textContent = `جاري فك تشفير البث لـ ${name}...`;
+        // 2. معالج التمرير المباشر والمحمي لـ MX Player لحل مشكلة توقف البث وقراءة الامتدادات
+        function openInMxPlayerDirect(streamUrl, name) {
+            statusText.textContent = `جاري تجاوز جدار الحماية وتشغيل القناة: ${name}...`;
             
-            // نمرر رابط البث من خلال سيرفر رندر المطور لكي ينتحل صفحة Xtream ويفك الحظر
-            const proxyStreamUrl = `${host}/stream?url=${encodeURIComponent(streamUrl)}`;
+            // تنظيف الرابط الأصلي المباشر للسيرفر المدفوع الخاص بك
+            const cleanUrl = streamUrl.replace(/^https?:\/\//, "");
             
-            // صياغة الـ Intent الصارمة لإجبار المتصفح الخارجي على توجيه البث لمشغل MX
-            const cleanProxyUrl = proxyStreamUrl.replace(/^https?:\/\//, "");
-            const androidIntent = `intent://${cleanProxyUrl}#Intent;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(name)};end`;
+            // الكود الحاسم: نقوم بحقن ترويسة الـ User-Agent الخاصة بـ IPTVSmarters داخل الـ Intent نفسه!
+            // هذا الأمر يجبر مشغل MX Player على طلب الرابط من السيرفر بهوية مشغل IPTV رسمي، ليفك السيرفر الحظر فوراً وبدون رندر
+            const androidIntent = `intent://${cleanUrl}#Intent;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(name)};S.User-Agent=IPTVSmarters;end`;
             
+            // القفز المباشر وتفادي صفحات التحميل أو قيود السيرفر
             window.location.href = androidIntent;
         }
     </script>

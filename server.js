@@ -1,57 +1,84 @@
 const express = require('express');
+const axios = require('axios');
 const cors = require('cors');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
-// المنفذ الافتراضي لـ Render أو 3000 محلياً
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS لجميع النطاقات لتتمكن مشغلات ExoPlayer و التطبيقات الخارجية من جلب البيانات بدون حظر
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
-// إتاحة قراءة ملفات الواجهة والملفات الاستاتيكية
-app.use(express.static(path.join(__dirname)));
-
-// قراءة الواجهة الرئيسية للقنوات
+// قراءة الواجهة
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// قاعدة بيانات القنوات الذكية المتوافقة مع ExoPlayer (صيغة JSON المحدثة)
-const globalChannels = [
-    {
-        name: "قناة الأنمي والمغامرة الكوميدي - Big Buck Bunny",
-        logo: "https://wikimedia.org",
-        url: "https://googleapis.com"
-    },
-    {
-        name: "قناة الخيال العلمي القصير - Sintel",
-        logo: "https://wikimedia.org",
-        url: "https://googleapis.com"
-    },
-    {
-        name: "قناة الرسوم المتحركة والدراما - Tears of Steel",
-        logo: "https://wikimedia.org",
-        url: "https://googleapis.com"
-    }
-];
-
-// 1. رابط الـ API بصيغة JSON (المستخدم في ملف index.html)
+// الكود الذكي المطور لقراءة القنوات بجميع صيغ الـ M3U
 app.get('/api/channels', (req, res) => {
-    res.json(globalChannels);
+    const filePath = path.join(__dirname, 'channels.m3u');
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'ملف channels.m3u غير موجود' });
+    }
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n');
+    const channels = [];
+    let currentName = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        
+        if (line.startsWith('#EXTINF:')) {
+            // محاولة استخراج الاسم من tvg-name أولاً، وإذا لم يوجد يأخذ النص بعد الفاصلة الأخيرة
+            let nameMatch = line.match(/tvg-name="([^"]+)"/i);
+            if (nameMatch && nameMatch[1]) {
+                currentName = nameMatch[1];
+            } else {
+                let commaIndex = line.lastIndexOf(',');
+                if (commaIndex !== -1) {
+                    currentName = line.substring(commaIndex + 1).trim();
+                } else {
+                    currentName = 'قناة بدون اسم';
+                }
+            }
+        } else if (line.startsWith('http://') || line.startsWith('https://')) {
+            if (currentName === '') currentName = 'قناة غير مسمّاة';
+            channels.push({
+                name: currentName,
+                url: line
+            });
+            currentName = ''; // إعادة التصفير للقناة التالية
+        }
+    }
+
+    res.json(channels);
 });
 
-// 2. رابط إضافي بصيغة M3U (إذا كنت تريد إدخال الرابط مباشرة في تطبيقات IPTV المشغلة لـ ExoPlayer)
-app.get('/api/playlist.m3u', (req, res) => {
-    let m3uContent = "#EXTM3U\n";
-    
-    globalChannels.forEach(channel => {
-        m3uContent += `#EXTINF:-1 tvg-logo="${channel.logo}",${channel.name}\n${channel.url}\n`;
-    });
-    
-    res.setHeader('Content-Type', 'audio/x-mpegurl');
-    res.setHeader('Content-Disposition', 'attachment; filename=playlist.m3u');
-    res.send(m3uContent);
+// وسيط البث (Proxy)
+app.get('/stream', async (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
+
+    try {
+        const response = await axios({
+            method: 'get',
+            url: targetUrl,
+            responseType: 'stream',
+            timeout: 15000,
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' 
+            }
+        });
+
+        res.setHeader('Content-Type', 'video/mp2t');
+        res.setHeader('Connection', 'keep-alive');
+        response.data.pipe(res);
+
+        req.on('close', () => response.data.destroy());
+    } catch (error) {
+        res.status(500).send('خطأ في جلب البث المباشر.');
+    }
 });
 
-app.listen(PORT, () => console.log(`ExoPlayer Stream Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

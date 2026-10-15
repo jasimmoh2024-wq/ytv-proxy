@@ -60,7 +60,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات والبوسترات الفورية
+        // 1. جلب قائمة القنوات والبوسترات
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -70,7 +70,6 @@
                     playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">مكتبتك فارغة تماماً حالياً</div>';
                     return;
                 }
-                
                 playlistDiv.innerHTML = '';
                 
                 channels.forEach((channel, idx) => {
@@ -94,7 +93,6 @@
                         card.classList.add('active');
                         playChannel(idx);
                     };
-                    
                     playlistDiv.appendChild(card);
                 });
                 statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
@@ -103,7 +101,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج التوليد والتشغيل النظيف المتوافق 100% مع هيدرز مشغلات النظام و ExoPlayer
+        // 2. معالج التتشغيل النظيف المانع للترميش والمتوافق 100% مع هيدرز مشغلات النظام و ExoPlayer
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -111,10 +109,13 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
+            // 🌟 تعديل أمني: إظهار الفخ الإعلاني فوراً عند النقر وقبل بناء المشغل لتفادي تفجير الـ Loop والترميش
+            triggerHoneyPotAd();
+
             // تصفير حاوية الفيديو لمسح الكاش الأمني
             videoContainer.innerHTML = '';
 
-            // إنشاء عنصر الفيديو الأصلي الصافي بدون مكتبات مشغلات خارجية معطلة
+            // إنشاء عنصر الفيديو الأصلي الصافي
             const videoElement = document.createElement('video');
             videoElement.id = 'videoPlayer';
             videoElement.controls = true;
@@ -126,10 +127,10 @@
 
             // التحقق والتحويل التلقائي لحقن الهوية الصارمة قبل تزويد الرابط للمشغل لمنع الحظر
             if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'video/mp2t'; // إجبار الـ WebView والـ ExoPlayer على فك تشفير الرابط بدون امتداد كقناة بث حي
+                videoElement.type = 'video/mp2t'; // قنوات الـ Xtream التي بدون امتداد ليفهمها ExoPlayer فوراً
                 videoElement.src = proxyUrl;
             } else if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'application/x-mpegURL'; // تعريف قنوات HLS المباشرة لتنطلق بأعلى سرعة وثبات دون بروكسي
+                videoElement.type = 'application/x-mpegURL'; // قنوات m3u8 تنطلق مباشرة بدون بروكسي لسرعة فائقة
                 videoElement.src = url; 
             } else {
                 videoElement.src = proxyUrl; // للأفلام وملفات الفيديو الخام
@@ -140,11 +141,9 @@
             
             videoElement.onplay = () => {
                 statusText.textContent = `يعرض الآن: ${name}  ✅`;
-                triggerHoneyPotAd();
             };
 
             videoElement.onerror = () => {
-                // خطة الإنقاذ الأمنية: إذا رفض المتصفح فك التشفير، يتم توجيه الرابط الخام مباشرة ليعمل داخل تطبيق الهاتف وبمشغل ExoPlayer
                 videoElement.src = proxyUrl;
                 videoElement.play().catch(() => {
                     statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وموجهاً لـ ExoPlayer.`;
@@ -153,11 +152,13 @@
         }
 
         function triggerHoneyPotAd() {
+            // تفعيل آمن للإعلان البيني بدون التأثير على حركة المشغل الأساسي
             if (typeof startapp !== 'undefined') {
                 startapp.showInterstitial();
             }
         }
 
+        // فخ صيد السارقين والخارجين عن التطبيق عند النقر العشوائي على الشاشة
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') {
                 startapp.showInterstitial();

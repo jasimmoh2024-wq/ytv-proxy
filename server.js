@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +14,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// الكود الذكي المطور لقراءة القنوات والشعارات بدقة
+// جلب القنوات والشعارات من ملف m3u
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -30,11 +31,9 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // 1. كود سحب الشعار الذكي والملائم لملفك
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = logoMatch ? logoMatch[1] : 'https://lo1.in';
 
-            // 2. استخراج اسم القناة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -44,20 +43,51 @@ app.get('/api/channels', (req, res) => {
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'قناة غير مسمّاة';
-            
             channels.push({
                 name: currentName,
                 url: line,
-                logo: currentLogo || 'https://lo1.in' // تزويد الواجهة بالشعار
+                logo: currentLogo || 'https://lo1.in'
             });
-            
-            // إعادة التصفير للقناة التالية
             currentName = ''; 
             currentLogo = '';
         }
     }
-
     res.json(channels);
+});
+
+// وسيط البث (Proxy) المطور لحل اللغز وتخطي الحظر
+app.get('/stream', async (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
+
+    try {
+        const response = await axios({
+            method: 'get',
+            url: targetUrl,
+            responseType: 'stream',
+            timeout: 30000,
+            headers: { 
+                // هنا يكمن السر الحقيقي: خداع السيرفر بأن الطلب قادم من مشغل IPTV مشهور وصحيح
+                'User-Agent': 'IPTVSmarters',
+                'Accept': '*/*',
+                'Connection': 'keep-alive'
+            }
+        });
+
+        // إجبار المتصفح على معالجة البث كبث فيديو حي فوري
+        res.setHeader('Content-Type', 'video/mp2t');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        
+        response.data.pipe(res);
+
+        req.on('close', () => {
+            if (response.data) response.data.destroy();
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('خطأ في جلب البث المباشر من السيرفر المحمي.');
+    }
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

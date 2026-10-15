@@ -7,7 +7,7 @@
     
     <!-- إعلانات Start.io الفخ الإعلاني -->
     <script>
-        window.startapp_app_id = "209100049"; 
+        window.startapp_app_id = "110183401"; 
     </script>
     <script src="https://startappcdn.com" async></script>
 
@@ -97,23 +97,26 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 🛠️ معالج ومستقبل البث المطور للتحويل الذكي بين m3u8 والـ Proxy
+        // 🛠️ معالج البث الذكي والخارق لقراءة الروابط بدون امتداد تلقائياً
         function playChannel(url, name) {
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            let finalUrl = "";
-
-            // 🌟 الفحص الذكي: إذا كان الرابط ينتهي بـ m3u8 يتم تمريره مباشرة لمشغل ExoPlayer دون الـ Proxy [1.3.2، 1.3.5]
-            if (url.toLowerCase().includes('.m3u8')) {
-                finalUrl = url; 
-                console.log("تم تشغيل رابط HLS مباشر تلقائياً.");
-            } else {
-                // إذا كان فيلماً أو قناة TS يمر عبر البروكسي لحل مشاكل التشفير والـ CORS [2.38K]
-                finalUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-                console.log("تم تشغيل الرابط عبر البروكسي السحابي.");
-            }
+            let proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
-            videoElement.src = finalUrl;
+            videoElement.src = proxyUrl;
+            
+            // 🌟 القفزة البرمجية الكبرى: إجبار المشغل على قراءة الرابط بدون امتداد كملف بث مباشر (MPEG-TS) أو ملف ذكي [1.1.6، 1.1.7]
+            if (!url.toLowerCase().includes('.m3u8') && !url.toLowerCase().includes('.mp4')) {
+                // إخبار وسم الفيديو الأصلي بالهوية الحقيقية للبث القادم من البروكسي ليتعرف عليه المشغل فورا
+                videoElement.type = 'video/mp2t'; 
+                console.log("تم تعريف الرابط بدون امتداد برمجياً كقناة TS مباشر.");
+            } else if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'application/x-mpegURL';
+                console.log("تم تعريف الرابط كـ HLS.");
+            } else {
+                videoElement.removeAttribute('type'); // ترك الاختيار الافتراضي لملفات الـ MP4 الخام والأفلام
+            }
+
             videoElement.load();
             
             videoElement.onplay = () => {
@@ -122,7 +125,7 @@
             };
 
             videoElement.onerror = () => {
-                statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف.`;
+                statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وبمشغل ExoPlayer.`;
             };
         }
 

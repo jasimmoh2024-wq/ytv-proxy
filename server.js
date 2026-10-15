@@ -7,20 +7,21 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*', methods: ['GET'] }));
+// تفعيل بروتوكولات الأمان الشاملة للمتصفحات والمشغلات الخارجية
+app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 // 1. مسار قراءة الواجهة السينمائية الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 🛠️ 2. مسار ملف التحقق المدمج والمطور ليعرض سطري الشركتين معاً في سطور منفصلة تلقائياً لقفل التحذيرات ورفع الأرباح
+// 2. مسار ملف التحقق المدمج لشركتي الإعلانات
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// 3. مسار قراءة القنوات والأفلام من ملف الـ M3U وبناء البوسترات تلقائياً
+// 3. مسار قراءة القنوات والأفلام من ملف الـ M3U
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -37,9 +38,8 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج اللوجو أو البوستر تلقائياً إن وجد داخل ملف القنوات
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            currentLogo = (logoMatch && logoMatch) ? logoMatch[1] : '';
+            currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
@@ -63,40 +63,51 @@ app.get('/api/channels', (req, res) => {
             currentLogo = '';
         }
     }
-
     res.json(channels);
 });
 
-// 4. وسيط البث (Proxy) المتوافق تماماً مع مشغل ExoPlayer للأندرويد
+// 🛠️ 4. وسيط البث (Proxy) العملاق والمعدل لحل مشكلة عدم تشغيل القنوات والأفلام نهائياً
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
 
     try {
+        // إعداد الاتصال ليكون سريعاً ومفتوح التدفق متوافقاً مع ExoPlayer والأندرويد
         const response = await axios({
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 15000,
+            timeout: 20000,
             headers: { 
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' 
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
+                'Accept': '*/*'
             }
         });
 
-        // جلب نوع الملف الحقيقي وحجمه وتمريره للمشغل لضمان عمل الأفلام وقنوات الـ TS والـ m3u8 بدون أخطاء
-        const contentType = response.headers['content-type'] || 'video/mp2t';
+        // فحص ذكي لنوع الملف من الرابط لتهيئة الهيدرز وضمان التشغيل الفوري للنوعين
+        let contentType = 'video/mp2t'; // الافتراضي لقنوات الـ TS والـ Xtream
+        if (targetUrl.toLowerCase().includes('.mp4')) contentType = 'video/mp4';
+        if (targetUrl.toLowerCase().includes('.m3u8')) contentType = 'application/x-mpegURL';
+
+        // إرسال الهيدرز العسكرية الحتمية لمشغلات الأندرويد والهواتف لتفادي التعطل
         res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
         
-        if (response.headers['content-length']) {
-            res.setHeader('Content-Length', response.headers['content-length']);
-        }
+        // السماح بتقديم وتأخير الفيديو لملفات الأفلام (Crucial for ExoPlayer)
+        res.setHeader('Accept-Ranges', 'bytes'); 
 
+        // ضخ البث الحي والمستمر فورا للمشغل
         response.data.pipe(res);
 
-        req.on('close', () => response.data.destroy());
+        req.on('close', () => {
+            response.data.destroy();
+        });
+
     } catch (error) {
-        res.status(500).send('خطأ في جلب البث المباشر.');
+        console.error("خطأ البروكسي:", error.message);
+        res.status(500).send('خطأ في جلب البث المباشر الممرر.');
     }
 });
 

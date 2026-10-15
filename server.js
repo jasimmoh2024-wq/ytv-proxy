@@ -9,14 +9,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'] }));
 
-app.use(express.static(path.join(__dirname)));
-
-// قراءة الواجهة
+// قراءة الواجهة الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// الكود الذكي المطور لقراءة القنوات واستخراج الشعارات (tvg-logo)
+// قراءة القنوات والشعارات الذكية من ملف الـ m3u
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -33,13 +31,9 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // 🛠️ استخراج رابط الشعار (tvg-logo) تلقائياً من السطر
+            // سحب رابط الشعار بدقة وحل لغز اختفاء الصور
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            if (logoMatch && logoMatch[1]) {
-                currentLogo = logoMatch[1];
-            } else {
-                currentLogo = ''; // فارغ ليتم معالجته بصورة افتراضية فخمة بالواجهة
-            }
+            currentLogo = logoMatch ? logoMatch[1] : 'https://lo1.in';
 
             // استخراج اسم القناة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
@@ -47,58 +41,54 @@ app.get('/api/channels', (req, res) => {
                 currentName = nameMatch[1];
             } else {
                 let commaIndex = line.lastIndexOf(',');
-                if (commaIndex !== -1) {
-                    currentName = line.substring(commaIndex + 1).trim();
-                } else {
-                    currentName = 'قناة بدون اسم';
-                }
+                currentName = commaIndex !== -1 ? line.substring(commaIndex + 1).trim() : 'قناة بدون اسم';
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'قناة غير مسمّاة';
-            
-            // ربط القنوات ديناميكياً ببروكسي السيرفر الخاص بك لحمايتها
             channels.push({
                 name: currentName,
-                logo: currentLogo,
-                url: line
+                url: line,
+                logo: currentLogo || 'https://lo1.in'
             });
             currentName = ''; 
             currentLogo = '';
         }
     }
-
     res.json(channels);
 });
 
-// وسيط البث الذكي وحاقن الإعلانات لحماية المحتوى المسروق
+// وسيط البث (Proxy) المطور لفك حظر السيرفرات وخداع الجدار الناري
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
 
     try {
-        // 🌐 الفكرة الذكية: حقن كود تتبع إعلانات Adsterra بالخلفية عند استدعاء الرابط خارجياً
-        // يتم إرسال طلب صامت لخوادم الإعلانات لاحتساب النقرة/المشاهدة لصالحك إذا سرق الرابط
-        try {
-            await axios.get('https://highratecpm.com', { timeout: 2000 }).catch(()=>{});
-        } catch(e){}
-
         const response = await axios({
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 15000,
+            timeout: 30000,
             headers: { 
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayerTest)' 
+                // حل لغز Xtream: ننتحل هوية المشغل الرسمي لكي يثق بنا السيرفر ويفتح البث
+                'User-Agent': 'IPTVSmarters',
+                'Accept': '*/*',
+                'Connection': 'keep-alive'
             }
         });
 
+        // تشفير البث المباشر الموجه للمتصفح والمشغل
         res.setHeader('Content-Type', 'video/mp2t');
+        res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
+        
         response.data.pipe(res);
 
-        req.on('close', () => response.data.destroy());
+        req.on('close', () => {
+            if (response.data) response.data.destroy();
+        });
     } catch (error) {
-        res.status(500).send('خطأ في جلب البث المباشر.');
+        console.error(error);
+        res.status(500).send('خطأ في جلب البث من السيرفر المدفوع.');
     }
 });
 

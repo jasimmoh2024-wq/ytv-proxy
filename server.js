@@ -62,7 +62,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// 🌟 البروكسي الحي المطور: مبرمج خصيصاً لعدم تجميد أو تحميل الروابط المعدلة وضخها فورا كبث حي
+// البروكسي الحي المشفر والمطور لتخطي حظر اللوحات وضخ البث للمشغل الداخلي
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -71,27 +71,28 @@ app.get('/stream', async (req, res) => {
         const response = await axios({
             method: 'get',
             url: targetUrl,
-            responseType: 'stream', // فتح أنبوب تدفق مستمر
-            timeout: 30000,
+            responseType: 'stream',
+            timeout: 25000,
+            // تمويه عسكري للطلب ليبدو كمتصفح حقيقي لتفادي حظر اللوحات الأصلية
             headers: { 
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': '*/*'
             }
         });
 
-        // فرض هيدرز البث الحي الصارمة للأندرويد والمشغلات لمنع قراءة البث كملف تحميل
-        res.setHeader('Content-Type', 'video/mp2t'); // إجبار المتصفح والمشغل على تشغيله فورا كفيديو حي
+        // فرض هيدرز البث الحي لمنع المتصفح الداخلي من التنزيل وإجباره على التثبيت داخل الصفحة
+        res.setHeader('Content-Type', 'video/mp2t'); 
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Accept-Ranges', 'bytes'); 
 
         response.data.pipe(res);
         req.on('close', () => response.data.destroy());
 
     } catch (error) {
-        res.status(500).send('خطأ في جلب البث المباشر.');
+        // العودة بالرابط الأصلي كخطة إنقاذ إذا تجمد اتصال البروكسي لتفادي الشاشة البيضاء
+        res.redirect(targetUrl);
     }
 });
 

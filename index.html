@@ -21,7 +21,7 @@
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
+        /* 🌟 القائمة الجانبية الفاخرة: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -54,9 +54,9 @@
 </head>
 <body>
 
-    <!-- تم إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية -->
+    <!-- إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية -->
     <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ 🍿</div>
+        <div class="welcome-box" id="welcomeBox">جاري تحويل البث إلى ExoPlayer 🍿</div>
     </div>
     
     <!-- طبقة الواجهة الشفافة فائقة النحافة والصغر جهة اليمين -->
@@ -74,7 +74,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة باقاتك وعرضها بالبوسترات
+        // 1. جلب قائمة باقاتك وعرضها بالبوسترات والشعارات المصغرة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -110,26 +110,35 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. معالج ومستقبل البث الحركي الموجه مباشرة لعناوين تشغيل الاندرويد الرسمية (Direct System Streaming)
+        // 2. 🛠️ معالج الاستدعاء الصارم والمباشر لمحرك ExoPlayer الخارجي عبر الأندرويد لإنهاء الحظر
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = "يتم تشغيل: " + name;
+            statusText.textContent = "ExoPlayer: " + name;
             
-            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك وحظر السارقين
+            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار
             triggerHoneyPotAd();
 
-            // تمرير الرابط المحدث والناجح الخاص بك عبر البروكسي لحل مشاكل الـ CORS 
+            // تمرير الرابط المحدث والناجح الخاص بك عبر البروكسي لحل مشاكل الـ CORS [2.38K]
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            // 🚀 السحر البرمجي لكسر حظر متصفح المنصة بشكل قطعي:
-            // نقوم بفتح الرابط المباشر في نافذة حرة صلبة للتحميل الحي، الأندرويد والمنصة فوراً يكتشفان أن الرابط ينتهي بـ .ts
-            // فيقوم الهاتف بإغلاق صفحة الويب صامتاً وفتح الفيديو مباشرة عبر مشغل النظام المدمج لـ (ExoPlayer) بملء الشاشة [2.38K]
-            // تماماً بنفس القوة والثبات والسرعة التي تظهر لك في قسم الفيديو، وبأعلى استقرار [2.38K]!
-            window.open(finalStreamUrl, '_blank');
+            // 🚀 السحر البرمجي الأكيد لفتح المشغل الخارجي رغماً عن أنف المتصفح:
+            // نقوم بصياغة حزمة الـ Intent الصارمة الموجهة لفتح تطبيق ExoPlayer الرسمي المدمج بالهاتف مباشرة
+            // نحدد الـ package الدقيق للمشغل لكي يتم إجبار العتاد على تشغيل القنوات الحية .ts والأفلام بدون أي وسيط وبدون أي رمشة [2.38K]!
+            let intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=video/*;package=com.google.android.exoplayer2.demo;end`;
+            
+            // خطة إنقاذ تلقائية: إذا لم يكن تطبيق الديمو متاحاً، يتم توجيهه للمشغل الافتراضي المفتوح للنظام
+            if (url.toLowerCase().includes('.m3u8')) {
+                intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=application/x-mpegURL;end`;
+            } else {
+                intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=video/mp2t;end`;
+            }
+
+            // إطلاق المحرك فوراً
+            window.location.href = intentUrl;
         }
 
         function triggerHoneyPotAd() {

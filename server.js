@@ -7,6 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// تفعيل إعدادات الـ CORS الفولاذية لضمان التوافق التام مع مشغل الويب السحابي المدمج
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 app.get('/', (req, res) => {
@@ -62,7 +63,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الفولاذي المطور لقراءة التوعين ديناميكياً ودعم m3u8 و TS
+// البروكسي الفولاذي المطور لتأمين تدفق الفيديو من خادم Xtream إلى مشغل التطبيق الداخلي بدقة متناهية
 app.get('/stream', async (req, res) => {
     const urlIndex = req.url.indexOf('?url=');
     if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -82,8 +83,8 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // 🌟 حركة ذكية: جلب الـ Content-Type الحقيقي القادم من سيرفر Xtream لكي لا نخدع الأندرويد
-        const contentType = response.headers['content-type'] || 'video/mp2t';
+        // الحصول على نوع المحتوى الحقيقي للقناة وتمريره للمشغل المدمج
+        const contentType = response.headers['content-type'] || 'application/x-mpegURL';
         
         res.setHeader('Content-Type', contentType); 
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -95,8 +96,8 @@ app.get('/stream', async (req, res) => {
         req.on('close', () => response.data.destroy());
 
     } catch (error) {
-        // إذا فشل البروكسي يتم التحويل المباشر كحل أخير آمن
-        res.redirect(decodedUrl);
+        // خطة بديلة لمنع كسر الشاشة في حال حدوث خطأ بالسيرفر
+        res.status(500).send('خطأ في الاتصال بالبث الحي.');
     }
 });
 

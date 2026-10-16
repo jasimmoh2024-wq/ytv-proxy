@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة الأفلام والقنوات الذكية</title>
+    <title>مكتبة الأفلام والسينما الحصرية</title>
     
-    <!-- استدعاء المحرك العالمي المتخصص في تثبيت ومنع فصل قنوات البث الحي والـ TS -->
-    <script src="https://jsdelivr.net"></script>
-
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
-        window.startapp_app_id = "110183401"; 
+        window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
 
@@ -19,20 +16,27 @@
         .header { background: #111322; padding: 15px; text-align: center; font-size: 18px; color: #00ffff; font-weight: bold; border-bottom: 2px solid #1f233a; text-shadow: 0 0 10px rgba(0,255,255,0.3); }
         .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
         
+        /* تحويل القائمة الجانبية إلى مصفوفة بوسترات وشعارات كرتونية ملونة */
         .playlist { width: 35%; max-width: 340px; background: #0b0c16; overflow-y: auto; border-left: 2px solid #1f233a; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         
         .channel-card {
             background: linear-gradient(135deg, #1a1d36, #141628); border: 1px solid #25294a;
-            padding: 8px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
+            padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
             cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: all 0.2s;
         }
         .channel-card:hover, .channel-card.active { border-color: #00ffff; background: #1f233a; transform: scale(0.97); }
         
-        .ch-logo-wrapper { width: 50px; height: 50px; border-radius: 8px; background: #060713; overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 24px; border: 1px solid #25294a; }
+        /* إطار وتصميم صورة القناة أو البوستر */
+        .ch-logo-wrapper { 
+            width: 65px; height: 65px; border-radius: 10px; background: #060713; 
+            overflow: hidden; display: flex; justify-content: center; align-items: center; 
+            font-size: 26px; border: 1px solid #25294a; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
         .ch-logo-img { width: 100%; height: 100%; object-fit: cover; }
+        
         .ch-info-box { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
         .ch-title-name { font-size: 14px; font-weight: bold; color: #ffffff; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ch-meta-txt { font-size: 10px; color: #00ffcc; text-align: right; margin-top: 3px; }
+        .ch-meta-txt { font-size: 10px; color: #00ffcc; text-align: right; margin-top: 5px; }
 
         .player-area { width: 65%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
         .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
@@ -42,11 +46,11 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header">🎬 مكتبة السينما والبث المباشر الذكية</div>
+    <div class="header">🎬 سينما الأطفال والبث المباشر الذكي</div>
     
     <div class="main-content">
         <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري سحب مكتبة العروض من السيرفر... ⏳</div>
+            <div style="padding:20px; text-align:center; color:#888;">جاري سحب مكتبة الصور والعروض... ⏳</div>
         </div>
         
         <div class="player-area">
@@ -62,9 +66,8 @@
         const videoContainer = document.getElementById('videoContainer');
         const statusText = document.getElementById('status');
         let channelsData = [];
-        let activeMpegtsPlayer = null;
 
-        // 1. جلب قائمة قنواتك وعرضها بالبوسترات
+        // 1. جلب قائمة القنوات وبناء الواجهة بالصور والبوسترات تلقائياً
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -81,8 +84,9 @@
                     card.className = 'channel-card';
                     card.id = `card-${idx}`;
                     
-                    let hasLogo = channel.logo || channel.tvgLogo || false;
-                    let logoVisual = hasLogo ? `<img src="${hasLogo}" class="ch-logo-img">` : '🎬';
+                    // 🌟 جلب الصورة تلقائياً: الكود يقرأ رابط الصورة المخزن في ملف الـ M3U الخاص بك ويعرضه فوراً
+                    let logoUrl = channel.logo || "";
+                    let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
 
                     card.innerHTML = `
                         <div class="ch-logo-wrapper">${logoVisual}</div>
@@ -99,13 +103,13 @@
                     };
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
+                statusText.textContent = `تم جلب ${channels.length} عرض بالصور بنجاح.`;
             })
             .catch(() => {
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج التشغيل الفولاذي المانع للفصل التكراري والترميش للأبد
+        // 2. معالج تشغيل ملفات الفيديو والأفلام المستقرة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -113,58 +117,30 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            // تشغيل الفخ الإعلاني فوراً عند النقر لمنع التداخل
+            // تفعيل الفخ الإعلاني فوراً عند النقر لكسب الأرباح
             triggerHoneyPotAd();
 
-            // إغلاق وتدمير أي مشغل قديم لتنظيف الذاكرة ومنع الفصل [2.38K]
-            if (activeMpegtsPlayer) {
-                activeMpegtsPlayer.unload();
-                activeMpegtsPlayer.detachMediaElement();
-                activeMpegtsPlayer.destroy();
-                activeMpegtsPlayer = null;
-            }
+            // تنظيف وإعادة بناء الحاوية البرمجية
             videoContainer.innerHTML = '';
 
-            // بناء عنصر الفيديو الصافي
             const videoElement = document.createElement('video');
             videoElement.id = 'videoPlayer';
             videoElement.controls = true;
             videoElement.autoplay = true;
             videoElement.setAttribute('playsinline', 'true');
             videoElement.setAttribute('preload', 'auto');
-            videoContainer.appendChild(videoElement);
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            // 🌟 الحل الجذري التاريخي: إذا كان الرابط بدون امتداد، نربطه بمحرك mpegts لمنع الفصل والترميش نهائياً [1.1.6، 1.1.7]
-            if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8') && mpegts.isSupported()) {
-                
-                // إنشاء أنبوب بث مستقر يمنع قطع الاتصال تلقائياً [1.1.6، 1.1.7]
-                const mpegtsPlayer = mpegts.createPlayer({
-                    type: 'mse', // تفعيل محرك التقطيع الصلب للنظام
-                    isLive: true,
-                    url: proxyUrl
-                }, {
-                    enableStashBuffer: false, // إلغاء التخزين المؤقت الزائد لمنع التأخير والفصل
-                    liveBufferLatencyChasing: true
-                });
-
-                mpegtsPlayer.attachMediaElement(videoElement);
-                mpegtsPlayer.load();
-                mpegtsPlayer.play();
-
-                activeMpegtsPlayer = mpegtsPlayer;
-                console.log("تم تشغيل محرك mpegts.js لتثبيت قنوات الـ Xtream.");
-
-            } else if (url.toLowerCase().includes('.m3u8')) {
-                // قنوات m3u8 تنطلق مباشرة وبدون بروكسي وبأعلى سرعة وثبات [1.3.2، 1.3.5]
+            // التمرير الذكي والمباشر لملفات الأفلام والروابط المستقرة
+            if (url.toLowerCase().includes('.m3u8')) {
                 videoElement.src = url; 
-                videoElement.load();
             } else {
-                // لتشغيل الأفلام وملفات الـ MP4 الخام بسلاسة عبر البروكسي
                 videoElement.src = proxyUrl;
-                videoElement.load();
             }
+
+            videoContainer.appendChild(videoElement);
+            videoElement.load();
             
             videoElement.onplay = () => {
                 statusText.textContent = `يعرض الآن: ${name}  ✅`;

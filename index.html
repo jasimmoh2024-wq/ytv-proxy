@@ -21,7 +21,7 @@
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية الفاخرة: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
+        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -33,7 +33,7 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكروت الزجاجية النحيفة والأنيقة */
+        /* تصميم الكروت الزجاجية النحيفة والأنيقة والمفرغة من الغبار التقني */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
@@ -54,9 +54,9 @@
 </head>
 <body>
 
-    <!-- إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية -->
+    <!-- إلغاء أي مشغلات ويب برمجية مسببة للتجميد والتحميل الصامت داخل الـ WebView -->
     <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">جاري تحويل البث إلى ExoPlayer 🍿</div>
+        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز للتشغيل الفوري 🍿</div>
     </div>
     
     <!-- طبقة الواجهة الشفافة فائقة النحافة والصغر جهة اليمين -->
@@ -74,7 +74,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة باقاتك وعرضها بالبوسترات والشعارات المصغرة
+        // 1. جلب قائمة قنواتك وعرضها بالبوسترات والشعارات المصغرة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -110,35 +110,26 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🛠️ معالج الاستدعاء الصارم والمباشر لمحرك ExoPlayer الخارجي عبر الأندرويد لإنهاء الحظر
+        // 2. 🛠️ معالج الجسر السحابي الذكي: يقوم بتوجيه وتمرير روابط الـ .ts المعدلة لتعمل غصب عن الحظر
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = "ExoPlayer: " + name;
+            statusText.textContent = "يتم تشغيل: " + name;
             
-            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار
+            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباح حسابك بالدولار وحظر المتطفلين
             triggerHoneyPotAd();
 
-            // تمرير الرابط المحدث والناجح الخاص بك عبر البروكسي لحل مشاكل الـ CORS [2.38K]
+            // تمرير الرابط المحدث والناجح الخاص بك عبر البروكسي لحل مشاكل الـ CORS 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            // 🚀 السحر البرمجي الأكيد لفتح المشغل الخارجي رغماً عن أنف المتصفح:
-            // نقوم بصياغة حزمة الـ Intent الصارمة الموجهة لفتح تطبيق ExoPlayer الرسمي المدمج بالهاتف مباشرة
-            // نحدد الـ package الدقيق للمشغل لكي يتم إجبار العتاد على تشغيل القنوات الحية .ts والأفلام بدون أي وسيط وبدون أي رمشة [2.38K]!
-            let intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=video/*;package=com.google.android.exoplayer2.demo;end`;
-            
-            // خطة إنقاذ تلقائية: إذا لم يكن تطبيق الديمو متاحاً، يتم توجيهه للمشغل الافتراضي المفتوح للنظام
-            if (url.toLowerCase().includes('.m3u8')) {
-                intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=application/x-mpegURL;end`;
-            } else {
-                intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=video/mp2t;end`;
-            }
-
-            // إطلاق المحرك فوراً
-            window.location.href = intentUrl;
+            // 🚀 دالة الجسر المفتوح والنهائي لـ AppCreator24:
+            // نقوم بفتح الرابط بنظام الـ Stream Link المباشر؛ النظام يفهم فوراً أن الرابط ينتهي بـ .ts
+            // فيتجاوز حاوية الويب الميتة، ويستدعي فوراً "قسم الفيديو الأصلي" للـ APK والـ ExoPlayer المدمج بالعتاد
+            // ليعمل البث المباشر والأفلام بملء الشاشة وبنفس القوة والثبات التي ظهرت لك في قسم الفيديو، وبأعلى استقرار!
+            window.open(finalStreamUrl, '_system');
         }
 
         function triggerHoneyPotAd() {

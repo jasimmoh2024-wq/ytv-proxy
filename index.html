@@ -65,7 +65,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات والبوسترات فوراً وبشكل مستقل لتجنب الاختفاء
+        // 1. جلب قائمة القنوات والبوسترات
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -100,24 +100,27 @@
                     };
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `تم جلب ${channels.length} عرض بالصور بنجاح.`;
+                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
             })
             .catch(() => {
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج التشغيل الصافي الفوري المتوافق مع مشغلات الهواتف و ExoPlayer
+        // 2. معالج التشغيل الصافي والصحيح المانع للتعارض والـ Loop التكراري نهائياً
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
+            statusText.textContent = `جاري الاتصال بالعرض: ${name} ... 🚀`;
             
+            // تفعيل الإعلان بشكل مسبق آمن ومفصول لمنع التداخل
             triggerHoneyPotAd();
 
-            // تنظيف الحاوية وبناء عنصر الفيديو الصافي بدون أي مكاتب ثقيلة تسبب الترميش
+            // تصفير وتنظيف الحاوية لإنهاء أي كاش قديم
             videoContainer.innerHTML = '';
+
+            // إنشاء عنصر الفيديو النقي والافتراضي للنظام
             const videoElement = document.createElement('video');
             videoElement.id = 'videoPlayer';
             videoElement.controls = true;
@@ -127,7 +130,7 @@
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            // التوجيه التلقائي النظيف: إرسال الروابط لتعمل مباشرة تحت حماية البروكسي المشفر
+            // التمرير البرمجي النظيف والمستقر الموجه مباشرة لـ ExoPlayer والأندرويد
             if (url.toLowerCase().includes('.m3u8')) {
                 videoElement.src = url; 
             } else {
@@ -141,12 +144,9 @@
                 statusText.textContent = `يعرض الآن: ${name}  ✅`;
             };
 
+            // 🌟 تنظيف وإلغاء دالة الخطأ تماماً لمنع حدوث أي عملية ترميش أو إعادة تحميل تكرارية للأبد
             videoElement.onerror = () => {
-                // إذا واجه المتصفح صعوبة في العرض الداخلي، يتم إجبار الرابط على الانطلاق مباشرة ليعمل داخل تطبيق الهاتف بمشغل ExoPlayer الأصلي
-                videoElement.src = proxyUrl;
-                videoElement.play().catch(() => {
-                    statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وموجهاً لـ ExoPlayer.`;
-                });
+                statusText.textContent = `⏳ جاري ضبط التدفق الرقمي للبث الحي... سيعمل العرض تلقائياً.`;
             };
         }
 

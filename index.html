@@ -15,24 +15,17 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين استدعاء المشغل */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
-        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
+        /* مشغل الميديا المدمج يملأ الخلفية بالكامل بنقاء 100% للمس المباشر */
+        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
+        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية الفاخرة: تم تثبيت العرض ليكون 22% (نحيف جداً ومستقر) لمنع انضغاط واختفاء القنوات */
+        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
-            width: 22% !important; 
-            max-width: 220px !important; 
-            min-width: 150px !important; 
-            height: 100vh; 
-            pointer-events: auto; 
+            width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
-            padding: 10px 5px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 6px; 
+            padding: 10px 5px; display: flex; flex-direction: column; gap: 6px; 
             border-left: 1px solid rgba(255, 255, 255, 0.02);
         }
         
@@ -40,7 +33,7 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم كروت القنوات الشفافة الأنيقة */
+        /* تصميم الكروت الزجاجية النحيفة والأنيقة */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
@@ -62,10 +55,11 @@
 <body>
 
     <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">مكتبة السينما الحرة جاهزة للضخ 🍿</div>
+        <!-- مشغل الميديا المباشر النقي والافتراضي بدون أي مكاتب خارجية معقدة لضمان فك التشفير الصلب داخل الصفحة -->
+        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
-        <div class="ui-layer">
-        <!-- القائمة الجانبية فائقة الصغر جهة اليمين المستقرة -->
+    <div class="ui-layer">
+        <!-- القائمة الجانبية فائقة الصغر الشفافة جهة اليمين المستقرة -->
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
@@ -76,10 +70,11 @@
 
     <script>
         const host = window.location.origin; 
+        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة
+        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة بنقاء 100%
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -115,31 +110,43 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 معالج قهر الحظر واستدعاء مشغل الـ ExoPlayer/أندرويد الأصلي فوراً
+        // 2. 🛠️ معالج التشغيل القياسي، النقي، والمكتوب بأعلى جودة جافا سكريبت صلبة بدون أي مكتبات معقدة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = "يتم تشغيل: " + name;
+            statusText.textContent = name;
+            
+            // تفعيل الفخ الإعلاني فور النقر بآمان وثبات
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير المباشر
+            // تمرير الرابط المحدث عبر البروكسي لحل مشاكل الـ CORS والتشفير [2.38K]
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
-
-            // تحديد هوية نوع البث بدقة متناهية
-            let mimeType = "video/*";
-            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
-            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
-            if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) mimeType = "video/mp2t";
-
-            // 🌟 كود الـ Intent العسكري الصارم: يجبر نظام الأندرويد على فتح البث مباشرة عبر أي مشغل فيديو مدمج بالهاتف يدعم الـ ExoPlayer
-            // الصيغة المحدثة تضمن القبول التام من الـ WebView دون حظر صامت
-            let intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
             
-            // إطلاق الأمر وتحويل دفة التشغيل للنظام فوراً
-            window.location.replace(intentUrl);
+            // تصفير وتهيئة المشغل الأصلي لضمان استقبال الأنبوب الجديد بدون تعليق
+            videoElement.removeAttribute('type');
+
+            // التمرير البرمجي النظيف والمباشر لوسم الفيديو القياسي بالنظام
+            if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'application/x-mpegURL'; // صياغة وتوجيه قنوات الـ m3u8
+                videoElement.src = url; 
+            } else if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) {
+                videoElement.type = 'video/mp2t'; // تعريف فوري وصارم لقنوات الـ ts والـ live المحقونة من قبلك
+                videoElement.src = proxyUrl;
+            } else {
+                videoElement.src = proxyUrl; // للأفلام وملفات الـ MP4 الخام
+            }
+
+            // أمر تفعيل وفك التشفير الحركي المباشر للنظام والأندرويد داخل الصفحة
+            videoElement.load();
+            videoElement.play().catch(e => {
+                console.log("محاولة إعادة الاتصال التلقائي الصافي بالأنبوب...");
+                videoElement.load();
+                videoElement.play();
+            });
+
+            videoElement.onplay = () => { console.log("البث مستقر وشغال داخلياً بنجاح."); };
         }
 
         function triggerHoneyPotAd() {
@@ -152,4 +159,3 @@
     </script>
 </body>
 </html>
-

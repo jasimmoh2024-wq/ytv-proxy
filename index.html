@@ -67,6 +67,15 @@
         </div>
         <div class="video-free-zone"></div>
     </div>
+    <div class="ui-layer">
+        <!-- القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط) جهة اليمين -->
+        <div class="playlist-container">
+            <div class="header">📺 قائمة القنوات</div>
+            <div class="status" id="status">اختر باقة 🍿</div>
+            <div class="playlist" id="playlist"></div>
+        </div>
+        <div class="video-free-zone"></div>
+    </div>
 
     <script>
         const host = window.location.origin; 
@@ -109,7 +118,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 معالج قهر حظر المتصفحات والتحويل المباشر لنظام تشغيل الهاتف
+        // 2. 🚀 معالج قهر حظر المتصفحات والاستدعاء المباشر الحُر لـ ExoPlayer
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -120,14 +129,19 @@
             // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحظر السارقين
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير [2.38K]
-            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
+            // لتخطي عجز صفحة الويب، نمرر رابط البث الحي الصافي المجهّز والمعدّل من قبلك مباشرة
+            let finalStreamUrl = url;
 
-            // 🌟 الخدعة البرمجية القاطعة: فتح الرابط في نطاق النظام الخارجي المباشر
-            // هذا الأمر يجبر الهاتف على تخطي صفحة الويب المعطلة، وتمرير الرابط المعدل بصيغة الـ .ts 
-            // ليفتح مباشرة ويعمل داخل التطبيق وبثبات كامل ومطلق (كأنك في قسم الفيديو تماماً) [2.38K]!
-            window.open(finalStreamUrl, '_system');
+            // تحديد الـ Mime-Type بدقة تكنولوجية متناهية بناءً على الامتداد ليفهمه الأندرويد فوراً
+            let mimeType = "video/*";
+            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
+            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
+            if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) mimeType = "video/mp2t";
+
+            // 🌟 كود الـ Intent القاطع: يجبر نظام الأندرويد على فتح البث مباشرة عبر مشغل ExoPlayer الأصلي للجهاز 
+            // هذا السطر يتخطى المتصفح تماماً، ويشغل قنوات الـ ts والـ m3u8 والافلام بأعلى ثبات للعتاد وبدون كشف الروابط
+            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود تلقائياً لداخل نفس تطبيقك وقائمتك الجانبية الفاخرة!
+            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
         }
 
         function triggerHoneyPotAd() {

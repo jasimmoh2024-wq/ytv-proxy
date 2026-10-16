@@ -15,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين انطلاق البث الخارجي الناجح */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
-        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
+        /* منطقة الخلفية كاملة: مشغل الميديا المدمج يشغل كامل حجم شاشة الهاتف في الخلفية بنقاء 100% */
+        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
+        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
+        /* 🌟 القائمة الجانبية المفضلة لديك: نحيفة جداً وصغيرة (18% فقط من الشاشة) بنقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -40,7 +40,7 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكروت الزجاجية الشفافة المضيئة الناعمة مفرغة الغبار التقني */
+        /* تصميم الكروت الزجاجية الشفافة المضيئة المفرغة من الغبار التقني */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
@@ -57,14 +57,13 @@
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
         .ch-title-name { font-size: 10px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .video-free-zone { flex: 1; height: 100vh; pointer-events: none; }
-        .loading-spinner { display: none; text-align: center; padding: 20px; font-size: 10px; color: #00ffff; width: 100%; }
     </style>
 </head>
 <body>
 
-    <!-- إلغاء أي وسوم فيديو داخلية تسبب الكراش والتحميل الصامت داخل الـ WebView المقيّد -->
+    <!-- مشغل الميديا المدمج بالخلفية لضمان العرض المباشر داخل نفس صفحة قسم الويب -->
     <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ 🍿</div>
+        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
@@ -72,7 +71,6 @@
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
-            <div class="loading-spinner" id="spinner">⏳...</div>
             <div class="playlist" id="playlist"></div>
         </div>
         <div class="video-free-zone"></div>
@@ -80,19 +78,16 @@
 
     <script>
         const host = window.location.origin; 
+        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        const spinner = document.getElementById('spinner');
-        spinner.style.display = 'block';
-
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق
+        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 channelsData = channels;
                 const playlistDiv = document.getElementById('playlist');
-                spinner.style.display = 'none';
                 playlistDiv.innerHTML = '';
                 
                 channels.forEach((channel, idx) => {
@@ -120,11 +115,10 @@
                 statusText.textContent = `جاهز لضخ البث.`;
             })
             .catch(() => {
-                spinner.style.display = 'none';
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 معالج قهر حظر المتصفحات والتحويل المباشر لفتح البث في المتصفح الخارجي الناجح
+        // 2. معالج التوصيل المباشر المحافظ على التوكنات البرمجية لتجاوز حظر السيرفرات الأصلية
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -133,19 +127,24 @@
             statusText.textContent = name;
             triggerHoneyPotAd();
 
-            // تمرير الرابط المحدث والناجح عبر البروكسي المشفر لسيرفر رندر الخاص بك لضمان حماية الروابط الأصلية [2.38K]
+            // تمرير الرابط بكامل تفاصيله وسم التوكن المشفر عبر أنبوب سيرفر رندر المطور
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
+            
+            videoElement.removeAttribute('type');
 
-            // 🌟 القفزة البرمجية القاطعة والذكية:
-            // بما أن فحصك أثبت أن الرابط يعمل بشكل رائع في متصفح الإنترنت، فإن هذا الأمر المطور 
-            // يقوم بطرد وتوجيه الرابط صلبًا لفتح القناة داخل المتصفح الخارجي الأصلي للهاتف غصباً عن قيود الـ WebView 
-            // فيعمل الفيديو فوراً وبمنتهى القوة والثبات والسرعة الخرافية التي شاهدتها بفحصك! [2.38K]
-            let a = document.createElement('a');
-            a.href = finalStreamUrl;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            a.click();
+            if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'application/x-mpegURL';
+                videoElement.src = proxyUrl; // إجبار الـ m3u8 المحمية بتوكن على المرور الآمن عبر السيرفر الوسيط
+            } else {
+                videoElement.type = 'video/mp2t';
+                videoElement.src = proxyUrl;
+            }
+
+            videoElement.load();
+            videoElement.play().catch(e => {
+                videoElement.load();
+                videoElement.play();
+            });
         }
 
         function triggerHoneyPotAd() {

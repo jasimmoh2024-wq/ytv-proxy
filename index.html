@@ -15,24 +15,55 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* مشغل الميديا المدمج يملأ الخلفية بالكامل داخل التطبيق آلياً */
+        /* مشغل الميديا المدمج يملأ الخلفية بالكامل */
         .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
         video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المصغرة الزجاجية المفضلة لديك (18% فقط من عرض الشاشة) جهة اليمين */
+        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
             padding: 10px 5px; display: flex; flex-direction: column; gap: 6px; 
             border-left: 1px solid rgba(255, 255, 255, 0.02);
+            transition: transform 0.3s ease-in-out;
         }
         
+        /* كلاس إخفاء وتصفير القائمة برمجياً لفتح ملء الشاشة الكامل */
+        .playlist-container.hide-sidebar {
+            transform: translateX(100%);
+        }
+
         .header { font-size: 11px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 6px #00ffff; margin-bottom: 2px; }
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* زر ملء الشاشة الاحترافي والمضيء النيون */
+        .fullscreen-toggle-btn {
+            background: linear-gradient(135deg, #e50914, #9b050d);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff; font-size: 10px; font-weight: bold;
+            padding: 5px; border-radius: 6px; cursor: pointer;
+            text-align: center; width: 100%; margin-bottom: 4px;
+            box-shadow: 0 3px 6px rgba(229, 9, 20, 0.3);
+            transition: all 0.2s;
+        }
+        .fullscreen-toggle-btn:active { transform: scale(0.95); }
+
+        /* زر عائم ذكي لإعادة إظهار القائمة عندما تكون الشاشة ممتلئة بالكامل */
+        .floating-back-btn {
+            position: fixed; top: 15px; right: 15px; z-index: 9999;
+            background: rgba(17, 19, 34, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15); color: #00ffff;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: none; justify-content: center; align-items: center;
+            font-size: 14px; cursor: pointer; pointer-events: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
+        /* تصميم كروت القنوات الزجاجية */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
@@ -50,16 +81,22 @@
         .video-free-zone { flex: 1; height: 100vh; pointer-events: none; }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
+
+    <!-- الزر العائم والذكي الذي يظهر فقط في وضع ملء الشاشة للعودة والتغيير -->
+    <div class="floating-back-btn" id="floatingBackBtn" onclick="toggleCinemaFullscreen()">⚙️</div>
 
     <div class="video-background-container">
-        <!-- مشغل الميديا المدمج ذكياً بالصفحة لتخطي الفتح الخارجي وحماية الروابط الأصلية للأبد -->
         <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
-    
     <div class="ui-layer">
-        <div class="playlist-container">
-            <div class="header">📺 قائمة القنوات</div>
+        <!-- القائمة الجانبية فائقة الصغر جهة اليمين -->
+        <div class="playlist-container" id="sidebarContainer">
+            <div class="header">📺 سينما الأطفال</div>
+            
+            <!-- زر ملء الشاشة السينمائي الفاخر -->
+            <div class="fullscreen-toggle-btn" onclick="toggleCinemaFullscreen()">📺 ملء الشاشة</div>
+            
             <div class="status" id="status">اختر باقة 🍿</div>
             <div class="playlist" id="playlist"></div>
         </div>
@@ -70,8 +107,11 @@
         const host = window.location.origin; 
         const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
+        const sidebarContainer = document.getElementById('sidebarContainer');
+        const floatingBackBtn = document.getElementById('floatingBackBtn');
         let channelsData = [];
 
+        // 1. جلب قنواتك المحدثة وعرضها بالشعارات المصغرة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -107,7 +147,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // تشغيل البث المباشر داخلياً بشكل كامل وبأعلى درجات إخفاء وحماية السورس كود
+        // 2. معالج تشغيل الميديا الآمن داخلياً
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -116,22 +156,37 @@
             statusText.textContent = name;
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي المشفر لإخفاء عنوان سيرفر الـ IPTV الأصلي للأبد عن أعين المستخدمين [2.38K]
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             videoElement.removeAttribute('type');
 
             if (url.toLowerCase().includes('.m3u8')) {
                 videoElement.type = 'application/x-mpegURL';
-                videoElement.src = url; // تشغيل داخلي فوري لقنوات الـ m3u8 الناجحة عندك
+                videoElement.src = url; 
             } else {
                 videoElement.type = 'video/mp2t';
-                videoElement.src = proxyUrl; // تشغيل داخلي للروابط المحقونة عبر خادم البروكسي المطور [1.1.6، 2.38K]
+                videoElement.src = proxyUrl; // تشغيل روابط الـ .ts المعدلة داخلياً بامتياز عبر ريندر
             }
 
             videoElement.load();
-            videoElement.onplay = () => { console.log("البث مستقر داخلياً."); };
-            // دالة إنقاذ: إذا رفض المشغل فك التشفير، يفتح الرابط كـ Redirect مباشر ومحمي داخل نفس حاوية التطبيق
+            videoElement.onplay = () => { console.log("البث شغال داخلياً."); };
             videoElement.onerror = () => { window.location.href = proxyUrl; };
+        }
+
+        // 3. دالة معالجة ملء الشاشة التلقائية والسينمائية
+        function toggleCinemaFullscreen() {
+            // تفعيل الفخ الإعلاني فوراً عند طلب تكبير الشاشة لزيادة الأرباح
+            triggerHoneyPotAd();
+
+            // فحص كلاس الإخفاء وتبديل الوضع
+            if (sidebarContainer.classList.contains('hide-sidebar')) {
+                // العودة للوضع الطبيعي وإظهار القائمة الجانبية
+                sidebarContainer.classList.remove('hide-sidebar');
+                floatingBackBtn.style.display = 'none';
+            } else {
+                // إخفاء القائمة وتوسيع الفيديو ليحتل كامل الشاشة 100%
+                sidebarContainer.classList.add('hide-sidebar');
+                floatingBackBtn.style.display = 'flex'; // إظهار زر التحكم العائم الذكي
+            }
         }
 
         function triggerHoneyPotAd() {

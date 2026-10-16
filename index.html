@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة الأفلام والسينما الذكية</title>
+    <title>مكتبة الأفلام والقنوات الذكية</title>
     
-    <!-- استدعاء مشغل قوقل العالمي المتطور لتخطي حظر الـ HTTP والروابط بدون امتداد وصيغ الـ TS -->
-    <script src="https://cloudflare.com"></script>
-    <link rel="stylesheet" href="https://cloudflare.com">
-
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "110183401"; 
@@ -68,12 +64,8 @@
         const videoContainer = document.getElementById('videoContainer');
         const statusText = document.getElementById('status');
         let channelsData = [];
-        let shakaPlayerInstance = null;
 
-        // تفعيل مكتبات البث لقوقل
-        shaka.polyfil.installAll();
-
-        // 1. جلب قائمة القنوات والبوسترات
+        // 1. جلب قائمة القنوات والبوسترات فوراً وبشكل مستقل لتجنب الاختفاء
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -114,7 +106,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج التشغيل الفولاذي المانع للفصل التكراري والترميش للأبد عبر Shaka Player
+        // 2. معالج التشغيل الصافي الفوري المتوافق مع مشغلات الهواتف و ExoPlayer
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -124,54 +116,38 @@
             
             triggerHoneyPotAd();
 
-            // إغلاق وتدمير أي مشغل قديم لتنظيف الذاكرة ومنع الفصل
-            if (shakaPlayerInstance) {
-                shakaPlayerInstance.destroy();
-                shakaPlayerInstance = null;
-            }
+            // تنظيف الحاوية وبناء عنصر الفيديو الصافي بدون أي مكاتب ثقيلة تسبب الترميش
             videoContainer.innerHTML = '';
-
-            // بناء عنصر الفيديو الصافي
             const videoElement = document.createElement('video');
             videoElement.id = 'videoPlayer';
             videoElement.controls = true;
             videoElement.autoplay = true;
             videoElement.setAttribute('playsinline', 'true');
             videoElement.setAttribute('preload', 'auto');
-            videoContainer.appendChild(videoElement);
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            // إعداد محرك قوقل لتخطي جدران المتصفح وفك شفرات الروابط بدون امتداد والـ TS تلقائياً [1.1.6، 1.1.7]
-            const player = new shaka.Player(videoElement);
-            shakaPlayerInstance = player;
-
-            // تكوين ذكي لتخطي قيود الـ mixed content والـ CORS
-            player.configure({
-                streaming: {
-                    bufferingGoal: 10,
-                    rebufferingGoal: 2,
-                    lowLatencyMode: true
-                }
-            });
-
-            // تحميل الرابط مباشرة داخل مشغل قوقل المتطور
-            player.load(finalStreamUrl).then(() => {
-                console.log("تم تحميل البث المباشر بنجاح واستقرار حديدي.");
-                videoElement.play();
-                statusText.textContent = `يعرض الآن: ${name}  ✅`;
-            }).catch((err) => {
-                console.log("خطة الإنقاذ الفورية لملفات الـ MP4 والأفلام الخام...");
-                // إذا كان الرابط فيلماً خام أو رفضه محرك البث، يوجه مباشرة للمشغل الأساسي ليعمل فوراً وبثبات
+            // التوجيه التلقائي النظيف: إرسال الروابط لتعمل مباشرة تحت حماية البروكسي المشفر
+            if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.src = url; 
+            } else {
                 videoElement.src = proxyUrl;
-                videoElement.load();
-                videoElement.play().then(() => {
-                    statusText.textContent = `يعرض الآن: ${name}  ✅`;
-                }).catch(() => {
+            }
+
+            videoContainer.appendChild(videoElement);
+            videoElement.load();
+            
+            videoElement.onplay = () => {
+                statusText.textContent = `يعرض الآن: ${name}  ✅`;
+            };
+
+            videoElement.onerror = () => {
+                // إذا واجه المتصفح صعوبة في العرض الداخلي، يتم إجبار الرابط على الانطلاق مباشرة ليعمل داخل تطبيق الهاتف بمشغل ExoPlayer الأصلي
+                videoElement.src = proxyUrl;
+                videoElement.play().catch(() => {
                     statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وموجهاً لـ ExoPlayer.`;
                 });
-            });
+            };
         }
 
         function triggerHoneyPotAd() {

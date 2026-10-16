@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الحصرية الشفافة الصغيرة</title>
     
-    <!-- استدعاء المحرك البرمجي العالمي المتطور لفك تشفير وتشغيل قنوات الـ ts والـ m3u8 داخل التطبيق صلبًا -->
-    <link href="https://zencdn.net" rel="stylesheet" />
-    <script src="https://zencdn.net"></script>
-
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "110183401"; 
@@ -19,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة مشغل الفيديو الاحترافي يملأ الخلفية بالكامل بنقاء 100% */
+        /* منطقة الخلفية كاملة: مشغل الميديا المدمج يشغل كامل حجم الشاشة في الخلفية بنقاء 100% */
         .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
-        .video-js { width: 100% !important; height: 100% !important; background: #000; }
+        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
+        /* 🌟 القائمة الجانبية الشفافة فائق النقاء والصغر (18% فقط من الشاشة) جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -44,7 +40,7 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكروت الزجاجية النحيفة والأنيقة */
+        /* تصميم الكروت الزجاجية الشفافة المضيئة الناعمة */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
@@ -61,19 +57,22 @@
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
         .ch-title-name { font-size: 10px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .video-free-zone { flex: 1; height: 100vh; pointer-events: none; }
+        .loading-spinner { display: none; text-align: center; padding: 20px; font-size: 10px; color: #00ffff; width: 100%; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
+    <!-- مشغل الميديا المدمج بالخلفية لضمان العرض المباشر والنظيف -->
     <div class="video-background-container">
-        <!-- استخدام مشغل الميديا المطور المعزز بالقدرة الفورية لتجميع قطع البث الحي -->
-        <video id="videoPlayer" class="video-js vjs-default-skin" controls autoplay playsinline preload="auto"></video>
+        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
     
+    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
+            <div class="loading-spinner" id="spinner">⏳...</div>
             <div class="playlist" id="playlist"></div>
         </div>
         <div class="video-free-zone"></div>
@@ -81,16 +80,20 @@
 
     <script>
         const host = window.location.origin; 
+        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
-        let myAwesomePlayer = videojs('videoPlayer'); // تهيئة مشغل الفيديو العالمي
 
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة بنقاء كامل
+        const spinner = document.getElementById('spinner');
+        spinner.style.display = 'block';
+
+        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 channelsData = channels;
                 const playlistDiv = document.getElementById('playlist');
+                spinner.style.display = 'none';
                 playlistDiv.innerHTML = '';
                 
                 channels.forEach((channel, idx) => {
@@ -118,10 +121,11 @@
                 statusText.textContent = `جاهز لضخ البث.`;
             })
             .catch(() => {
+                spinner.style.display = 'none';
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. معالج التشغيل المستقل القائم على فك التشفير البرمجي داخل الصفحة
+        // 2. معالج التشغيل الصافي القياسي المتوافق %100 مع الروابط ذات الامتداد الناجحة عندك
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -131,18 +135,27 @@
             triggerHoneyPotAd();
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            
-            // حقن وتوجيه الرابط ومطالبة المحرك ببدء تفكيك البث داخلياً فوراً [1.1.6، 2.38K]
+            videoElement.removeAttribute('type');
+
+            // تزويد المشغل بالـ Type الصارم والمناسب للامتداد فوراً لمنع تعليق المتصفح الداخلي [1.1.6، 1.1.7]
             if (url.toLowerCase().includes('.m3u8')) {
-                myAwesomePlayer.src({ src: url, type: 'application/x-mpegURL' });
+                videoElement.type = 'application/x-mpegURL';
+                videoElement.src = url; // تشغيل فوري لقنوات الـ m3u8 بدون بروكسي لسرعة فائقة
+            } else if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) {
+                videoElement.type = 'video/mp2t'; // تعريف صارم لروابط الـ ts المعدلة الشغالة عندك
+                videoElement.src = proxyUrl;
             } else {
-                // قنوات الـ ts الممررة عبر البروكسي المشفر يتم إجبار المحرك الخارجي على معالجتها كبث متدفق حي صلب
-                myAwesomePlayer.src({ src: proxyUrl, type: 'video/mp2t' });
+                videoElement.src = proxyUrl; // للأفلام وملفات الـ MP4
             }
 
-            myAwesomePlayer.ready(function() {
-                myAwesomePlayer.play();
+            videoElement.load();
+            videoElement.play().catch(e => {
+                // خطة إعانة ذاتية لإعادة تشغيل الفيديو في حال تأخر الأنبوب لثوانٍ
+                videoElement.load();
+                videoElement.play();
             });
+
+            videoElement.onplay = () => { console.log("البث مستقر داخلياً بنجاح."); };
         }
 
         function triggerHoneyPotAd() {

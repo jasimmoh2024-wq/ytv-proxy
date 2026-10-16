@@ -15,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* مشغل الميديا العملاق بالخلفية كاملة ومفتوح اللمس */
+        /* مشغل الميديا بالخلفية كاملة ومفتوح اللمس */
         .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
         video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
+        /* القائمة الجانبية الشفافة فائقة الصغر (18% من الشاشة) جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -33,14 +33,14 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكرت المستطيل النحيف الزجاجي المشوش المضيء */
+        /* تصميم الكروت الزجاجية الشفافة المضيئة */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
         }
         .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 6px rgba(0,255,255,0.4); }
         
-        /* تثبيت حجم الشعار الصغير الأنيق جداً (22 بكسل) لمنع الاختفاء والضغط البصري */
+        /* تثبيت الشعارات المصغرة (22 بكسل) لمنع الاختفاء والضغط */
         .ch-logo-wrapper { 
             width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important;
             border-radius: 3px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 9px; border: 1px solid rgba(255,255,255,0.12); 
@@ -86,7 +86,7 @@
                 spinner.style.display = 'none';
                 
                 if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:10px; text-align:center; color:#f87171; font-size:10px;">فارغة تماماً</div>';
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171; font-size:10px;">فارغة تماماً</div>';
                     return;
                 }
                 playlistDiv.innerHTML = '';
@@ -120,7 +120,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 🛠️ المحرك الذكي المطور لحقن الـ /live/ والـ .ts برمجياً رغماً عن السيرفر الأصلي
+        // 🛠️ معالج ومستقبل البث المطور بالكامل لعملية حقن النصوص المباشرة السريعة والمضمونة
         function playChannel(idx) {
             const channel = channelsData[idx];
             let url = channel.url;
@@ -129,26 +129,24 @@
             statusText.textContent = name;
             triggerHoneyPotAd();
 
-            // 🌟 الخدعة التاريخية الكبرى: إعادة تشكيل الروابط التي بدون امتداد تلقائياً لتركيب صيغة الـ Live والـ .ts
+            // 🌟 دالة الحقن الفولاذية الجديدة والمصلحة:
             if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8')) {
-                try {
-                    // فحص إذا كان الرابط لا يحتوي على كلمة live ويحتاج تركيبها تفادياً للتكرار
-                    if (!url.toLowerCase().includes('/live/')) {
-                        // تقسيم الرابط لاستبدال أول مائل بعد الهوست والبورت بكلمة /live/
-                        let urlObj = new URL(url);
-                        let origin = urlObj.origin; // الهوست + البورت (http://server:8080)
-                        let pathAndQuery = urlObj.pathname + urlObj.search; // (/username/password/stream_id)
-                        
-                        // دمج الكلمة بالصيغة القياسية لـ Xtream وتوليد الامتداد .ts في نهاية الـ Stream ID [1.1.4، 1.1.7]
-                        url = `${origin}/live${pathAndQuery}.ts`; 
-                    } else if (!url.toLowerCase().endsWith('.ts')) {
-                        // إذا كانت كلمة live موجودة ولكن ينقصه امتداد .ts نقوم بتركيبه فوراً [1.1.4، 1.1.7]
-                        url = url + ".ts";
+                // الفحص والتركيب السريع: إذا كان الرابط لا يحتوي على كلمة /live/ نقوم بحقنها مباشرة بعد البورت أو النطاق
+                if (!url.toLowerCase().includes('/live/')) {
+                    // البحث الذكي عن أول مائل بعد السيرفر والبورت (مثال: st/ أو com:8080/)
+                    let match = url.match(/(:\d+|\.[a-zA-Z]{2,6})\//);
+                    if (match) {
+                        let position = url.indexOf(match[0]) + match[0].length;
+                        // حقن كلمة live في مكانها الصحيح القياسي للسيرفرات
+                        url = url.slice(0, position) + 'live/' + url.slice(position);
                     }
-                    console.log("تم تعديل وصياغة الرابط بنجاح للصيغة النارية المباشرة:", url);
-                } catch(e) {
-                    console.error("خطأ في تشكيل الرابط القياسي");
                 }
+                
+                // إلصاق امتداد .ts في نهاية رقم القناة إذا لم يكن موجوداً [1.1.4، 1.1.7]
+                if (!url.toLowerCase().endsWith('.ts')) {
+                    url = url + ".ts";
+                }
+                console.log("الرابط المحدث والجاهز للانطلاق:", url);
             }
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
@@ -158,13 +156,13 @@
                 videoElement.type = 'application/x-mpegURL';
                 videoElement.src = url; 
             } else {
-                videoElement.type = 'video/mp2t'; // إجبار مشغل ExoPlayer والأندرويد على قراءة الصيغة المحقونة الحية فورا [1.1.6، 1.1.7]
+                videoElement.type = 'video/mp2t'; // لتشغيل القنوات على الـ ExoPlayer بثبات حديدي [1.1.6، 1.1.7]
                 videoElement.src = proxyUrl;
             }
 
             videoElement.load();
-            videoElement.onplay = () => { console.log("البث مستقر وشغال بنجاح."); };
-            videoElement.onerror = () => { statusText.textContent = `جاري الاتصال الآمن...`; };
+            videoElement.onplay = () => { console.log("تم الاستقرار."); };
+            videoElement.onerror = () => { statusText.textContent = `جاري جلب إشارة البث...`; };
         }
 
         function triggerHoneyPotAd() {

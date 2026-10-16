@@ -64,8 +64,8 @@
     <div class="video-background-container">
         <div class="welcome-box" id="welcomeBox">مكتبة السينما الحرة جاهزة للضخ 🍿</div>
     </div>
-    <div class="ui-layer">
-        <!-- القائمة الجانبية فائقة الصغر جهة اليمين -->
+        <div class="ui-layer">
+        <!-- القائمة الجانبية فائقة الصغر جهة اليمين المستقرة -->
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
@@ -115,29 +115,31 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 معالج استدعاء مشغل ExoPlayer الخارجي الصارم رغماً عن قيود الـ WebView
+        // 2. 🚀 معالج قهر الحظر واستدعاء مشغل الـ ExoPlayer/أندرويد الأصلي فوراً
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = "ExoPlayer: " + name;
+            statusText.textContent = "يتم تشغيل: " + name;
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير [2.38K]
+            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير المباشر
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            // تحديد الـ Mime-Type بدقة تكنولوجية متناهية بناءً على الامتداد المعدل
+            // تحديد هوية نوع البث بدقة متناهية
             let mimeType = "video/*";
             if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
             if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
             if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) mimeType = "video/mp2t";
 
-            // 🌟 كود الـ Intent السحري: يجبر نظام الأندرويد على فتح البث مباشرة عبر مشغل ExoPlayer الأصلي للجهاز 
-            // هذا السطر يتخطى المتصفح تماماً، ويشغل قنوات الـ ts والـ m3u8 والافلام بأعلى ثبات للعتاد [1.1.6، 2.38K]
-            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود تلقائياً لداخل نفس تطبيقك وقائمتك الجانبية الفاخرة! [2.38K]
-            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};end`;
+            // 🌟 كود الـ Intent العسكري الصارم: يجبر نظام الأندرويد على فتح البث مباشرة عبر أي مشغل فيديو مدمج بالهاتف يدعم الـ ExoPlayer
+            // الصيغة المحدثة تضمن القبول التام من الـ WebView دون حظر صامت
+            let intentUrl = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
+            
+            // إطلاق الأمر وتحويل دفة التشغيل للنظام فوراً
+            window.location.replace(intentUrl);
         }
 
         function triggerHoneyPotAd() {
@@ -150,3 +152,4 @@
     </script>
 </body>
 </html>
+

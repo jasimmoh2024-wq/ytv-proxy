@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة الأفلام والقنوات الذكية</title>
+    <title>مكتبة السينما الذكية للروابط المباشرة</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -12,67 +12,108 @@
     <script src="https://startappcdn.com" async></script>
 
     <style>
-        body { margin: 0; background: #060713; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
-        .header { background: #111322; padding: 15px; text-align: center; font-size: 18px; color: #00ffff; font-weight: bold; border-bottom: 2px solid #1f233a; text-shadow: 0 0 10px rgba(0,255,255,0.3); }
-        .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
-        
-        .playlist { width: 35%; max-width: 340px; background: #0b0c16; overflow-y: auto; border-left: 2px solid #1f233a; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
-        
-        .channel-card {
-            background: linear-gradient(135deg, #1a1d36, #141628); border: 1px solid #25294a;
-            padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
-            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: all 0.2s;
-        }
-        .channel-card:hover, .channel-card.active { border-color: #00ffff; background: #1f233a; transform: scale(0.97); }
-        
-        .ch-logo-wrapper { 
-            width: 65px; height: 65px; border-radius: 10px; background: #060713; 
-            overflow: hidden; display: flex; justify-content: center; align-items: center; 
-            font-size: 26px; border: 1px solid #25294a;
-        }
-        .ch-logo-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .ch-info-box { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
-        .ch-title-name { font-size: 14px; font-weight: bold; color: #ffffff; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ch-meta-txt { font-size: 10px; color: #00ffcc; text-align: right; margin-top: 5px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        .player-area { width: 65%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
-        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
-        video { width: 100%; height: 100%; background: #000; }
-        .status { padding: 12px; background: #111322; text-align: center; font-size: 13px; color: #888; border-top: 2px solid #1f233a; font-weight: bold; }
+        /* مشغل الميديا العملاق بالخلفية كاملة */
+        .video-background-container { 
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; 
+        }
+        /* فتح حريّة اللمس بالكامل للمشغل لتظهر أزرار ملء الشاشة والتحكم فورا عند النقر */
+        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
+
+        /* طبقة الواجهة الشفافة الطافية في الأمام */
+        .ui-layer { 
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; 
+            display: flex; flex-direction: row; pointer-events: none; 
+        }
+
+        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي صافي كريستال جهة اليمين */
+        .playlist-container { 
+            width: 18%; 
+            max-width: 160px; 
+            height: 100vh; 
+            pointer-events: auto; /* السماح بالتنقل اللمسي */
+            background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
+            padding: 10px 5px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+            border-left: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        
+        .header { font-size: 11px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 6px #00ffff; margin-bottom: 2px; }
+        .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
+        
+        /* تصميم الكرت المستطيل الصغير جداً والناعم بتأثير زجاجي مشوش نقي 100% */
+        .channel-card {
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); 
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
+        }
+        .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 6px rgba(0,255,255,0.4); }
+        
+        /* تصغير ميكروسكوبي للشعار (22 بكسل فقط) مع تأمين التثبيت ضد الضغط */
+        .ch-logo-wrapper { 
+            width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important;
+            border-radius: 3px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 9px; border: 1px solid rgba(255,255,255,0.12); 
+        }
+        .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
+        .ch-title-name { font-size: 10px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* منطقة الفيديو الحرة الممتدة على مساحة 82% من الشاشة للمس المباشر والأزرار */
+        .video-free-zone { flex: 1; height: 100vh; pointer-events: none; }
+
+        .loading-spinner { display: none; text-align: center; padding: 20px; font-size: 10px; color: #00ffff; width: 100%; }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
-    <div class="header">🎬 سينما الأطفال والبث المباشر الذكي</div>
+    <!-- مشغل الميديا بالخلفية متاح للمس الحر للتحقق من أزرار ملء الشاشة لقوقل وأندرويد -->
+    <div class="video-background-container">
+        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+    </div>
     
-    <div class="main-content">
-        <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري سحب مكتبة الصور والعروض... ⏳</div>
-        </div>
+    <!-- طبقة الواجهة الشفافة فائقة النحافة والصغر جهة اليمين -->
+    <div class="ui-layer">
         
-        <div class="player-area">
-            <div class="video-container" id="videoContainer">
-                <div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; color:#444;">المشغل جاهز ومستعد</div>
-            </div>
-            <div class="status" id="status">اختر فيلماً أو قناة من البوستر لبدء العرض الممتع 🍿</div>
+        <!-- القائمة الجانبية المصغرة الزجاجية -->
+        <div class="playlist-container">
+            <div class="header">📺 قائمة القنوات</div>
+            <div class="status" id="status">اختر باقة 🍿</div>
+            <div class="loading-spinner" id="spinner">⏳...</div>
+            <div class="playlist" id="playlist"></div>
         </div>
+
+        <!-- المنطقة الحرة المفتوحة للمس أزرار الفيديو بالكامل -->
+        <div class="video-free-zone"></div>
+        
     </div>
 
     <script>
         const host = window.location.origin; 
-        const videoContainer = document.getElementById('videoContainer');
+        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات والبوسترات
+        const spinner = document.getElementById('spinner');
+        spinner.style.display = 'block';
+
+        // 1. جلب قائمة القنوات والبوسترات من خادم رندر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 channelsData = channels;
                 const playlistDiv = document.getElementById('playlist');
+                spinner.style.display = 'none';
+                
                 if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">مكتبتك فارغة تماماً حالياً</div>';
+                    playlistDiv.innerHTML = '<div style="padding:10px; text-align:center; color:#f87171; font-size:10px;">فارغة تماماً</div>';
                     return;
                 }
                 playlistDiv.innerHTML = '';
@@ -89,7 +130,6 @@
                         <div class="ch-logo-wrapper">${logoVisual}</div>
                         <div class="ch-info-box">
                             <span class="ch-title-name">${channel.name}</span>
-                            <span class="ch-meta-txt">• عرض عالي الدقة HD</span>
                         </div>
                     `;
 
@@ -100,54 +140,45 @@
                     };
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
+                statusText.textContent = `جاهز لضخ البث.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
+                spinner.style.display = 'none';
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. معالج التشغيل الصافي والصحيح المانع للتعارض والـ Loop التكراري نهائياً
+        // 2. معالج التشغيل الصافي والمباشر المخصص للروابط ذات الامتداد الصريح
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = `جاري الاتصال بالعرض: ${name} ... 🚀`;
+            statusText.textContent = name;
             
-            // تفعيل الإعلان بشكل مسبق آمن ومفصول لمنع التداخل
+            // تفعيل الفخ الإعلاني فوراً عند النقر لتأمين الأرباح
             triggerHoneyPotAd();
 
-            // تصفير وتنظيف الحاوية لإنهاء أي كاش قديم
-            videoContainer.innerHTML = '';
-
-            // إنشاء عنصر الفيديو النقي والافتراضي للنظام
-            const videoElement = document.createElement('video');
-            videoElement.id = 'videoPlayer';
-            videoElement.controls = true;
-            videoElement.autoplay = true;
-            videoElement.setAttribute('playsinline', 'true');
-            videoElement.setAttribute('preload', 'auto');
-
+            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS والـ HTTPS
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            
+            // مسح أي أنواع قديمة لتهيئة المشغل
+            videoElement.removeAttribute('type');
 
-            // التمرير البرمجي النظيف والمستقر الموجه مباشرة لـ ExoPlayer والأندرويد
+            // التوجيه الصارم بناءً على امتداد الملف ليفهمه المشغل الأصلي و ExoPlayer فوراً
             if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.src = url; 
+                videoElement.type = 'application/x-mpegURL'; // صياغة قنوات الـ HLS الحية
+                videoElement.src = url; // تنطلق مباشرة بدون بروكسي لسرعة خارقة وثبات
+            } else if (url.toLowerCase().includes('.mp4')) {
+                videoElement.type = 'video/mp4'; // لملفات الأفلام والـ MP4
+                videoElement.src = proxyUrl;
             } else {
+                // لأي امتداد صريح آخر مثل .ts أو الامتدادات المرئية
                 videoElement.src = proxyUrl;
             }
 
-            videoContainer.appendChild(videoElement);
             videoElement.load();
-            
-            videoElement.onplay = () => {
-                statusText.textContent = `يعرض الآن: ${name}  ✅`;
-            };
-
-            // 🌟 تنظيف وإلغاء دالة الخطأ تماماً لمنع حدوث أي عملية ترميش أو إعادة تحميل تكرارية للأبد
-            videoElement.onerror = () => {
-                statusText.textContent = `⏳ جاري ضبط التدفق الرقمي للبث الحي... سيعمل العرض تلقائياً.`;
-            };
+            videoElement.onplay = () => { console.log("البث يعمل بنجاح بالخلفية."); };
+            videoElement.onerror = () => { statusText.textContent = `خطأ بالبث`; };
         }
 
         function triggerHoneyPotAd() {
@@ -156,6 +187,7 @@
             }
         }
 
+        // تشغيل الإعلان عند النقر العشوائي لصيد السارقين
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') {
                 startapp.showInterstitial();

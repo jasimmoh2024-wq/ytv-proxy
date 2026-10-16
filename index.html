@@ -8,7 +8,7 @@
     <script>window.startapp_app_id = "110183401";</script>
     <script src="https://startappcdn.com" async></script>
     
-    <!-- مكتبة HLS الخفيفة المخصصة لتشغيل روابط m3u8 و TS للأندرويد والكمبيوتر -->
+    <!-- مكتبة HLS الخفيفة جداً لتشغيل روابط البث -->
     <script src="https://jsdelivr.net"></script>
 
     <style>
@@ -17,12 +17,12 @@
         
         .main-container { display: flex; width: 100vw; height: 100vh; position: relative; }
         
-        /* مشغل الفيديو */
+        /* شاشة عرض الفيديو */
         .video-box { flex: 1; height: 100vh; background: #000; display: flex; justify-content: center; align-items: center; position: relative; }
         video { width: 100%; height: 100%; object-fit: contain; }
         .welcome { position: absolute; color: #555; font-size: 13px; font-weight: bold; pointer-events: none; }
 
-        /* قائمة القنوات النحيفة والسريعة جداً */
+        /* قائمة القنوات الفورية النحيفة */
         .sidebar { 
             width: 150px; height: 100vh; background: #0c0e1a; 
             display: flex; flex-direction: column; border-left: 1px solid #1a1d36; z-index: 10;
@@ -49,7 +49,7 @@
         </div>
 
         <div class="sidebar">
-            <div class="sidebar-header" id="status">جاري معالجة الملف الحالية...</div>
+            <div class="sidebar-header" id="status">جاري معالجة الملف...</div>
             <div class="list-wrapper" id="playlist"></div>
         </div>
     </div>
@@ -61,7 +61,7 @@
         let channelsList = [];
         let hlsPlayer = null;
 
-        // قراءة ملف الـ M3U المرفوع بجانب الصفحة مباشرة وبسرعة خارقة من المتصفح
+        // قراءة الملف مع حماية كاملة ضد الأخطاء البرمجية الناتجة عن التوكنات المعقدة
         fetch('channels.m3u')
             .then(res => res.text())
             .then(content => {
@@ -71,16 +71,18 @@
 
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
-                    if (line.startsWith('#EXTINF:')) {
+                    
+                    if (line.toUpperCase().startsWith('#EXTINF:')) {
+                        // طريقة آمنة جداً لاستخراج الشعار دون حظر الكود
                         const logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
-                        currentLogo = logoMatch ? logoMatch[1] : '';
+                        currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1].trim() : '';
                         
-                        const nameMatch = line.match(/tvg-name="([^"]+)"/i);
-                        if (nameMatch) {
-                            currentName = nameMatch[1];
+                        // طريقة ذكية للحصول على الاسم بعد الفاصلة الأخيرة دائماً تفادياً لتعقيد التوكنات
+                        const commaIdx = line.lastIndexOf(',');
+                        if (commaIdx !== -1) {
+                            currentName = line.substring(commaIdx + 1).trim();
                         } else {
-                            const commaIdx = line.lastIndexOf(',');
-                            currentName = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : 'قناة بث';
+                            currentName = 'قناة بث مباشرة';
                         }
                     } else if (line.startsWith('http://') || line.startsWith('https://')) {
                         channelsList.push({
@@ -93,10 +95,15 @@
                     }
                 }
 
-                // عرض القنوات فوراً وبدون أي تأخير
                 const container = document.getElementById('playlist');
                 container.innerHTML = '';
                 
+                if (channelsList.length === 0) {
+                    status.textContent = "لم يتم العثور على روابط داخل الملف ❌";
+                    return;
+                }
+
+                // بناء القائمة فوراً وبسرعة البرق
                 channelsList.forEach((ch, index) => {
                     const item = document.createElement('div');
                     item.className = 'channel-item';
@@ -117,7 +124,8 @@
                 });
                 status.textContent = `القنوات (${channelsList.length}) 🎬`;
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error(err);
                 status.textContent = "خطأ في قراءة ملف channels.m3u ❌";
             });
 
@@ -127,14 +135,14 @@
             
             if (typeof startapp !== 'undefined' && startapp.showAd) startapp.showAd();
 
-            // الاتصال المباشر بالرابط الأصلي بدون سيرفرات وسيطة معطلة
             const streamUrl = channel.url;
 
             if (Hls.isSupported()) {
                 if (hlsPlayer) hlsPlayer.destroy();
                 hlsPlayer = new Hls({
                     enableWorker: true,
-                    maxBufferLength: 6
+                    maxBufferLength: 10,
+                    liveSyncDuration: 3
                 });
                 hlsPlayer.loadSource(streamUrl);
                 hlsPlayer.attachMedia(video);

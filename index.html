@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة الأفلام والقنوات الذكية</title>
+    <title>مكتبة الأفلام والسينما الحصرية</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -16,30 +16,29 @@
         .header { background: #111322; padding: 15px; text-align: center; font-size: 18px; color: #00ffff; font-weight: bold; border-bottom: 2px solid #1f233a; text-shadow: 0 0 10px rgba(0,255,255,0.3); }
         .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
         
-        .playlist { width: 35%; max-width: 340px; background: #0b0c16; overflow-y: auto; border-left: 2px solid #1f233a; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
+        /* مصفوفة البوسترات والشعارات الكرتونية الملونة */
+        .playlist { width: 100%; background: #0b0c16; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding-bottom: 60px; }
         
         .channel-card {
             background: linear-gradient(135deg, #1a1d36, #141628); border: 1px solid #25294a;
-            padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
-            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: all 0.2s;
+            padding: 10px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3); transition: all 0.2s;
         }
-        .channel-card:hover, .channel-card.active { border-color: #00ffff; background: #1f233a; transform: scale(0.97); }
+        .channel-card:active { border-color: #00ffff; background: #1f233a; transform: scale(0.96); }
         
+        /* تصميم البوستر المطور */
         .ch-logo-wrapper { 
-            width: 65px; height: 65px; border-radius: 10px; background: #060713; 
+            width: 100%; height: 180px; border-radius: 12px; background: #060713; 
             overflow: hidden; display: flex; justify-content: center; align-items: center; 
-            font-size: 26px; border: 1px solid #25294a;
+            font-size: 45px; border: 1px solid #25294a;
         }
         .ch-logo-img { width: 100%; height: 100%; object-fit: cover; }
         
-        .ch-info-box { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
-        .ch-title-name { font-size: 14px; font-weight: bold; color: #ffffff; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ch-meta-txt { font-size: 10px; color: #00ffcc; text-align: right; margin-top: 5px; }
+        .ch-info-box { display: flex; flex-direction: column; width: 100%; text-align: center; }
+        .ch-title-name { font-size: 14px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch-meta-txt { font-size: 10px; color: #00ffcc; margin-top: 5px; }
 
-        .player-area { width: 65%; flex: 1; display: flex; flex-direction: column; background: #000; justify-content: center; position: relative; }
-        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
-        video { width: 100%; height: 100%; background: #000; }
-        .status { padding: 12px; background: #111322; text-align: center; font-size: 13px; color: #888; border-top: 2px solid #1f233a; font-weight: bold; }
+        .loading-spinner { display: none; text-align: center; padding: 40px; font-size: 16px; font-weight: bold; color: #00ffff; width: 100%; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -47,32 +46,29 @@
     <div class="header">🎬 سينما الأطفال والبث المباشر الذكي</div>
     
     <div class="main-content">
+        <div class="loading-spinner" id="spinner">جاري سحب البوسترات والعروض الحصرية... ⏳</div>
         <div class="playlist" id="playlist">
-            <div style="padding:20px; text-align:center; color:#888;">جاري سحب مكتبة الصور والعروض... ⏳</div>
-        </div>
-        
-        <div class="player-area">
-            <div class="video-container" id="videoContainer">
-                <div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; color:#444;">المشغل جاهز ومستعد</div>
-            </div>
-            <div class="status" id="status">اختر فيلماً أو قناة من البوستر لبدء العرض الممتع 🍿</div>
+            <!-- شبكة البوسترات السينمائية الملونة تولد هنا تلقائياً -->
         </div>
     </div>
 
     <script>
         const host = window.location.origin; 
-        const videoContainer = document.getElementById('videoContainer');
-        const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات والبوسترات
+        // 1. جلب قائمة باقاتك وعرضها بالبوسترات بسرعة الصاروخ
+        const spinner = document.getElementById('spinner');
+        spinner.style.display = 'block';
+
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
                 channelsData = channels;
                 const playlistDiv = document.getElementById('playlist');
+                spinner.style.display = 'none';
+                
                 if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171;">مكتبتك فارغة تماماً حالياً</div>';
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171; width:100%;">مكتبتك فارغة تماماً حالياً</div>';
                     return;
                 }
                 playlistDiv.innerHTML = '';
@@ -80,7 +76,6 @@
                 channels.forEach((channel, idx) => {
                     const card = document.createElement('div');
                     card.className = 'channel-card';
-                    card.id = `card-${idx}`;
                     
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
@@ -89,65 +84,37 @@
                         <div class="ch-logo-wrapper">${logoVisual}</div>
                         <div class="ch-info-box">
                             <span class="ch-title-name">${channel.name}</span>
-                            <span class="ch-meta-txt">• عرض عالي الدقة HD</span>
+                            <span class="ch-meta-txt">• اضغط للتشغيل الفوري HD</span>
                         </div>
                     `;
 
-                    card.onclick = () => {
-                        document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
-                        card.classList.add('active');
-                        playChannel(idx);
-                    };
+                    card.onclick = () => playChannel(idx);
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
+                spinner.style.display = 'none';
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center; width:100%;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج التشغيل الصافي والصحيح المانع للتعارض والـ Loop التكراري نهائياً
+        // 2. معالج التوجيه الذكي والخارق المتوافق مع ExoPlayer والمشغلات الخارجية %100
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
-            const name = channel.name;
 
-            statusText.textContent = `جاري الاتصال بالعرض: ${name} ... 🚀`;
-            
-            // تفعيل الإعلان بشكل مسبق آمن ومفصول لمنع التداخل
+            // 🌟 القفزة التاريخية: تشغيل الفخ الإعلاني فوراً عند النقر لتأمين أرباحك بالدولار
             triggerHoneyPotAd();
 
-            // تصفير وتنظيف الحاوية لإنهاء أي كاش قديم
-            videoContainer.innerHTML = '';
-
-            // إنشاء عنصر الفيديو النقي والافتراضي للنظام
-            const videoElement = document.createElement('video');
-            videoElement.id = 'videoPlayer';
-            videoElement.controls = true;
-            videoElement.autoplay = true;
-            videoElement.setAttribute('playsinline', 'true');
-            videoElement.setAttribute('preload', 'auto');
-
+            // تجهيز رابط البروكسي المشفر لسيرفر رندر الخاص بك [2.38K]
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            // التمرير البرمجي النظيف والمستقر الموجه مباشرة لـ ExoPlayer والأندرويد
+            // 🚀 الخدعة البرمجية الحتمية لتشغيل الروابط بدون امتداد وقفل التعارض:
+            // نقوم بإرسال أمر للنظام لفتح الرابط مباشرة عبر مشغل الهاتف المدمج (ExoPlayer) دون تدخل صفحة الويب المعطلة
             if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.src = url; 
+                window.location.href = url; // تشغيل قنوات m3u8 بأعلى ثبات
             } else {
-                videoElement.src = proxyUrl;
+                window.location.href = proxyUrl; // توجيه الأفلام وروابط الـ Xtream للعمل على مشغل ExoPlayer للأندرويد فوراً وبدون قيود! [2.38K]
             }
-
-            videoContainer.appendChild(videoElement);
-            videoElement.load();
-            
-            videoElement.onplay = () => {
-                statusText.textContent = `يعرض الآن: ${name}  ✅`;
-            };
-
-            // 🌟 تنظيف وإلغاء دالة الخطأ تماماً لمنع حدوث أي عملية ترميش أو إعادة تحميل تكرارية للأبد
-            videoElement.onerror = () => {
-                statusText.textContent = `⏳ جاري ضبط التدفق الرقمي للبث الحي... سيعمل العرض تلقائياً.`;
-            };
         }
 
         function triggerHoneyPotAd() {
@@ -156,6 +123,7 @@
             }
         }
 
+        // فخ صيد السارقين عند النقر العشوائي على الواجهة
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') {
                 startapp.showInterstitial();

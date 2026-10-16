@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الحصرية الشفافة الصغيرة</title>
     
-    <!-- استدعاء المحرك البرمجي العالمي المتطور لإجبار الفيديو على العمل داخل التطبيق ومنع الانبثاق الخارجي -->
+    <!-- استدعاء المحرك البرمجي العالمي المتطور لتثبيت قنوات الـ m3u8 داخل التطبيق ومنع الانبثاق -->
     <script src="https://jsdelivr.net"></script>
 
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
@@ -24,7 +24,7 @@
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين --> */
+        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -98,7 +98,7 @@
         const sidebarContainer = document.getElementById('sidebarContainer');
         const floatingBackBtn = document.getElementById('floatingBackBtn');
         let channelsData = [];
-        let hlsEngineInstance = null; // الاحتفاظ بمحرك التشغيل الحالي لمنع التداخل
+        let hlsEngineInstance = null; // التحكم في محرك HLS لمنع التداخل والتعليق
 
         // 1. جلب قنواتك المحدثة وعرضها بالشعارات المصغرة
         fetch(`${host}/api/channels`)
@@ -136,7 +136,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. معالج تشغيل الميديا الآمن داخلياً وبدون مغادرة الصفحة أو كشف السورس كود
+        // 2. معالج الفصل الذكي لتشغيل الـ m3u8 والـ ts داخل الصفحة 100% وبدون انبثاق
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -145,54 +145,46 @@
             statusText.textContent = name;
             triggerHoneyPotAd();
 
-            // تنظيف أي دفق قديم لمنع التعليق أو الفصل التكراري [2.38K]
+            // تدمير وتنظيف أي دفق قديم لإعادة تهيئة الذاكرة المؤقتة
             if (hlsEngineInstance) {
                 hlsEngineInstance.destroy();
                 hlsEngineInstance = null;
             }
+            videoElement.removeAttribute('type');
+            videoElement.src = '';
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            videoElement.removeAttribute('type');
 
-            // 🌟 السر السحري: استخدام محرك Hls.js المدمج لإجبار الـ m3u8 والـ ts على التشغيل صلبًا داخل الصفحة [1.1.6، 2.38K]
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                    maxBufferLength: 30
-                });
+            // 🌟 نظام الفصل التلقائي المزدوج:
+            if (url.toLowerCase().includes('.m3u8')) {
+                // روابط الـ m3u8 يتم إجبارها على العمل عبر محرك Hls.js لتقييدها داخل الصفحة ومنع خروجها
+                if (Hls.isSupported()) {
+                    const hls = new Hls({
+                        enableWorker: true,
+                        lowLatencyMode: true
+                    });
+                    hls.loadSource(url);
+                    hls.attachMedia(videoElement);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        videoElement.play();
+                    });
+                    hlsEngineInstance = hls;
+                } else {
+                    videoElement.type = 'application/x-mpegURL';
+                    videoElement.src = url;
+                    videoElement.load();
+                }
+                console.log("تم تشغيل محرك HLS المدمج لرابط الـ m3u8");
 
-                // توجيه قنوات m3u8 مباشرة، وتمرير قنوات الـ ts والـ Xtream عبر البروكسي المشفر لإخفائها [1.3.2، 2.38K]
-                let finalSource = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
-
-                hls.loadSource(finalSource);
-                hls.attachMedia(videoElement);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoElement.play();
-                });
-
-                hls.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        // خطة الإنقاذ المباشرة داخل الصفحة إذا واجه المحرك الذكي عقبة برمجية
-                        videoElement.src = proxyUrl;
-                        videoElement.play().catch(() => {});
-                    }
-                });
-
-                hlsEngineInstance = hls;
-
-            } else if (videoElement.canPlayType('application/x-mpegURL') || videoElement.canPlayType('vnd.apple.mpegURL')) {
-                // للأجهزة التي تدعم قراءة الروابط مباشرة داخل المتصفح الداخلي بدون وسيط (مثل الأندرويد الحديث جداً)
-                videoElement.src = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
-                videoElement.load();
             } else {
-                // للأفلام وملفات الـ MP4 الخام
+                // روابط الـ ts والـ Xtream تنطلق مباشرة للمشغل الناجح الصافي لتفتح فوراً وبدون تعارض المحركات
+                videoElement.type = 'video/mp2t';
                 videoElement.src = proxyUrl;
                 videoElement.load();
+                console.log("تم تشغيل البث المباشر الممرر عبر البروكسي لقنوات الـ ts");
             }
 
-            videoElement.onplay = () => { console.log("البث مستقر وثابت داخل الصفحة 100%."); };
+            videoElement.onplay = () => { console.log("البث مستقر داخلياً بدون انفصال."); };
         }
 
         // 3. دالة معالجة ملء الشاشة التلقائية والسينمائية

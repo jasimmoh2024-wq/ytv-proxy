@@ -15,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين استدعاء المشغل الخارجي */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
-        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
+        /* منطقة الخلفية كاملة: مشغل الميديا المدمج يشغل كامل حجم الشاشة في الخلفية بنقاء 100% */
+        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
+        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
+        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) بنقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -61,9 +61,9 @@
 </head>
 <body>
 
-    <!-- إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية داخل الـ WebView -->
+    <!-- مشغل الميديا المدمج بالخلفية النقي والافتراضي لضمان العرض المباشر داخل نفس الصفحة -->
     <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ المباشر 🍿</div>
+        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
@@ -78,6 +78,7 @@
 
     <script>
         const host = window.location.origin; 
+        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
@@ -117,7 +118,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 معالج قهر حظر المتصفحات والاستدعاء المباشر لـ ExoPlayer عبر عتاد الهاتف
+        // 2. معالج التشغيل الصافي والنقي المتوافق مع شروط البث بالتوكن والامتداد داخل الصفحة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -128,20 +129,30 @@
             // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير
+            // تمرير الرابط المحدث والناجح الخاص بك عبر أنبوب البروكسي لسيرفر رندر الخاص بك
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
+            
+            // تصفير وتهيئة المشغل لمنع التعليق
+            videoElement.removeAttribute('type');
 
-            // تحديد الـ Mime-Type بدقة تكنولوجية متناهية بناءً على الامتداد ليفهمه الأندرويد فوراً
-            let mimeType = "video/*";
-            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
-            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
-            if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) mimeType = "video/mp2t";
+            // التوجيه القياسي لوسم الفيديو المتوافق مع متصفح الهاتف وقسم الويب بالتوكن والامتداد المباشر
+            if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'application/x-mpegURL';
+                videoElement.src = url; // تنطلق مباشرة بأعلى ثبات
+            } else {
+                // قنوات الـ ts والـ live المحقونة من قبلك تمر عبر البروكسي ليفهمها عتاد الهاتف فوراً داخل الصفحة
+                videoElement.type = 'video/mp2t';
+                videoElement.src = proxyUrl;
+            }
 
-            // 🌟 كود الـ Intent القاطع والمحكم هندسياً: يجبر نظام الأندرويد على فتح البث مباشرة عبر مشغل ExoPlayer الأصلي للجهاز 
-            // هذا السطر يتخطى المتصفح الداخلي الميت تماماً، ويشغل قنوات الـ ts والـ m3u8 والافلام بأعلى ثبات للعتاد وبدون كشف الروابط
-            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود تلقائياً لداخل نفس تطبيقك وقائمتك الجانبية الفاخرة المحدثة بالشعارات!
-            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
+            videoElement.load();
+            videoElement.play().catch(e => {
+                // خطة إنقاذ سريعة لإعادة تشغيل أنبوب البث تلقائياً عند التأخير
+                videoElement.load();
+                videoElement.play();
+            });
+
+            videoElement.onplay = () => { console.log("البث مستقر داخلياً بنجاح."); };
         }
 
         function triggerHoneyPotAd() {

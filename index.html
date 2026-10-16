@@ -15,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة الخلفية كاملة: مشغل الميديا المدمج يشغل كامل حجم شاشة الهاتف في الخلفية بنقاء 100% */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
-        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
+        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين استدعاء مشغل النظام المدمج */
+        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
+        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: نحيفة جداً وصغيرة (18% فقط من الشاشة) بنقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
+        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -61,11 +61,12 @@
 </head>
 <body>
 
+    <!-- إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية -->
     <div class="video-background-container">
-        <!-- مشغل الميديا المدمج الصافي والمطابق هندسياً لنظام قسم الويب بالمنصة -->
-        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ المباشر 🍿</div>
     </div>
     
+    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
@@ -77,11 +78,10 @@
 
     <script>
         const host = window.location.origin; 
-        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة
+        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -117,7 +117,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🛠️ معالج التشغيل المطابق لعمل المنصة: يمرر الرابط المعدل بالتوكن كاملاً وبشكل مباشر دون وسيط
+        // 2. 🚀 المعالج السحري والحتمي: يوجه الرابط الأصلي بالتوكن والامتداد ليفتح مباشرة عبر مشغل النظام المدمج للمنصة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -127,28 +127,11 @@
             
             // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها
             triggerHoneyPotAd();
-            
-            // تهيئة وتصفير وسم الفيديو لاستقبال الدفق الصافي
-            videoElement.removeAttribute('type');
 
-            // 🚀 محاكاة المنصة الحتمية الكبرى:
-            // نمرر الرابط الأصلي بالتوكن والامتداد المتغير مباشرة وبدون تشفيره داخل السيرفر الوسيط
-            // هذا الأمر يطابق كتابته يدوياً داخل إعدادات قسم الويب بالمنصة، فيتعرف عليه الـ APK ويفتحه فوراً وبدون أي تجميد!
-            if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'application/x-mpegURL';
-            } else {
-                videoElement.type = 'video/mp2t';
-            }
-
-            videoElement.src = url; // حقن المسار الحر والمباشر بالتوكن والامتداد القياسي
-            videoElement.load();
-            videoElement.play().catch(e => {
-                console.log("إعادة المحاكاة التلقائية الصافية...");
-                videoElement.load();
-                videoElement.play();
-            });
-
-            videoElement.onplay = () => { console.log("البث مستقر وثابت كلياً داخل الصفحة."); };
+            // 🌟 القفزة البرمجية المطلقة: تمرير الرابط المباشر بالتوكن والامتداد دون أي تشويه أو وسيط يفسد الصلاحية الأمنية
+            // هذا الأمر يجبر المنصة على فتح الرابط تلقائياً داخل "مشغل الفيديو الداخلي للـ APK" بملء الشاشة وبدون الخروج من التطبيق
+            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود فوراً لقائمتك الجانبية المحدثة بالشعارات المصغرة!
+            window.location.href = url; 
         }
 
         function triggerHoneyPotAd() {

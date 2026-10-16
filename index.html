@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة الأفلام والقنوات الذكية</title>
     
+    <!-- استدعاء المحرك العالمي المتخصص في تثبيت ومنع فصل قنوات البث الحي والـ TS -->
+    <script src="https://jsdelivr.net"></script>
+
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "110183401"; 
@@ -59,8 +62,9 @@
         const videoContainer = document.getElementById('videoContainer');
         const statusText = document.getElementById('status');
         let channelsData = [];
+        let activeMpegtsPlayer = null;
 
-        // 1. جلب قائمة القنوات والبوسترات الفورية
+        // 1. جلب قائمة قنواتك وعرضها بالبوسترات
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -101,7 +105,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج تشغيل البث المباشر الذكي لفك عقدة الروابط بدون امتداد
+        // 2. معالج التشغيل الفولاذي المانع للفصل التكراري والترميش للأبد
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -109,37 +113,64 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            // تفعيل الفخ الإعلاني بشكل مسبق لمنع الترميش والتداخل
+            // تشغيل الفخ الإعلاني فوراً عند النقر لمنع التداخل
             triggerHoneyPotAd();
 
-            // تنظيف وإعادة بناء الحاوية البرمجية
+            // إغلاق وتدمير أي مشغل قديم لتنظيف الذاكرة ومنع الفصل [2.38K]
+            if (activeMpegtsPlayer) {
+                activeMpegtsPlayer.unload();
+                activeMpegtsPlayer.detachMediaElement();
+                activeMpegtsPlayer.destroy();
+                activeMpegtsPlayer = null;
+            }
             videoContainer.innerHTML = '';
 
+            // بناء عنصر الفيديو الصافي
             const videoElement = document.createElement('video');
             videoElement.id = 'videoPlayer';
             videoElement.controls = true;
             videoElement.autoplay = true;
             videoElement.setAttribute('playsinline', 'true');
             videoElement.setAttribute('preload', 'auto');
+            videoContainer.appendChild(videoElement);
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            // 🌟 الفحص الحتمي: إذا كان الرابط ينتهي بـ m3u8 ينطلق فوراً، وإذا كان بدون امتداد نمرره للبروكسي المحدث دون تحديد نوع مقيد [1.1.6، 1.3.2]
-            if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.src = url; 
-            } else {
-                videoElement.src = proxyUrl;
-            }
+            // 🌟 الحل الجذري التاريخي: إذا كان الرابط بدون امتداد، نربطه بمحرك mpegts لمنع الفصل والترميش نهائياً [1.1.6، 1.1.7]
+            if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8') && mpegts.isSupported()) {
+                
+                // إنشاء أنبوب بث مستقر يمنع قطع الاتصال تلقائياً [1.1.6، 1.1.7]
+                const mpegtsPlayer = mpegts.createPlayer({
+                    type: 'mse', // تفعيل محرك التقطيع الصلب للنظام
+                    isLive: true,
+                    url: proxyUrl
+                }, {
+                    enableStashBuffer: false, // إلغاء التخزين المؤقت الزائد لمنع التأخير والفصل
+                    liveBufferLatencyChasing: true
+                });
 
-            videoContainer.appendChild(videoElement);
-            videoElement.load();
+                mpegtsPlayer.attachMediaElement(videoElement);
+                mpegtsPlayer.load();
+                mpegtsPlayer.play();
+
+                activeMpegtsPlayer = mpegtsPlayer;
+                console.log("تم تشغيل محرك mpegts.js لتثبيت قنوات الـ Xtream.");
+
+            } else if (url.toLowerCase().includes('.m3u8')) {
+                // قنوات m3u8 تنطلق مباشرة وبدون بروكسي وبأعلى سرعة وثبات [1.3.2، 1.3.5]
+                videoElement.src = url; 
+                videoElement.load();
+            } else {
+                // لتشغيل الأفلام وملفات الـ MP4 الخام بسلاسة عبر البروكسي
+                videoElement.src = proxyUrl;
+                videoElement.load();
+            }
             
             videoElement.onplay = () => {
                 statusText.textContent = `يعرض الآن: ${name}  ✅`;
             };
 
             videoElement.onerror = () => {
-                // خطة الطوارئ: إجبار هاتف الأندرويد ومشغل ExoPlayer على فتح تدفق البروكسي الخام مباشرة رغماً عن قيود المتصفح
                 videoElement.src = proxyUrl;
                 videoElement.play().catch(() => {
                     statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وموجهاً لـ ExoPlayer.`;

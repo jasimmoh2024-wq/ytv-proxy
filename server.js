@@ -18,7 +18,6 @@ app.get('/app-ads.txt', (req, res) => {
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار قراءة قائمة باقاتك مع الحفاظ على الرابط بكامل توكناته البرمجية السحرية الممررة
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -36,10 +35,10 @@ app.get('/api/channels', (req, res) => {
         
         if (line.startsWith('#EXTINF:')) {
             let logoMatch = line.match(/tvg-logo\s*=\s*"([^"]+)"/i) || line.match(/logo\s*=\s*"([^"]+)"/i);
-            currentLogo = (logoMatch && logoMatch) ? logoMatch[1].trim() : '';
+            currentLogo = logoMatch ? logoMatch[1].trim() : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
-            if (nameMatch && nameMatch) {
+            if (nameMatch) {
                 currentName = nameMatch[1];
             } else {
                 let commaIndex = line.lastIndexOf(',');
@@ -54,7 +53,7 @@ app.get('/api/channels', (req, res) => {
             channels.push({
                 name: currentName,
                 logo: currentLogo,
-                url: line // هنا يتم تخزين الرابط كاملاً بالتوكن مالتة المتغير
+                url: line
             });
             currentName = '';
             currentLogo = '';
@@ -63,18 +62,18 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// 🌟 البروكسي المطور الفولاذي: يقوم بالتقاط الرابط وإعادة بناء التوكنات كاملة وتمريرها للسيرفر الأصلي
+// البروكسي الفولاذي المطور لقراءة التوعين ديناميكياً ودعم m3u8 و TS
 app.get('/stream', async (req, res) => {
-    // التقاط الرابط الكامل الممرر بالاستعلام بما يحتويه من علامات استفهام وتوكنات حماية
-    const fullUrl = req.url.substring(req.url.indexOf('?url=') + 5);
+    const urlIndex = req.url.indexOf('?url=');
+    if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
+    
+    const fullUrl = req.url.substring(urlIndex + 5);
     const decodedUrl = decodeURIComponent(fullUrl);
-
-    if (!decodedUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
 
     try {
         const response = await axios({
             method: 'get',
-            url: decodedUrl, // إرسال الطلب بالتوكن الأصلي كاملاً للحصول على الصلاحية الأمنية للبث
+            url: decodedUrl,
             responseType: 'stream',
             timeout: 30000,
             headers: { 
@@ -83,8 +82,10 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // فرض هيدرز البث الحي المستقر المتوافق مع متصفح قسم الويب
-        res.setHeader('Content-Type', 'video/mp2t'); 
+        // 🌟 حركة ذكية: جلب الـ Content-Type الحقيقي القادم من سيرفر Xtream لكي لا نخدع الأندرويد
+        const contentType = response.headers['content-type'] || 'video/mp2t';
+        
+        res.setHeader('Content-Type', contentType); 
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
@@ -94,7 +95,7 @@ app.get('/stream', async (req, res) => {
         req.on('close', () => response.data.destroy());
 
     } catch (error) {
-        // إذا حدث خطأ، يوجه الرابط الأصلي مباشرة كخطة بديلة آمنة لتشغيل الميديا
+        // إذا فشل البروكسي يتم التحويل المباشر كحل أخير آمن
         res.redirect(decodedUrl);
     }
 });

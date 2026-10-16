@@ -1,412 +1,153 @@
-[
-  {
-    "name": "beIN Sports 1 ",
-    "logo": "https://lo1.in/bss/bsS1.png",
-    "url": "http://tyqw.site:2052/live/10675785266958/99039021857485/677012.m3u8"
-  },
-  {
-    "name": "beIN Sports 2",
-    "logo": "https://lo1.in/bss/bsS2.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677013"
-  },
-  {
-    "name": "beIN Sports 3",
-    "logo": "https://lo1.in/bss/bs3.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677014"
-  },
-  {
-    "name": "beIN Sports 4",
-    "logo": "https://lo1.in/bss/bs4.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677015"
-  },
-  {
-    "name": "beIN Sports 5",
-    "logo": "https://lo1.in/bein/beinn5.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677016"
-  },
-  {
-    "name": "beIN Sports 6",
-    "logo": "https://lo1.in/bein/beinn6.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677017"
-  },
-  {
-    "name": "beIN Sports 7",
-    "logo": "https://lo1.in/bss/BEIN SPORTS 07.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677018"
-  },
-  {
-    "name": "beIN Sports 8",
-    "logo": "https://lo1.in/bss/bss8.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/677019"
-  },
-  {
-    "name": "Alwan Sport 1",
-    "logo": "https://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649689"
-  },
-  {
-    "name": "Alwan Sport 2",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649690"
-  },
-  {
-    "name": "Alwan Sport 3",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649691"
-  },
-  {
-    "name": "Alwan Sport 4",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649692"
-  },
-  {
-    "name": "Alwan Sport 5",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649693"
-  },
-  {
-    "name": "Alwan Sport 6",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649694"
-  },
-  {
-    "name": "Alwan Sport 7",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649695"
-  },
-  {
-    "name": "Alwan Sport 8",
-    "logo": "http://lo1.in/fwc/ALWANS.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/649696"
-  },
-  {
-    "name": "BEIN MOVIES 1",
-    "logo": "https://lo1.in/beinn/beinm1pre0.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/427"
-  },
-  {
-    "name": "BEIN MOVIES 2",
-    "logo": "https://lo1.in/beinn/beinm2act0.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/428"
-  },
-  {
-    "name": "BEIN MOVIES 3",
-    "logo": "https://lo1.in/beinn/bm3.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/429"
-  },
-  {
-    "name": "BEIN MOVIES 4",
-    "logo": "https://lo1.in/beinn/beinm4famm.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/430"
-  },
-  {
-    "name": "BEIN SERIES 1",
-    "logo": "https://lo1.in/beinn/beinser100.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/431"
-  },
-  {
-    "name": "BEIN SERIES 2",
-    "logo": "https://lo1.in/beinn/beinser20.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/432"
-  },
-  {
-    "name": "BEIN DRAMA",
-    "logo": "https://lo1.in/FCB/beinet.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/433"
-  },
-  {
-    "name": "ViVo OSCAR",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192835"
-  },
-  {
-    "name": "ViVo CLUB",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192834"
-  },
-  {
-    "name": "ViVo SHOWTIME",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192836"
-  },
-  {
-    "name": "ViVo PLUS",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192837"
-  },
-  {
-    "name": "ViVo MOVIES",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192838"
-  },
-  {
-    "name": "ViVo SENTRAL",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192839"
-  },
-  {
-    "name": "ViVo ONLINE",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192842"
-  },
-  {
-    "name": "ViVo CRYSTAL",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192843"
-  },
-  {
-    "name": "ViVo WAR TIME",
-    "logo": "https://static.vecteezy.com/system/resources/previews/054/650/800/non_2x/vivo-logo-rounded-vivo-logo-free-png.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192841"
-  },
-  {
-    "name": "Signal Comedy",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192634"
-  },
-  {
-    "name": "Signal Action",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192633"
-  },
-  {
-    "name": "Signal Cinema",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192635"
-  },
-  {
-    "name": "Signal AFLAM",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192636"
-  },
-  {
-    "name": "Signal CLASSIC",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192637"
-  },
-  {
-    "name": "Signal 90s",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192638"
-  },
-  {
-    "name": "Signal VOX",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192639"
-  },
-  {
-    "name": "Signal GOLD",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192640"
-  },
-  {
-    "name": "Signal ANIME",
-    "logo": "https://images.seeklogo.com/logo-png/12/2/signal-logo-png_seeklogo-126441.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192642"
-  },
-  {
-    "name": "SHAHID ACTION",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192749"
-  },
-  {
-    "name": "SHAHID Comedy",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192739"
-  },
-  {
-    "name": "SHAHID MARVEL",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192740"
-  },
-  {
-    "name": "SHAHID ASIAN",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192742"
-  },
-  {
-    "name": "SHAHID BOLLYWOOD",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192743"
-  },
-  {
-    "name": "SHAHID WRESTLING",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192744"
-  },
-  {
-    "name": "SHAHID Animation AR",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192745"
-  },
-  {
-    "name": "SHAHID Animation EN",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/192746"
-  },
-  {
-    "name": "SHAHID MOVIES 1",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396793"
-  },
-  {
-    "name": "SHAHID MOVIES 2",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396805"
-  },
-  {
-    "name": "SHAHID 1",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396795"
-  },
-  {
-    "name": "SHAHID 2",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396796"
-  },
-  {
-    "name": "SHAHID 3",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396797"
-  },
-  {
-    "name": "SHAHID 4",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396799"
-  },
-  {
-    "name": "SHAHID 5",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396800"
-  },
-  {
-    "name": "SHAHID 6",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396802"
-  },
-  {
-    "name": "SHAHID 7",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396803"
-  },
-  {
-    "name": "SHAHID 8",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396807"
-  },
-  {
-    "name": "SHAHID 9",
-    "logo": "https://lo1.in/fwc/shahid.png",
-    "url": "http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1396812"
-  },
-  {
-    "name": "WILD",
-    "logo": "https://banner2.cleanpng.com/20180711/phz/kisspng-nat-geo-wild-national-geographic-television-show-t-tron-legacy-logo-5b45a4a81150c8.2022016915312907920709.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625061"
-  },
-  {
-    "name": "travel",
-    "logo": "https://images.seeklogo.com/logo-png/32/1/travel-channel-logo-png_seeklogo-326359.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625063"
-  },
- {
-    "name": "National Geographic Abu Dhabi",
-    "logo": "https://arabsciences.com/wp-content/uploads/2010/03/NAT_GEO_Abu_Dhabi.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625058"
-  },
-  {
-    "name": "الشروق الوثائقية",
-    "logo": "https://i.ytimg.com/vi/IB1r2H2lkBw/sddefault.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625067"
-  },
-  {
-    "name": "DISCOVERY",
-    "logo": "https://banner2.cleanpng.com/20180508/rlw/avdx7n1im.webp",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625069"
-  },
-  {
-    "name": "Animal Planet",
-    "logo": "https://e7.pngegg.com/pngimages/694/46/png-clipart-animal-planet-logo-icons-logos-emojis-iconic-brands.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625075"
-  },
-  {
-    "name": "H HISORY",
-    "logo": "https://www.broadbandtvnews.com/wp-content/uploads/2008/11/history-id.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625076"
-  },
-  {
-    "name": "Discovery",
-    "logo": "https://toppng.com/uploads/preview/discovery-channel-logo-vector-11574229905pblh5eesph.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625080"
-  },
-  {
-    "name": "ID",
-    "logo": "https://www.pngarts.com/files/11/ID-Channel-Logo-PNG-Image.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/625081"
-  },
-  {
-    "name": "Nickelodeon 1",
-    "logo": "https://w7.pngwing.com/pngs/350/177/png-transparent-nickelodeon-logo-nick-jr-television-show-cartoon-logo-miscellaneous-text-orange-thumbnail.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/151195"
-  },
-  {
-    "name": "Nickelodeon 2",
-    "logo": "https://w7.pngwing.com/pngs/350/177/png-transparent-nickelodeon-logo-nick-jr-television-show-cartoon-logo-miscellaneous-text-orange-thumbnail.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/151192"
-  },
-  {
-    "name": "Baraem",
-    "logo": "https://i.pinimg.com/564x/d9/76/0a/d9760ae15be233d2d955987f4497af86.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/443"
-  },
-  {
-    "name": "جيم",
-    "logo": "https://e7.pngegg.com/pngimages/482/774/png-clipart-jeem-tv-satellite-television-television-channel-bein-sports-others-television-logo.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/444"
-  },
-  {
-    "name": "Baby tv",
-    "logo": "https://static.wikia.nocookie.net/logopedia/images/2/21/LogoBabyTV-2021-MAIN_logo.png",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/442"
-  },
-  {
-    "name": "TOM And jerry 1",
-    "logo": "https://icon2.cleanpng.com/20180817/kxq/kisspng-tom-cat-jerry-mouse-tom-and-jerry-nibbles-cartoon-tom-and-jerry-cartoon-logo-png-free-png-images-t-5b766c5ba018f9.9581577815344876436558.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193324"
-  },
-  {
-    "name": "TOM And jerry 2",
-    "logo": "https://icon2.cleanpng.com/20180817/kxq/kisspng-tom-cat-jerry-mouse-tom-and-jerry-nibbles-cartoon-tom-and-jerry-cartoon-logo-png-free-png-images-t-5b766c5ba018f9.9581577815344876436558.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193323"
-  },
-  {
-    "name": "TOM And jerry 3",
-    "logo": "https://icon2.cleanpng.com/20180817/kxq/kisspng-tom-cat-jerry-mouse-tom-and-jerry-nibbles-cartoon-tom-and-jerry-cartoon-logo-png-free-png-images-t-5b766c5ba018f9.9581577815344876436558.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193321"
-  },
-  {
-    "name": "pink panther",
-    "logo": "https://i.pinimg.com/736x/c4/ec/35/c4ec35377f9a02c1dbf13198f0550bcc.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193316"
-  },
-  {
-    "name": "Kids Music 1",
-    "logo": "https://img.magnific.com/premium-vector/kids-channel-logo-template-design-use-live-stream-social-media-logo_57082-2311.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193350"
-  },
-  {
-    "name": "Kids Music 2",
-    "logo": "https://img.magnific.com/premium-vector/kids-channel-logo-template-design-use-live-stream-social-media-logo_57082-2311.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193347"
-  },
-  {
-    "name": "Kids Music 3",
-    "logo": "https://img.magnific.com/premium-vector/kids-channel-logo-template-design-use-live-stream-social-media-logo_57082-2311.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193346"
-  },
-  {
-    "name": "Kids Music 4",
-    "logo": "https://img.magnific.com/premium-vector/kids-channel-logo-template-design-use-live-stream-social-media-logo_57082-2311.jpg",
-    "url": "http://tyqw.site:2052/10675785266958/99039021857485/193348"
-  }
-]
+#EXTM3U
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX ALWAN HD" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX ALWAN HD
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/944168.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX ZAMAN HD" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX ZAMAN HD
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/944167.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX TIME HD" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX TIME HD
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/944166
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX CIMA HD" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX CIMA HD
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/944165
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MIX HD" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MIX HD
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/944164
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 1 ULTRA" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 1 ULTRA
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206026
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 1" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 1
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206025
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 2" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 2
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206024
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 3" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 3
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206023
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 4" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 4
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206022
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 5" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 5
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206021
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 6" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 6
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206020
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 7" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 7
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206019
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 8" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 8
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206018
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 9" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 9
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206017
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX MOVIES 10" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX MOVIES 10
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206016
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 1" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 1
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206041
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 2" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 2
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206040
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 3" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 3
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206039
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 4" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 4
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206038
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 5" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 5
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206037
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 6" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 6
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206036
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 7" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 7
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206035
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 8" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 8
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206034
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 9" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 9
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206033
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 10" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 10
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206032
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 11" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 11
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206031
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 12" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 12
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206030
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 13" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 13
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206029
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 14" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 14
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206028
+#EXTINF:-1 tvg-id="" tvg-name="VIP| NETFLIX DE 15" tvg-logo="https://lo1.in/ger/ntfx.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| NETFLIX DE 15
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206027
+#EXTINF:-1 tvg-id="" tvg-name="✦●✦ |AR-VIP| BOX OFFICE ✦●✦" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",✦●✦ |AR-VIP| BOX OFFICE ✦●✦
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206608
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 01" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 01
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206598
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 02" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 02
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206597
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 03" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 03
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206596
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 04" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 04
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206595
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 05" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 05
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206594
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 06" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 06
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206593
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 07" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 07
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206592
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 08" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 08
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206591
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 09" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 09
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206590
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 10" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 10
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206589
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 11" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 11
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206588
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 12" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 12
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206587
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 13" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 13
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206586
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 14" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 14
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206585
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 15" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 15
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206584
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 16" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 16
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206583
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 17" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 17
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206582
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 18" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 18
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206581
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 19" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 19
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206580
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 20" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 20
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206579
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 21" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 21
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206578
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 22" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 22
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206577
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 23" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 23
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206576
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 24" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 24
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206575
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 25" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 25
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206574
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 26" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 26
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206573
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 27" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 27
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206572
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 28" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 28
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206571
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 29" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 29
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206570
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 30" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 30
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206569
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 31" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 31
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206568
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 32" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 32
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206567
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 33" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 33
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206566
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 34" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 34
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206565
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 35" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 35
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206564
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 36" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 36
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206563
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 37" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 37
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206562
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 38" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 38
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206561
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 39" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 39
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206560
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 40" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 40
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206559
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 41" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 41
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206558
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 42" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 42
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206557
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 43" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 43
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206556
+#EXTINF:-1 tvg-id="" tvg-name="VIP| BOX OFFICE 44" tvg-logo="https://lo1.in/arvip1/boxoff.png" group-title="VIP | VIP-PREMIUN AR CINEMA",VIP| BOX OFFICE 44
+http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1206555

@@ -7,7 +7,7 @@
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
-        window.startapp_app_id = "209100049"; 
+        window.startapp_app_id = "110183401"; 
     </script>
     <script src="https://startappcdn.com" async></script>
 
@@ -16,7 +16,6 @@
         .header { background: #111322; padding: 15px; text-align: center; font-size: 18px; color: #00ffff; font-weight: bold; border-bottom: 2px solid #1f233a; text-shadow: 0 0 10px rgba(0,255,255,0.3); }
         .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
         
-        /* تحويل القائمة الجانبية إلى مصفوفة بوسترات وشعارات كرتونية ملونة */
         .playlist { width: 35%; max-width: 340px; background: #0b0c16; overflow-y: auto; border-left: 2px solid #1f233a; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
         
         .channel-card {
@@ -26,7 +25,6 @@
         }
         .channel-card:hover, .channel-card.active { border-color: #00ffff; background: #1f233a; transform: scale(0.97); }
         
-        /* إطار وتصميم صورة القناة أو البوستر */
         .ch-logo-wrapper { 
             width: 65px; height: 65px; border-radius: 10px; background: #060713; 
             overflow: hidden; display: flex; justify-content: center; align-items: center; 
@@ -67,7 +65,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات وبناء الواجهة بالصور والبوسترات تلقائياً
+        // 1. جلب قائمة القنوات وبناء الواجهة بالصور والبوسترات الممررة من السيرفر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -84,7 +82,7 @@
                     card.className = 'channel-card';
                     card.id = `card-${idx}`;
                     
-                    // 🌟 جلب الصورة تلقائياً: الكود يقرأ رابط الصورة المخزن في ملف الـ M3U الخاص بك ويعرضه فوراً
+                    // قراءة رابط السحابة الفعلي المستخرج من السيرفر وعرض الصورة فوراً
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
 
@@ -117,10 +115,8 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            // تفعيل الفخ الإعلاني فوراً عند النقر لكسب الأرباح
             triggerHoneyPotAd();
 
-            // تنظيف وإعادة بناء الحاوية البرمجية
             videoContainer.innerHTML = '';
 
             const videoElement = document.createElement('video');
@@ -132,7 +128,6 @@
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            // التمرير الذكي والمباشر لملفات الأفلام والروابط المستقرة
             if (url.toLowerCase().includes('.m3u8')) {
                 videoElement.src = url; 
             } else {

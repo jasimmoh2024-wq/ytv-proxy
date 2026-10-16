@@ -21,7 +21,7 @@ app.get('/app-ads.txt', (req, res) => {
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// 3. مسار قراءة القنوات والأفلام من ملف الـ M3U وبناء الباقتين تلقائياً
+// 3. مسار قراءة القنوات والأفلام من ملف الـ M3U وبناء الباقتين مع استخراج الشعارات تلقائياً
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -38,12 +38,17 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
+            // 🌟 التعديل الجوهري الحاسم: استخراج رابط اللوجو/البوستر بدقة عبر فحص وسم tvg-logo
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            currentLogo = (logoMatch && logoMatch) ? logoMatch : '';
+            if (logoMatch && logoMatch[1]) {
+                currentLogo = logoMatch[1];
+            } else {
+                currentLogo = ''; // تصفير إذا لم يوجد
+            }
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
-            if (nameMatch && nameMatch) {
-                currentName = nameMatch;
+            if (nameMatch && nameMatch[1]) {
+                currentName = nameMatch[1];
             } else {
                 let commaIndex = line.lastIndexOf(',');
                 if (commaIndex !== -1) {
@@ -56,7 +61,7 @@ app.get('/api/channels', (req, res) => {
             if (currentName === '') currentName = 'عرض غير مسمّى';
             channels.push({
                 name: currentName,
-                logo: currentLogo,
+                logo: currentLogo, // تمرير رابط الصورة الفعلي للواجهة
                 url: line
             });
             currentName = '';
@@ -66,13 +71,12 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// 4. وسيط البث (Proxy) العملاق والمعدل بالكامل ليتوافق 100% مع مشغل ExoPlayer للأندرويد والأفلام والـ Xtream معاً
+// 4. وسيط البث (Proxy) المتوافق تماماً مع مشغل ExoPlayer للأندرويد والأفلام
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
 
     try {
-        // إعداد البث المباشر المفتوح لمطابقة شروط مشغل الأندرويد لـ ExoPlayer
         const response = await axios({
             method: 'get',
             url: targetUrl,
@@ -84,21 +88,16 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // فحص ذكي لنوع الملف لتهيئة الهيدرز وضمان التشغيل الفوري للنوعين بدون تشنج
-        let contentType = 'video/mp2t'; // الافتراضي لقنوات الـ TS والـ Xtream التي بدون امتداد
+        let contentType = 'video/mp2t'; 
         if (targetUrl.toLowerCase().includes('.mp4')) contentType = 'video/mp4';
         if (targetUrl.toLowerCase().includes('.m3u8')) contentType = 'application/x-mpegURL';
 
-        // ضخ الهيدرز العسكرية الحتمية التي تنتظرها شريحة مشغل الهاتف والأندرويد لتفادي التعطل صامتاً
         res.setHeader('Content-Type', contentType);
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
-        
-        // تفعيل ميزة السماح بتقديم وتأخير الفيديو لملفات الأفلام (حتمي ومصيري لـ ExoPlayer)
         res.setHeader('Accept-Ranges', 'bytes'); 
 
-        // ضخ الأنبوب الحي المفتوح والمستمر فورا للمشغل
         response.data.pipe(res);
 
         req.on('close', () => {

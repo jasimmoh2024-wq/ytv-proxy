@@ -9,18 +9,15 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
-// 1. مسار قراءة الواجهة الرئيسية الشفافة الجانبية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 2. مسار ملف التحقق المدمج والمحدث لشركتي الإعلانات (Start.io & PubNative) لتوثيق الحساب
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// 3. مسار جلب القنوات وبناء الباقتين مع استخراج الشعارات تلقائياً من حقل الـ M3U
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -37,7 +34,6 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // سحب رابط الصورة أو اللوجو بدقة رغماً عن حالات الحروف والفراغات
             let logoMatch = line.match(/tvg-logo\s*=\s*"([^"]+)"/i) || line.match(/logo\s*=\s*"([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch) ? logoMatch[1].trim() : '';
 
@@ -66,7 +62,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// 4. وسيط البث (Proxy) المطور ببروتوكولات الأمان العسكرية وتخطي الحظر
+// 🌟 البروكسي الحي المطور: مبرمج خصيصاً لعدم تجميد أو تحميل الروابط المعدلة وضخها فورا كبث حي
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -75,29 +71,27 @@ app.get('/stream', async (req, res) => {
         const response = await axios({
             method: 'get',
             url: targetUrl,
-            responseType: 'stream',
-            timeout: 25000,
+            responseType: 'stream', // فتح أنبوب تدفق مستمر
+            timeout: 30000,
             headers: { 
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 'Accept': '*/*'
             }
         });
 
-        let contentType = 'video/mp2t'; 
-        if (targetUrl.toLowerCase().includes('.mp4')) contentType = 'video/mp4';
-        if (targetUrl.toLowerCase().includes('.m3u8')) contentType = 'application/x-mpegURL';
-
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Cache-Control', 'no-cache');
+        // فرض هيدرز البث الحي الصارمة للأندرويد والمشغلات لمنع قراءة البث كملف تحميل
+        res.setHeader('Content-Type', 'video/mp2t'); // إجبار المتصفح والمشغل على تشغيله فورا كفيديو حي
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Accept-Ranges', 'bytes'); 
 
         response.data.pipe(res);
         req.on('close', () => response.data.destroy());
 
     } catch (error) {
-        res.status(500).send('خطأ في جلب البث المباشر الممرر.');
+        res.status(500).send('خطأ في جلب البث المباشر.');
     }
 });
 

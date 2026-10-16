@@ -15,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة البث الخلفية العملاقة النظيفة والمفتوحة للمس مشغلات النظام */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
-        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
+        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة */
+        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
+        .welcome-box { text-align: center; font-size: 14px; color: #444; font-weight: bold; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط) ونقاء زجاجي صافي جهة اليمين */
+        /* 🌟 القائمة الجانبية الفاخرة: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -53,13 +53,14 @@
         .loading-spinner { display: none; text-align: center; padding: 20px; font-size: 10px; color: #00ffff; width: 100%; }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
+    <!-- تم إلغاء وسم الفيديو الداخلي المعطل برمجياً لكسر الحظر للأبد -->
     <div class="video-background-container">
-        <!-- 🌟 الاعتماد الكلي على مشغل النظام لتخطي التحميل المباشر وتفجير البث فوراً -->
-        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد 🍿</div>
     </div>
     
+    <!-- طبقة الواجهة الشفافة فائقة النحافة والصغر جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
@@ -72,7 +73,6 @@
 
     <script>
         const host = window.location.origin; 
-        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
@@ -122,33 +122,32 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // دالة العرض الصافية والمطابقة تماماً لشروط متصفح المنصة (AppCreator24 WebView)
+        // 🛠️ معالج الإرسال الخارجي المباشر والتلقائي: يكسر حظر المتصفحات ويضخ القنوات رغماً عن القيود
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = name;
+            statusText.textContent = "جاري تشغيل: " + name;
+            
+            // تفعيل الفخ الإعلاني فور النقر بآمان وثبات قبل فتح البث
             triggerHoneyPotAd();
 
-            // تجهيز الرابط عبر البروكسي لحل مشاكل الـ CORS وتمريره بالصيغة القياسية المباشرة لـ ExoPlayer [2.38K]
+            // تمرير الرابط المحدث عبر البروكسي لحل مشاكل التشفير والـ CORS
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
+            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
+
+            // 🚀 السحر الحقيقي لـ AppCreator24 وتخطي قيود الترميش والتحميل الصامت:
+            // نستخدم صيغة روابط الـ Intent الأصلية لنظام الأندرويد لنجبر الهاتف على فتح الفيديو 
+            // باستخدام مشغل الفيديو المدمج الخارجي للنظام (ExoPlayer) مباشرة كـ "نافذة منبثقة فوق التطبيق"
+            // وعند انتهاء الفيديو أو الضغط على زر رجوع، يعود الطفل تلقائياً لنفس صفحة البوسترات والقائمة الشفافة الجانبية بدون خروج!
             
-            // 🌟 تنظيف وحقن الـ Type الصارم لمنع المتصفح من تحميل الملف وإجباره على تشغيله فوراً كبث حي للأندرويد
-            videoElement.removeAttribute('type');
+            let mimeType = "video/*";
+            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
+            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
 
-            if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'application/x-mpegURL';
-                videoElement.src = url; 
-            } else {
-                // إجبار المتصفح على تشغيل الرابط المعدل بصيغة الـ .ts كقناة فيديو حية لمنع تنزيل الملف [1.1.6، 1.1.7]
-                videoElement.type = 'video/mp2t'; 
-                videoElement.src = proxyUrl;
-            }
-
-            videoElement.load();
-            videoElement.onplay = () => { console.log("تم التوصيل بنجاح."); };
-            videoElement.onerror = () => { statusText.textContent = `جاري جلب إشارة البث...`; };
+            // صياغة الرابط الخارجي القاطع لحسم تشغيل روابط الـ .ts والـ Xtream المباشرة
+            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};end`;
         }
 
         function triggerHoneyPotAd() {

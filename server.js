@@ -9,16 +9,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
+// 1. مسار قراءة الواجهة الرئيسية الشفافة الجانبية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// 2. مسار ملف التحقق المدمج والمحدث لشركتي الإعلانات (Start.io & PubNative) لتوثيق الحساب
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية
+// 3. مسار جلب القنوات وبناء الباقتين مع استخراج الشعارات تلقائياً من حقل الـ M3U
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -35,12 +37,12 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الصورة أو الشعار بدقة وعمق من وسم tvg-logo
-            let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
+            // سحب رابط الصورة أو اللوجو بدقة رغماً عن حالات الحروف والفراغات
+            let logoMatch = line.match(/tvg-logo\s*=\s*"([^"]+)"/i) || line.match(/logo\s*=\s*"([^"]+)"/i);
+            currentLogo = (logoMatch && logoMatch) ? logoMatch[1].trim() : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
-            if (nameMatch && nameMatch[1]) {
+            if (nameMatch && nameMatch) {
                 currentName = nameMatch[1];
             } else {
                 let commaIndex = line.lastIndexOf(',');
@@ -64,7 +66,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد
+// 4. وسيط البث (Proxy) المطور ببروتوكولات الأمان العسكرية وتخطي الحظر
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -74,28 +76,28 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 20000,
+            timeout: 25000,
             headers: { 
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': '*/*'
             }
         });
 
-        // تمرير البيانات بنظام التدفق المستمر والآمن بدون تثبيت صيغة واحدة تسبب الترميش للأفلام
-        res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
+        let contentType = 'video/mp2t'; 
+        if (targetUrl.toLowerCase().includes('.mp4')) contentType = 'video/mp4';
+        if (targetUrl.toLowerCase().includes('.m3u8')) contentType = 'application/x-mpegURL';
+
+        res.setHeader('Content-Type', contentType);
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('Accept-Ranges', 'bytes'); 
 
         response.data.pipe(res);
-
-        req.on('close', () => {
-            response.data.destroy();
-        });
+        req.on('close', () => response.data.destroy());
 
     } catch (error) {
-        res.status(500).send('خطأ في جلب البث المباشر.');
+        res.status(500).send('خطأ في جلب البث المباشر الممرر.');
     }
 });
 

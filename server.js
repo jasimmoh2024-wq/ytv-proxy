@@ -7,21 +7,18 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل بروتوكولات الأمان والحركة الشاملة لمشغلات الفيديو الخارجية والأندرويد
+// تفعيل بروتوكولات الأمان والحركة الشاملة لمشغلات الفيديو الخارجية والأندرويد والتأكيد على تخطي جدار حماية رندر
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
-// 1. مسار قراءة الواجهة السينمائية الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 2. مسار ملف التحقق المدمج والمحدث لشركتي الإعلانات (Start.io & PubNative) لتوثيق الحساب
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// 3. مسار قراءة القنوات والأفلام من ملف الـ M3U وبناء الباقتين مع استخراج الشعارات تلقائياً
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -38,16 +35,11 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // 🌟 التعديل الجوهري الحاسم: استخراج رابط اللوجو/البوستر بدقة عبر فحص وسم tvg-logo
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-            if (logoMatch && logoMatch[1]) {
-                currentLogo = logoMatch[1];
-            } else {
-                currentLogo = ''; // تصفير إذا لم يوجد
-            }
+            currentLogo = (logoMatch && logoMatch) ? logoMatch[1] : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
-            if (nameMatch && nameMatch[1]) {
+            if (nameMatch && nameMatch) {
                 currentName = nameMatch[1];
             } else {
                 let commaIndex = line.lastIndexOf(',');
@@ -61,7 +53,7 @@ app.get('/api/channels', (req, res) => {
             if (currentName === '') currentName = 'عرض غير مسمّى';
             channels.push({
                 name: currentName,
-                logo: currentLogo, // تمرير رابط الصورة الفعلي للواجهة
+                logo: currentLogo,
                 url: line
             });
             currentName = '';
@@ -71,7 +63,6 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// 4. وسيط البث (Proxy) المتوافق تماماً مع مشغل ExoPlayer للأندرويد والأفلام
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -92,8 +83,9 @@ app.get('/stream', async (req, res) => {
         if (targetUrl.toLowerCase().includes('.mp4')) contentType = 'video/mp4';
         if (targetUrl.toLowerCase().includes('.m3u8')) contentType = 'application/x-mpegURL';
 
+        // ضخ الهيدرز الاحترافية لتخطي جدار الـ Mixed Content والسماح بالتدفق المفتوح
         res.setHeader('Content-Type', contentType);
-        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('Accept-Ranges', 'bytes'); 

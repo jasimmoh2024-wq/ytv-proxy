@@ -18,6 +18,7 @@ app.get('/app-ads.txt', (req, res) => {
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
+// مسار قراءة قائمة باقاتك مع الحفاظ على الرابط بكامل توكناته البرمجية السحرية الممررة
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -53,7 +54,7 @@ app.get('/api/channels', (req, res) => {
             channels.push({
                 name: currentName,
                 logo: currentLogo,
-                url: line
+                url: line // هنا يتم تخزين الرابط كاملاً بالتوكن مالتة المتغير
             });
             currentName = '';
             currentLogo = '';
@@ -62,25 +63,27 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الحي المشفر والمطور لتخطي حظر اللوحات وضخ البث للمشغل الداخلي
+// 🌟 البروكسي المطور الفولاذي: يقوم بالتقاط الرابط وإعادة بناء التوكنات كاملة وتمريرها للسيرفر الأصلي
 app.get('/stream', async (req, res) => {
-    const targetUrl = req.query.url;
-    if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
+    // التقاط الرابط الكامل الممرر بالاستعلام بما يحتويه من علامات استفهام وتوكنات حماية
+    const fullUrl = req.url.substring(req.url.indexOf('?url=') + 5);
+    const decodedUrl = decodeURIComponent(fullUrl);
+
+    if (!decodedUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
 
     try {
         const response = await axios({
             method: 'get',
-            url: targetUrl,
+            url: decodedUrl, // إرسال الطلب بالتوكن الأصلي كاملاً للحصول على الصلاحية الأمنية للبث
             responseType: 'stream',
-            timeout: 25000,
-            // تمويه عسكري للطلب ليبدو كمتصفح حقيقي لتفادي حظر اللوحات الأصلية
+            timeout: 30000,
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': '*/*'
             }
         });
 
-        // فرض هيدرز البث الحي لمنع المتصفح الداخلي من التنزيل وإجباره على التثبيت داخل الصفحة
+        // فرض هيدرز البث الحي المستقر المتوافق مع متصفح قسم الويب
         res.setHeader('Content-Type', 'video/mp2t'); 
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -91,8 +94,8 @@ app.get('/stream', async (req, res) => {
         req.on('close', () => response.data.destroy());
 
     } catch (error) {
-        // العودة بالرابط الأصلي كخطة إنقاذ إذا تجمد اتصال البروكسي لتفادي الشاشة البيضاء
-        res.redirect(targetUrl);
+        // إذا حدث خطأ، يوجه الرابط الأصلي مباشرة كخطة بديلة آمنة لتشغيل الميديا
+        res.redirect(decodedUrl);
     }
 });
 

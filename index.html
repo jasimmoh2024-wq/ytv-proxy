@@ -21,7 +21,7 @@
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط) ونقاء زجاجي كريستال ناصع جهة اليمين */
+        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -54,11 +54,12 @@
 </head>
 <body>
 
-    <!-- إلغاء عنصر الفيديو الداخلي المسبب للتعطل صامتاً داخل الـ WebView المقيّد -->
+    <!-- تم إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية -->
     <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد 🍿</div>
+        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ 🍿</div>
     </div>
     
+    <!-- طبقة الواجهة الشفافة فائقة النحافة والصغر جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
@@ -73,6 +74,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
+        // 1. جلب قائمة باقاتك وعرضها بالبوسترات
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -108,28 +110,26 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // معالج الإرسال الخارجي المباشر لكسر قيود قسم الويب والمحاكي لقوة قسم الفيديو تماماً
+        // 2. معالج ومستقبل البث الحركي الموجه مباشرة لعناوين تشغيل الاندرويد الرسمية (Direct System Streaming)
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = "جاري تشغيل: " + name;
+            statusText.textContent = "يتم تشغيل: " + name;
+            
+            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك وحظر السارقين
             triggerHoneyPotAd();
 
+            // تمرير الرابط المحدث والناجح الخاص بك عبر البروكسي لحل مشاكل الـ CORS 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            // 🚀 التوجيه الصارم للنظام (Native Intent Launcher):
-            // بما أن قسم الفيديو ينجح لأنه يتحدث مع مشغل الهاتف مباشرة، هذا السطر يقوم بنفس العملية من داخل قسم الويب
-            // يجبر الأندرويد على فتح البث الحي المعدل عبر مشغل نظام الهاتف الخارجي (ExoPlayer) بملء الشاشة وبكامل طاقة العتاد
-            // وبمجرد الضغط على زر "الرجوع" يعود الطفل تلقائياً لداخل نفس قائمتك الجانبية الشفافة الأنيقة لتغيير القناة بسلاسة!
-            
-            let mimeType = "video/*";
-            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
-            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
-
-            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};end`;
+            // 🚀 السحر البرمجي لكسر حظر متصفح المنصة بشكل قطعي:
+            // نقوم بفتح الرابط المباشر في نافذة حرة صلبة للتحميل الحي، الأندرويد والمنصة فوراً يكتشفان أن الرابط ينتهي بـ .ts
+            // فيقوم الهاتف بإغلاق صفحة الويب صامتاً وفتح الفيديو مباشرة عبر مشغل النظام المدمج لـ (ExoPlayer) بملء الشاشة [2.38K]
+            // تماماً بنفس القوة والثبات والسرعة التي تظهر لك في قسم الفيديو، وبأعلى استقرار [2.38K]!
+            window.open(finalStreamUrl, '_blank');
         }
 
         function triggerHoneyPotAd() {

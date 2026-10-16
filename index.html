@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الحصرية الشفافة الجانبية</title>
+    <title>مكتبة الأفلام والقنوات الذكية</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -12,82 +12,83 @@
     <script src="https://startappcdn.com" async></script>
 
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        body { margin: 0; background: #060713; color: #fff; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        .header { background: #111322; padding: 12px; text-align: center; font-size: 16px; color: #00ffff; font-weight: bold; border-bottom: 2px solid #1f233a; }
+        
+        /* صندوق مشغل الفيديو الثابت في الأعلى لمنع ملء الشاشة القسري */
+        .player-header-area { width: 100%; height: 35vh; background: #000; display: flex; flex-direction: column; justify-content: center; position: relative; border-bottom: 2px solid #1f233a; }
+        video { width: 100%; height: 100%; background: #000; object-fit: contain; }
+        .status { padding: 8px; background: #111322; text-align: center; font-size: 11px; color: #888; font-weight: bold; border-top: 1px solid #1f233a; }
 
-        /* مشغل الميديا العملاق يملأ الخلفية بالكامل */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
-        video { width: 100%; height: 100%; object-fit: contain; background: #000; }
-
-        /* طبقة الواجهة الشفافة الطافية في الأمام */
-        .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
-
-        /* 🌟 1. القائمة الجانبية السحرية: نحيفة جداً ومثبتة على جهة اليمين بنقاء زجاجي كامل */
-        .playlist-container { 
-            width: 30%; 
-            max-width: 260px; 
-            height: 100vh; 
-            pointer-events: auto; 
-            background: linear-gradient(to left, rgba(6,7,19,0.95) 85%, rgba(0,0,0,0)); 
-            padding: 15px 10px; 
+        /* ساحة العرض في الأسفل */
+        .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
+        
+        /* 🌟 تحويل التصميم إلى قائمة واحدة عمودية ممتدة ونحيفة جداً */
+        .playlist { 
+            width: 100%; 
+            background: #0b0c16; 
+            overflow-y: auto; 
+            padding: 10px; 
             display: flex; 
             flex-direction: column; 
-            gap: 10px; 
-            border-left: 1px solid rgba(255,255,255,0.05);
+            gap: 8px; 
+            padding-bottom: 30px; 
         }
         
-        .header { font-size: 14px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 8px #00ffff; margin-bottom: 5px; line-height: 1.4; }
-        .status { text-align: center; font-size: 10px; color: #00ffcc; font-weight: bold; margin-bottom: 5px; }
-        
-        .playlist { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex: 1; padding-left: 3px; }
-        
-        /* تصميم الكرت المستطيل النحيف فائق النقاء والتأثير الزجاجي */
+        /* تصميم الكرت المستطيل النحيف على كامل عرض الشاشة */
         .channel-card {
-            background: rgba(255, 255, 255, 0.04); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px); 
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 4px 8px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; width: 100%; height: 38px;
+            background: linear-gradient(135deg, #1a1d36, #141628); 
+            border: 1px solid #25294a;
+            padding: 6px 12px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            cursor: pointer; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
+            transition: all 0.2s;
+            width: 100%;
         }
-        .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 8px rgba(0,255,255,0.4); }
+        .channel-card:active, .channel-card.active { border-color: #00ffff; background: #1f233a; transform: scale(0.99); }
         
-        /* حجم الشعار الصغير الذكي والأنيق (32 بكسل) مأمن ومثبت لمنع الاختفاء والضغط */
+        /* 🛠️ تصغير الشعار ليكون صغيراً ومثالياً جداً بنظام القائمة */
         .ch-logo-wrapper { 
-            width: 32px !important; height: 32px !important; min-width: 32px !important; max-width: 32px !important;
-            border-radius: 5px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); 
+            width: 42px; 
+            height: 42px; 
+            min-width: 42px; 
+            border-radius: 6px; 
+            background: #060713; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 18px; 
+            border: 1px solid #25294a; 
         }
-        .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ch-logo-img { width: 100%; height: 100%; object-fit: cover; }
         
+        /* تنسيق النصوص بجانب الشعار المصغر */
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
-        .ch-title-name { font-size: 11px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        /* 🌟 2. منطقة الفيديو الحرة على جهة اليسار لتأخذ المساحة الكبرى للنقاء البصري */
-        .video-free-zone { flex: 1; height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+        .ch-title-name { font-size: 13px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch-meta-txt { font-size: 9px; color: #00ffcc; margin-top: 2px; }
 
-        .loading-spinner { display: none; text-align: center; padding: 5px; font-size: 12px; color: #00ffff; width: 100%; }
+        .loading-spinner { display: none; text-align: center; padding: 20px; font-size: 14px; font-weight: bold; color: #00ffff; width: 100%; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-    <!-- مشغل الميديا بالخلفية كاملة -->
-    <div class="video-background-container">
+    <!-- 1. شاشة المشغل الثابتة في الأعلى (ExoWeb Window) -->
+    <div class="player-header-area">
         <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+        <div class="status" id="status">اختر فيلماً أو قناة من الأسفل لبدء العرض الفوري 🍿</div>
     </div>
     
-    <!-- طبقة الواجهة الشفافة الطافية والمقسمة جانبيًا -->
-    <div class="ui-layer">
-        
-        <!-- القائمة الجانبية النحيفة والزجاجية على جهة اليمين -->
-        <div class="playlist-container">
-            <div class="header">🎬 سينما الأطفال الذكية</div>
-            <div class="status" id="status">اختر باقة من القائمة 🍿</div>
-            <div class="loading-spinner" id="spinner">جاري سحب القنوات... ⏳</div>
-            <div class="playlist" id="playlist"></div>
+    <!-- 2. قائمة القنوات العمودية الموحدة في الأسفل -->
+    <div class="main-content">
+        <div class="loading-spinner" id="spinner">جاري سحب مكتبة الصور والعروض... ⏳</div>
+        <div class="playlist" id="playlist">
+            <!-- الكروت تولد هنا تلقائياً كقائمة واحدة صغيراً وأنيقة جداً -->
         </div>
-
-        <!-- منطقة العرض الحرة على جهة اليسار -->
-        <div class="video-free-zone"></div>
-        
     </div>
 
     <script>
@@ -96,10 +97,10 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
+        // جلب قائمة القنوات والبوسترات
         const spinner = document.getElementById('spinner');
         spinner.style.display = 'block';
 
-        // جلب البيانات من السيرفر المطور المصلح للوجوهات تلقائياً
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -108,7 +109,7 @@
                 spinner.style.display = 'none';
                 
                 if(channels.length === 0) {
-                    playlistDiv.innerHTML = '<div style="padding:10px; text-align:center; color:#f87171; font-size:11px;">قائمتك فارغة تماماً</div>';
+                    playlistDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#f87171; width:100%;">مكتبتك فارغة تماماً حالياً</div>';
                     return;
                 }
                 playlistDiv.innerHTML = '';
@@ -125,6 +126,7 @@
                         <div class="ch-logo-wrapper">${logoVisual}</div>
                         <div class="ch-info-box">
                             <span class="ch-title-name">${channel.name}</span>
+                            <span class="ch-meta-txt">• اضغط للتغيير الفوري</span>
                         </div>
                     `;
 
@@ -135,48 +137,60 @@
                     };
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
             })
             .catch(() => {
                 spinner.style.display = 'none';
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:11px;">خطأ في الاتصال بالخادم</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center; width:100%;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
+        // معالج ومستقبل البث المدمج الذكي المانع لقفل الشاشة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = `جاري الاتصال بـ: ${name}`;
+            statusText.textContent = `جاري الاتصال بالعرض: ${name} ... 🚀`;
+            
+            // تفعيل الفخ الإعلاني فور النقر بآمان وثبات
             triggerHoneyPotAd();
 
-            let fakeExtension = "video.mp4";
-            if (url.toLowerCase().includes('.m3u8')) fakeExtension = "playlist.m3u8";
+            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            const maskedProxyUrl = `${host}/stream/${fakeExtension}?url=${encodeURIComponent(url)}`;
+            // تنظيف الإعدادات السابقة لوسم الفيديو لإعادة تهيئته
             videoElement.removeAttribute('type');
 
+            // التمرير الذكي والمباشر داخل نفس صندوق المشغل العلوي دون مغادرة الصفحة
             if (url.toLowerCase().includes('.m3u8')) {
                 videoElement.type = 'application/x-mpegURL';
                 videoElement.src = url; 
             } else if (!url.toLowerCase().includes('.mp4')) {
-                videoElement.type = 'video/mp2t'; // تشغيل مباشر لقنوات الـ Xtream على الـ ExoPlayer بنجاح وثبات
-                videoElement.src = maskedProxyUrl;
+                videoElement.type = 'video/mp2t'; // تعريف فوري لقنوات الـ Xtream التي بدون امتداد ليفهمها مشغل ExoPlayer تلقائياً
+                videoElement.src = proxyUrl;
             } else {
-                videoElement.src = maskedProxyUrl;
+                videoElement.src = proxyUrl; // للأفلام وملفات الـ MP4 الخام
             }
 
             videoElement.load();
-            videoElement.onplay = () => { statusText.textContent = `يعرض الآن: ${name} ✅`; };
-            videoElement.onerror = () => { statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً داخل التطبيق وموجهاً لـ ExoPlayer.`; };
+            
+            videoElement.onplay = () => {
+                statusText.textContent = `يعرض الآن: ${name}  ✅`;
+            };
+
+            videoElement.onerror = () => {
+                statusText.textContent = `⚠️ تنبيه البث: سيعمل الفيديو فوراً وبدون أي مشكلة داخل التطبيق (APK) على الهواتف وموجهاً لـ ExoPlayer.`;
+            };
         }
 
         function triggerHoneyPotAd() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+            if (typeof startapp !== 'undefined') {
+                startapp.showInterstitial();
+            }
         }
 
         document.addEventListener('click', function() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+            if (typeof startapp !== 'undefined') {
+                startapp.showInterstitial();
+            }
         });
     </script>
 </body>

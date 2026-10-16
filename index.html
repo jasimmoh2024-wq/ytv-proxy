@@ -21,7 +21,7 @@
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المحدثة: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
+        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -61,7 +61,7 @@
 </head>
 <body>
 
-    <!-- إلغاء أي مشغلات ويب برمجية داخلية تسبب التجميد والكراش الصامت -->
+    <!-- إلغاء أي مشغلات ويب برمجية معطلة تسبب التجميد والكراش الصامت داخل الـ WebView المقيّد -->
     <div class="video-background-container">
         <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ المباشر 🍿</div>
     </div>
@@ -81,7 +81,7 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق
+        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق من خادم رندر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -117,7 +117,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 المعالج السحري والحتمي المعتمد في كل التطبيقات العالمية لاستدعاء مشغل ExoPlayer للأندرويد
+        // 2. 🚀 معالج الانتقال الفولاذي: يقوم بطرد الرابط المعدل ليعمل على مشغل الهاتف الافتراضي المتكامل
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -125,10 +125,10 @@
 
             statusText.textContent = name;
             
-            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها
+            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها قبل بدء التحويل المباشر
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير وحماية الروابط الأصلية [2.38K]
+            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير وحماية الروابط الأصلية
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
@@ -139,8 +139,8 @@
             if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) mimeType = "video/mp2t";
 
             // 🌟 كود الـ Intent الشامل والمعدل للاندرويد: يجبر النظام على فتح البث مباشرة عبر مشغل ExoPlayer الأصلي للهاتف
-            // هذا السطر يتخطى المتصفح الداخلي الميت تماماً، ويشغل قنوات الـ ts والـ m3u8 والافلام بأعلى ثبات للعتاد [1.1.6، 2.38K]
-            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود تلقائياً لداخل نفس تطبيقك وقائمتك الجانبية الفاخرة المحدثة بالشعارات! [2.38K]
+            // هذا السطر يتخطى المتصفح الداخلي الميت تماماً، ويشغل قنوات الـ ts والـ m3u8 والافلام بأعلى ثبات للعتاد وبدون كشف الروابط
+            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود تلقائياً لداخل نفس تطبيقك وقائمتك الجانبية الفاخرة المحدثة بالشعارات!
             window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
         }
 

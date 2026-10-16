@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة الأفلام والقنوات الذكية</title>
     
-    <!-- إعلانات Start.io الفخ الإعلاني المتطور لصيد السارقين وحفظ أرباحك -->
+    <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "110183401"; 
     </script>
@@ -101,7 +101,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:20px; color:#ef4444; text-align:center;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // 2. معالج التتشغيل النظيف المانع للترميش والمتوافق 100% مع هيدرز مشغلات النظام و ExoPlayer
+        // 2. معالج التشغيل النظيف الخالي تماماً من التعارض والترميش لـ ExoPlayer
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -109,13 +109,13 @@
 
             statusText.textContent = `جاري الاتصال الآمن بالعرض: ${name} ... 🚀`;
             
-            // 🌟 تعديل أمني: إظهار الفخ الإعلاني فوراً عند النقر وقبل بناء المشغل لتفادي تفجير الـ Loop والترميش
+            // 🌟 خطوة الحل القاطع: إظهار الفخ الإعلاني فوراً عند الضغط وقبل بناء المشغل لتفادي تداخل شاشات الـ WebView والترميش
             triggerHoneyPotAd();
 
-            // تصفير حاوية الفيديو لمسح الكاش الأمني
+            // تصفير حاوية الفيديو لمسح الكاش ومنع التداخل
             videoContainer.innerHTML = '';
 
-            // إنشاء عنصر الفيديو الأصلي الصافي
+            // إنشاء عنصر الفيديو الأصلي النقي
             const videoElement = document.createElement('video');
             videoElement.id = 'videoPlayer';
             videoElement.controls = true;
@@ -125,12 +125,12 @@
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
 
-            // التحقق والتحويل التلقائي لحقن الهوية الصارمة قبل تزويد الرابط للمشغل لمنع الحظر
+            // التوجيه والتحويل التلقائي لحقن الهوية الصارمة لـ ExoPlayer [1.1.6، 1.1.7]
             if (!url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'video/mp2t'; // قنوات الـ Xtream التي بدون امتداد ليفهمها ExoPlayer فوراً
+                videoElement.type = 'video/mp2t'; // إجبار النظام على تشغيل الرابط بدون امتداد كقناة TS [1.1.6، 1.1.7]
                 videoElement.src = proxyUrl;
             } else if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'application/x-mpegURL'; // قنوات m3u8 تنطلق مباشرة بدون بروكسي لسرعة فائقة
+                videoElement.type = 'application/x-mpegURL'; // تشغيل مباشر لقنوات m3u8 بأعلى ثبات [1.3.2، 1.3.5]
                 videoElement.src = url; 
             } else {
                 videoElement.src = proxyUrl; // للأفلام وملفات الفيديو الخام
@@ -152,13 +152,13 @@
         }
 
         function triggerHoneyPotAd() {
-            // تفعيل آمن للإعلان البيني بدون التأثير على حركة المشغل الأساسي
+            // تفعيل آمن ومفصول للإعلان البيني لحماية المشغل
             if (typeof startapp !== 'undefined') {
                 startapp.showInterstitial();
             }
         }
 
-        // فخ صيد السارقين والخارجين عن التطبيق عند النقر العشوائي على الشاشة
+        // فخ صيد السارقين عند النقر العشوائي على الواجهة خارج النطاق المسموح
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') {
                 startapp.showInterstitial();

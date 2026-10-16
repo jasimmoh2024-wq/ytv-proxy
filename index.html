@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الحصرية الشفافة النارية</title>
+    <title>مكتبة السينما الحصرية الشفافة النقية</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -19,7 +19,7 @@
             user-select: none; -webkit-user-select: none; 
         }
 
-        /* المشغل العملاق يملأ الخلفية بنقاء كامل */
+        /* المشغل العملاق يملأ الخلفية بنقاء كامل لضمان أعلى ثبات وفك تشفير صلب */
         .video-background-container {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000;
         }
@@ -33,47 +33,55 @@
         }
 
         .header { 
-            background: linear-gradient(to bottom, rgba(6,7,19,0.8), rgba(0,0,0,0)); 
+            background: linear-gradient(to bottom, rgba(6,7,19,0.85), rgba(0,0,0,0)); 
             padding: 12px; text-align: center; font-size: 15px; color: #00ffff; font-weight: bold; 
             text-shadow: 0 0 8px #00ffff; pointer-events: auto;
         }
 
-        /* 🌟 القائمة السحرية الجديدة: نحيفة جداً، ناصعة النقاء، وزجاجية بالأسفل */
+        /* 🌟 القائمة السحرية المحسنة: نحيفة جداً، ناصعة النقاء، وزجاجية بالأسفل تظهر الصور بانتظام */
         .playlist-container {
             width: 100%; max-height: 25vh; pointer-events: auto;
-            background: linear-gradient(to top, rgba(6,7,19,0.9) 80%, rgba(0,0,0,0));
+            background: linear-gradient(to top, rgba(6,7,19,0.92) 80%, rgba(0,0,0,0));
             padding: 10px; display: flex; flex-direction: column; gap: 4px;
         }
         
         .status { text-align: center; font-size: 11px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; }
 
         .playlist { 
-            display: flex; flex-direction: column; gap: 4px; 
+            display: flex; flex-direction: column; gap: 5px; 
             overflow-y: auto; max-height: 18vh; padding-right: 3px;
         }
         
         /* تصميم الكرت المستطيل النحيف فائق النقاء والتأثير الزجاجي */
         .channel-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); /* زيادة النقاء التام والزجاج المشوش */
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 10px; 
-            cursor: pointer; transition: all 0.2s; width: 100%; height: 36px; /* تثبيت ارتفاع نحيف جداً */
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 12px; 
+            cursor: pointer; transition: all 0.2s; width: 100%; height: 38px; /* تثبيت ارتفاع نحيف وجذاب */
         }
         .channel-card:active, .channel-card.active { 
             border-color: #00ffff; 
-            background: rgba(0, 255, 255, 0.12); 
+            background: rgba(0, 255, 255, 0.15); 
             box-shadow: 0 0 8px rgba(0,255,255,0.4);
         }
         
-        /* 🛠️ تصغير ميكروسكوبي للشعار ليصبح فائق النحافة (28 بكسل فقط) */
+        /* 🛠️ تصغير ميكروسكوبي للشعار مع إجبار التثبيت الفولاذي لحجم 30 بكسل لمنع الاختفاء والضغط */
         .ch-logo-wrapper { 
-            width: 28px; height: 28px; min-width: 28px; 
-            border-radius: 4px; background: rgba(0,0,0,0.6); 
-            overflow: hidden; display: flex; justify-content: center; align-items: center; 
-            font-size: 12px; border: 1px solid rgba(255,255,255,0.15); 
+            width: 30px !important; 
+            height: 30px !important; 
+            min-width: 30px !important; 
+            max-width: 30px !important;
+            border-radius: 5px; 
+            background: rgba(0,0,0,0.6); 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 12px; 
+            border: 1px solid rgba(255,255,255,0.2); 
         }
-        .ch-logo-img { width: 100%; height: 100%; object-fit: cover; }
+        .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
         .ch-title-name { font-size: 12px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -81,7 +89,7 @@
         .loading-spinner { display: none; text-align: center; padding: 5px; font-size: 12px; color: #00ffff; width: 100%; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <!-- مشغل الميديا بالخلفية كاملة -->
     <div class="video-background-container">
@@ -97,7 +105,7 @@
             <div class="loading-spinner" id="spinner">جاري اتصال السيرفر وجلب القنوات... ⏳</div>
             
             <div class="playlist" id="playlist">
-                <!-- قائمة القنوات الزجاجية النحيفة تولد هنا تلقائياً -->
+                <!-- قائمة القنوات الزجاجية النحيفة تولد هنا تلقائياً بالشعارات والمجسمات الملونة -->
             </div>
         </div>
     </div>
@@ -147,14 +155,14 @@
                     };
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح.`;
+                statusText.textContent = `تم جلب ${channels.length} عرض بنجاح بالصور والشعارات.`;
             })
             .catch(() => {
                 spinner.style.display = 'none';
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:12px;">خطأ في جلب البيانات من السيرفر المباشر</div>';
             });
 
-        // معالج ومستقبل البث السينمائي المدمج بالخلفية المانع للتعارض
+        // معالج ومستقبل البث السينمائي المدمج بالخلفية المانع للتعارض والترميش
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -165,7 +173,7 @@
             // تفعيل آمن ومستقل للإعلان لمنع تداخل شاشات الـ WebView والترميش
             triggerHoneyPotAd();
 
-            // استخدام طريقة القناع والامتداد الوهمي المحدثة لتسريع فك التشفير
+            // استخدام طريقة القناع والامتداد الوهمي المحدثة لتسريع فك التشفير لـ ExoPlayer
             let fakeExtension = "video.mp4";
             if (url.toLowerCase().includes('.m3u8')) fakeExtension = "playlist.m3u8";
 

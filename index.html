@@ -15,13 +15,11 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين استدعاء مشغل النظام الأصلي */
         .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
         .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -40,14 +38,12 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكروت الزجاجية الشفافة المضيئة الناعمة المفرغة من الغبار التقني */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
         }
         .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 6px rgba(0,255,255,0.4); }
         
-        /* تثبيت حجم الشعار الصغير جداً (22 بكسل) بقوة لمنع الاختفاء والضغط البصري */
         .ch-logo-wrapper { 
             width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important;
             border-radius: 3px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 9px; border: 1px solid rgba(255,255,255,0.12); 
@@ -61,12 +57,10 @@
 </head>
 <body>
 
-    <!-- إلغاء أي مشغلات ويب برمجية معطلة تسبب التجميد والكراش الصامت داخل الـ WebView المقيّد -->
     <div class="video-background-container">
         <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ المباشر 🍿</div>
     </div>
     
-    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container">
             <div class="header"> Amos TV 🎬</div>
@@ -81,7 +75,6 @@
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق من خادم رندر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -117,7 +110,6 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. 🚀 معالج الانتقال الفولاذي: يقوم بطرد الرابط المعدل ليعمل على مشغل الهاتف الافتراضي المتكامل
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -125,32 +117,29 @@
 
             statusText.textContent = name;
             
-            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها قبل بدء التحويل المباشر
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر البروكسي لحل مشاكل الـ CORS وتأمين التشفير وحماية الروابط الأصلية
+            // تمرير الرابط عبر البروكسي المشفر بالكامل لحل الـ CORS والـ HTTP
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            // تحديد الـ Mime-Type بدقة تكنولوجية متناهية بناءً على الامتداد ليفهمه الأندرويد فوراً
             let mimeType = "video/*";
-            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
-            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
-            if (url.toLowerCase().includes('.ts') || url.toLowerCase().includes('/live/')) mimeType = "video/mp2t";
+            if (url.toLowerCase().includes('.m3u8')) {
+                mimeType = "application/x-mpegURL";
+            } else if (url.toLowerCase().includes('.mp4')) {
+                mimeType = "video/mp4";
+            } else {
+                mimeType = "video/mp2t"; // تشغيل قنوات الـ TS والـ Live الافتراضية لـ Xtream
+            }
 
-            // 🌟 كود الـ Intent الشامل والمعدل للاندرويد: يجبر النظام على فتح البث مباشرة عبر مشغل ExoPlayer الأصلي للهاتف
-            // هذا السطر يتخطى المتصفح الداخلي الميت تماماً، ويشغل قنوات الـ ts والـ m3u8 والافلام بأعلى ثبات للعتاد وبدون كشف الروابط
-            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود تلقائياً لداخل نفس تطبيقك وقائمتك الجانبية الفاخرة المحدثة بالشعارات!
-            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
+            // إرسال الـ Intent الفولاذي لفتح المشغل الخارجي تلقائياً
+            window.location.href = `intent:${proxyUrl}#Intent;action=view;type=${mimeType};S.title=${encodeURIComponent(name)};end`;
         }
 
         function triggerHoneyPotAd() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+            if (typeof startapp !== 'undefined' && startapp.showAd) {
+                startapp.showAd();
+            }
         }
-
-        document.addEventListener('click', function() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        });
     </script>
 </body>
 </html>

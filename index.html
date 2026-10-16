@@ -15,13 +15,12 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة البث الخلفية العملاقة النظيفة والمفتوحة للمس مشغلات النظام */
         .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
         video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي صافي كريستال ناصع جهة اليمين */
+        /* القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط) ونقاء زجاجي صافي جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -33,14 +32,12 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكروت الزجاجية النحيفة والأنيقة */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
         }
         .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 6px rgba(0,255,255,0.4); }
         
-        /* تثبيت حجم الشعار الصغير جداً (22 بكسل) بقوة لمنع الاختفاء والضغط البصري */
         .ch-logo-wrapper { 
             width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important;
             border-radius: 3px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 9px; border: 1px solid rgba(255,255,255,0.12); 
@@ -56,7 +53,6 @@
 <body>
 
     <div class="video-background-container">
-        <!-- استخدام وسم الفيديو النقي المباشر المتوافق مع متصفح المنصة والمشغل الداخلي للأندرويد -->
         <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
     
@@ -79,7 +75,6 @@
         const spinner = document.getElementById('spinner');
         spinner.style.display = 'block';
 
-        // جلب البيانات من باقة جيت هاب المحدثة من قبلك
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -122,7 +117,6 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // دالة العرض الصافية والمطابقة تماماً لشروط متصفح المنصة (AppCreator24 WebView)
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -131,26 +125,19 @@
             statusText.textContent = name;
             triggerHoneyPotAd();
 
-            // تمرير الرابط المحدث عبر البروكسي لحل مشاكل الـ CORS وتمريره بالصيغة القياسية المباشرة لـ ExoPlayer
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            
-            // تنظيف وحقن الـ Type الصارم لمنع المتصفح من تحميل الملف وإجباره على تشغيله فوراً كبث حي للأندرويد
             videoElement.removeAttribute('type');
 
             if (url.toLowerCase().includes('.m3u8')) {
+                videoElement.type = 'application/x-mpegURL';
                 videoElement.src = url; 
             } else {
-                // إجبار المتصفح على قراءة الرابط المحدث بصيغة الـ .ts كقناة فيديو حية لمنع تنزيل الملف
+                // إجبار المتصفح على قراءة الرابط الممرر لبروكسي ريندر الحي كقناة فيديو حيّة ومنع التحميل التلقائي [1.1.6، 1.1.7]
+                videoElement.type = 'video/mp2t'; 
                 videoElement.src = proxyUrl;
             }
 
             videoElement.load();
-            videoElement.play().catch(e => {
-                console.log("محاولة تشغيل بديلة...");
-                videoElement.src = proxyUrl;
-                videoElement.play();
-            });
-
             videoElement.onplay = () => { console.log("تم التوصيل بنجاح."); };
             videoElement.onerror = () => { statusText.textContent = `جاري جلب إشارة البث...`; };
         }

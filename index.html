@@ -21,7 +21,7 @@
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* 🌟 القائمة الجانبية المفضلة لديك: نحيفة جداً وصغيرة (18% فقط من الشاشة) بنقاء زجاجي كريستال ناصع جهة اليمين */
+        /* 🌟 القائمة الجانبية المفضلة لديك: نحيفة جداً وصغيرة (18% فقط من الشاشة) بنقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
         .playlist-container { 
             width: 18% !important; 
             max-width: 160px !important; 
@@ -40,7 +40,7 @@
         .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* تصميم الكروت الزجاجية الشفافة المضيئة المفرغة من الغبار التقني */
+        /* تصميم الكروت الزجاجية الشفافة المضيئة الناعمة المفرغة من الغبار التقني */
         .channel-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
@@ -61,12 +61,11 @@
 </head>
 <body>
 
-    <!-- مشغل الميديا المدمج بالخلفية لضمان العرض المباشر داخل نفس صفحة قسم الويب -->
     <div class="video-background-container">
+        <!-- مشغل الميديا المدمج الصافي والمطابق هندسياً لنظام قسم الويب بالمنصة -->
         <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
     </div>
     
-    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container">
             <div class="header">📺 قائمة القنوات</div>
@@ -118,33 +117,38 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // 2. معالج التوصيل المباشر المحافظ على التوكنات البرمجية لتجاوز حظر السيرفرات الأصلية
+        // 2. 🛠️ معالج التشغيل المطابق لعمل المنصة: يمرر الرابط المعدل بالتوكن كاملاً وبشكل مباشر دون وسيط
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
             statusText.textContent = name;
-            triggerHoneyPotAd();
-
-            // تمرير الرابط بكامل تفاصيله وسم التوكن المشفر عبر أنبوب سيرفر رندر المطور
-            const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
             
+            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها
+            triggerHoneyPotAd();
+            
+            // تهيئة وتصفير وسم الفيديو لاستقبال الدفق الصافي
             videoElement.removeAttribute('type');
 
+            // 🚀 محاكاة المنصة الحتمية الكبرى:
+            // نمرر الرابط الأصلي بالتوكن والامتداد المتغير مباشرة وبدون تشفيره داخل السيرفر الوسيط
+            // هذا الأمر يطابق كتابته يدوياً داخل إعدادات قسم الويب بالمنصة، فيتعرف عليه الـ APK ويفتحه فوراً وبدون أي تجميد!
             if (url.toLowerCase().includes('.m3u8')) {
                 videoElement.type = 'application/x-mpegURL';
-                videoElement.src = proxyUrl; // إجبار الـ m3u8 المحمية بتوكن على المرور الآمن عبر السيرفر الوسيط
             } else {
                 videoElement.type = 'video/mp2t';
-                videoElement.src = proxyUrl;
             }
 
+            videoElement.src = url; // حقن المسار الحر والمباشر بالتوكن والامتداد القياسي
             videoElement.load();
             videoElement.play().catch(e => {
+                console.log("إعادة المحاكاة التلقائية الصافية...");
                 videoElement.load();
                 videoElement.play();
             });
+
+            videoElement.onplay = () => { console.log("البث مستقر وثابت كلياً داخل الصفحة."); };
         }
 
         function triggerHoneyPotAd() {

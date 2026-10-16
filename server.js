@@ -7,7 +7,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل إعدادات الـ CORS الفولاذية لضمان التوافق التام مع مشغل الويب السحابي المدمج
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 app.get('/', (req, res) => {
@@ -19,6 +18,7 @@ app.get('/app-ads.txt', (req, res) => {
     res.send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
+// قراءة وتوليد القنوات بشكل سليم بدون انهيار السيرفر
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -36,21 +36,22 @@ app.get('/api/channels', (req, res) => {
         
         if (line.startsWith('#EXTINF:')) {
             let logoMatch = line.match(/tvg-logo\s*=\s*"([^"]+)"/i) || line.match(/logo\s*=\s*"([^"]+)"/i);
-            currentLogo = logoMatch ? logoMatch[1].trim() : '';
+            // تصحيح الخطأ: استخراج النص من المصفوفة أولاً قبل عمل trim
+            currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1].trim() : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
-            if (nameMatch) {
-                currentName = nameMatch[1];
+            if (nameMatch && nameMatch[1]) {
+                currentName = nameMatch[1].trim();
             } else {
                 let commaIndex = line.lastIndexOf(',');
                 if (commaIndex !== -1) {
                     currentName = line.substring(commaIndex + 1).trim();
                 } else {
-                    currentName = 'عرض بدون اسم';
+                    currentName = 'قناة مباشرة';
                 }
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
-            if (currentName === '') currentName = 'عرض غير مسمّى';
+            if (currentName === '') currentName = 'قناة غير مسمى';
             channels.push({
                 name: currentName,
                 logo: currentLogo,
@@ -63,7 +64,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الفولاذي المطور لتأمين تدفق الفيديو من خادم Xtream إلى مشغل التطبيق الداخلي بدقة متناهية
+// البروكسي الفولاذي لإعادة توجيه البث بأمان وتخطي حجب الـ HTTP
 app.get('/stream', async (req, res) => {
     const urlIndex = req.url.indexOf('?url=');
     if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -76,28 +77,26 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: decodedUrl,
             responseType: 'stream',
-            timeout: 30000,
+            timeout: 20000,
             headers: { 
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': '*/*'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         });
 
-        // الحصول على نوع المحتوى الحقيقي للقناة وتمريره للمشغل المدمج
         const contentType = response.headers['content-type'] || 'application/x-mpegURL';
-        
         res.setHeader('Content-Type', contentType); 
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Accept-Ranges', 'bytes'); 
 
         response.data.pipe(res);
-        req.on('close', () => response.data.destroy());
+        req.on('close', () => {
+            if (response.data) response.data.destroy();
+        });
 
     } catch (error) {
-        // خطة بديلة لمنع كسر الشاشة في حال حدوث خطأ بالسيرفر
-        res.status(500).send('خطأ في الاتصال بالبث الحي.');
+        // خطة بديلة لتفادي الشاشة السوداء: تحويل مباشر للرابط الأصلي إذا كان المتصفح يدعمه
+        res.redirect(decodedUrl);
     }
 });
 

@@ -15,13 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
 
-        /* منطقة البث الخلفية العملاقة النظيفة والمفتوحة للمس مشغلات النظام */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #000; }
-        video { width: 100%; height: 100%; object-fit: contain; background: #000; pointer-events: auto !important; }
+        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين انطلاق البث */
+        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
+        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
 
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
 
-        /* القائمة الجانبية: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين */
+        /* القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط) ونقاء زجاجي كريستال ناصع جهة اليمين */
         .playlist-container { 
             width: 18%; max-width: 160px; height: 100vh; pointer-events: auto; 
             background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
@@ -54,9 +54,9 @@
 </head>
 <body>
 
+    <!-- إلغاء عنصر الفيديو الداخلي المسبب للتعطل صامتاً داخل الـ WebView المقيّد -->
     <div class="video-background-container">
-        <!-- استخدام مشغل الفيديو الصافي المتوافق مع شروط قسم الويب بالمنصة -->
-        <video id="videoPlayer" controls autoplay playsinline preload="auto"></video>
+        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد 🍿</div>
     </div>
     
     <div class="ui-layer">
@@ -70,11 +70,9 @@
 
     <script>
         const host = window.location.origin; 
-        const videoElement = document.getElementById('videoPlayer');
         const statusText = document.getElementById('status');
         let channelsData = [];
 
-        // جلب البيانات من السيرفر المطور المصلح للوجوهات تلقائياً
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -110,30 +108,28 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
             });
 
-        // دالة العرض الصافية والمطابقة لشروط الروابط المعدلة بنجاح
+        // معالج الإرسال الخارجي المباشر لكسر قيود قسم الويب والمحاكي لقوة قسم الفيديو تماماً
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
 
-            statusText.textContent = name;
+            statusText.textContent = "جاري تشغيل: " + name;
             triggerHoneyPotAd();
 
             const proxyUrl = `${host}/stream?url=${encodeURIComponent(url)}`;
-            videoElement.removeAttribute('type');
+            let finalStreamUrl = url.toLowerCase().includes('.m3u8') ? url : proxyUrl;
 
-            if (url.toLowerCase().includes('.m3u8')) {
-                videoElement.type = 'application/x-mpegURL';
-                videoElement.src = url; 
-            } else {
-                // إجبار المشغل على قراءة الرابط المعدل بصيغة .ts كفيديو حي لتتطابق مع شروط قسم الويب
-                videoElement.type = 'video/mp2t'; 
-                videoElement.src = proxyUrl;
-            }
+            // 🚀 التوجيه الصارم للنظام (Native Intent Launcher):
+            // بما أن قسم الفيديو ينجح لأنه يتحدث مع مشغل الهاتف مباشرة، هذا السطر يقوم بنفس العملية من داخل قسم الويب
+            // يجبر الأندرويد على فتح البث الحي المعدل عبر مشغل نظام الهاتف الخارجي (ExoPlayer) بملء الشاشة وبكامل طاقة العتاد
+            // وبمجرد الضغط على زر "الرجوع" يعود الطفل تلقائياً لداخل نفس قائمتك الجانبية الشفافة الأنيقة لتغيير القناة بسلاسة!
+            
+            let mimeType = "video/*";
+            if (url.toLowerCase().includes('.m3u8')) mimeType = "application/x-mpegURL";
+            if (url.toLowerCase().includes('.mp4')) mimeType = "video/mp4";
 
-            videoElement.load();
-            videoElement.onplay = () => { console.log("تم التوصيل بنجاح."); };
-            videoElement.onerror = () => { statusText.textContent = `جاري جلب إشارة البث...`; };
+            window.location.href = `intent:${finalStreamUrl}#Intent;action=view;type=${mimeType};end`;
         }
 
         function triggerHoneyPotAd() {

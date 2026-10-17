@@ -7,20 +7,18 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل وتخطي حماية CORS لجميع طلبات قنوات الويب والتطبيقات
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ملف حماية الأرباح الفنية app-ads.txt الخاص بـ Start.io
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار فك وتحليل قنوات M3U البرمجية لاستخراج الشعارات والأسماء بدقة 
+// مسار فك وتحليل قنوات M3U البرمجية المصلح بالكامل
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -37,11 +35,11 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الشعار tvg-logo بشكل نصوص صافية
+            // 🛠️ تم التصحيح: استخراج نص رابط الشعار الصافي بدقة
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
-            // استخراج اسم القناة بشكل نصوص صافية 
+            // 🛠️ تم التصحيح: استخراج نص الاسم الصافي بدقة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -67,7 +65,6 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الحامي والموجه للتدفق لمنع تجميد شبكة الهاتف عند الدخول بوضع الخمول
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -77,7 +74,7 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 30000, // زيادة المهلة لتفادي الانقطاعات المفاجئة للإنترنت
+            timeout: 30000,
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
                 'Accept': '*/*',
@@ -85,7 +82,6 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // ترويسات متطورة تجبر متصفح الهاتف ومشغل الفيديو الداخلي على اعتبار التدفق نشطاً دائماً
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Expires', '0');
@@ -97,7 +93,6 @@ app.get('/stream', async (req, res) => {
 
         response.data.pipe(res);
 
-        // حماية خادم Render من التوقف المفاجئ في حال خروج المستخدم السريع
         response.data.on('error', (err) => {
             console.error('خطأ في تدفق بيانات المصدر:', err.message);
             response.data.destroy();

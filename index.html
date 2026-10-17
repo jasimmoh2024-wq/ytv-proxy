@@ -174,10 +174,13 @@
 </head>
 <body>
 
+    <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند إطلاق البث -->
+    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
+
     <!-- السيرفر أو مشغل المتصفح المدمج ليعرض رابط رند ملء الشاشة خلف القائمة -->
     <div class="video-background-container" id="fullscreenBg">
-        <!-- ضع رابط رند الفعلي الخاص بك مكان الرابط التجريبي أدناه -->
-        <iframe src="https://ytv-proxy.onrender.com" allowfullscreen></iframe>
+        <!-- تذكر وضع رابط رند الفعلي الخاص بك مكان الرابط أدناه -->
+        <iframe src="https://example.com" allowfullscreen></iframe>
     </div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
@@ -196,7 +199,7 @@
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر
+        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر والخلفية الخافتة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -236,7 +239,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً لمشاهدة سينمائية كاملة
+        // 2. معالج تشغيل القناة الذكي: يمنع وميض ورمش شاشة الهاتف تماماً عبر الاستدعاء المخفي
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -244,18 +247,19 @@
 
             statusText.textContent = name;
             
-            // إخفاء القائمة الجانبية فوراً عند اختيار القناة لتفريغ الشاشة للبث
+            // إخفاء القائمة الجانبية فوراً بنعومة للمشاهدة كاملة الشاشة
             playlistContainer.classList.add('hidden');
 
             triggerHoneyPotAd();
 
-            // تمرير الرابط وتوجيهه عبر مسار الـ stream الآمن والمحمي في سيرفرك
+            // 🌟 الحل السحري: تمرير الرابط عبر الإطار المخفي لمنع الرمش وإبقاء الصفحة مستقرة وثابتة
             setTimeout(() => {
-                window.location.href = `${host}/stream?url=` + encodeURIComponent(url); 
+                const streamUrl = `${host}/stream?url=` + encodeURIComponent(url);
+                document.getElementById('hiddenExecutionFrame').src = streamUrl;
             }, 250); 
         }
 
-        // 3. نقر المنطقة الحرة لإعادة إظهار القائمة الجانبية في أي وقت بسلاسة
+        // 3. نقر المنطقة الحرة لإعادة إظهار القائمة الجانبية في أي وقت بسلاسة وبدون وميض
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

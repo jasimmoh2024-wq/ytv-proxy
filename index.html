@@ -51,6 +51,8 @@
             background: #000;
         }
         .video-background-container video {
+            width: 100% !important;
+            height: 100% !important;
             object-fit: contain !important;
         }
 
@@ -182,7 +184,7 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية المدمجة تحتوي الآن على مشغل Plyr الاحترافي الداخلي -->
+    <!-- غرفة العرض السينمائية المدمجة تحتوي على وسم الفيديو النظيف -->
     <div class="video-background-container" id="fullscreenBg">
         <video id="mainVideo" controls playsinline crossorigin></video>
     </div>
@@ -207,25 +209,30 @@
         let channelsData = [];
         let wakeLock = null; 
         let hlsPlayer = null;
+        let plyrInstance = null; // كائن المشغل يتم تعريفه لاحقاً لمنع تجميد الجافا سكريبت
 
-        // تهيئة وتثبيت مشغل Plyr.io بإعدادات سينمائية كاملة تتناسب مع الهواتف الذكية
-        const player = new Plyr(videoElement, {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'fullscreen'],
-            tooltips: { controls: true, seek: true },
-            keyboard: { focused: true, global: true },
-            i18n: {
-                play: 'تشغيل',
-                pause: 'إيقاف مؤقت',
-                mute: 'كتم الصوت',
-                unmute: 'إلغاء كتم الصوت',
-                settings: 'الإعدادات',
-                fullscreen: 'ملء الشاشة',
-                exitFullscreen: 'خروج من ملء الشاشة',
-                speed: 'السرعة',
-                normal: 'طبيعي',
-                quality: 'الجودة'
+        // دالة لتهيئة مشغل Plyr فقط عند التشغيل الفعلي
+        function initPlyr() {
+            if (!plyrInstance) {
+                plyrInstance = new Plyr(videoElement, {
+                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'fullscreen'],
+                    tooltips: { controls: true, seek: true },
+                    keyboard: { focused: true, global: true },
+                    i18n: {
+                        play: 'تشغيل',
+                        pause: 'إيقاف مؤقت',
+                        mute: 'كتم الصوت',
+                        unmute: 'إلغاء كتم الصوت',
+                        settings: 'الإعدادات',
+                        fullscreen: 'ملء الشاشة',
+                        exitFullscreen: 'خروج من ملء الشاشة',
+                        speed: 'السرعة',
+                        normal: 'طبيعي',
+                        quality: 'الجودة'
+                    }
+                });
             }
-        });
+        }
 
         // دالة لإبقاء شاشة الهاتف مستيقظة تماماً ومنع النظام من تجميد البث
         async function requestWakeLock() {
@@ -245,7 +252,7 @@
             }
         });
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر وخلفية الصورة الخافتة
+        // 1. جلب قائمة القنوات وتوليد الكروت بشكل نظيف وآمن
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -261,7 +268,7 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // تم إصلاح السطر وإزالة الـ \ لضمان تفعيل الجافا سكريبت وبناء القائمة فوراً
+                    // تم حذف السلاش المائلة العكسية بالكامل من السلسلة النصية لضمان عمل الواجهة بنجاح
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -282,7 +289,8 @@
                 });
                 statusText.textContent = `جاهز لضخ البث.`;
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error("Fetch Error:", err);
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
@@ -295,6 +303,7 @@
             statusText.textContent = name;
             playlistContainer.classList.add('hidden'); 
             
+            initPlyr(); // تشغيل وتهيئة Plyr الآن بعد أن تم بناء العناصر بنجاح
             requestWakeLock(); 
             triggerHoneyPotAd();
             
@@ -309,16 +318,16 @@
                     hlsPlayer.loadSource(playbackUrl);
                     hlsPlayer.attachMedia(videoElement);
                     hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function() {
-                        player.play().catch(err => console.log("Auto-play prevented:", err));
+                        plyrInstance.play().catch(err => console.log("Auto-play prevented:", err));
                     });
                 } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                     videoElement.src = playbackUrl;
-                    player.play().catch(err => console.log("Auto-play prevented:", err));
+                    plyrInstance.play().catch(err => console.log("Auto-play prevented:", err));
                 }
             } else {
                 if (hlsPlayer) hlsPlayer.destroy();
                 videoElement.src = playbackUrl;
-                player.play().catch(err => console.log("Auto-play prevented:", err));
+                plyrInstance.play().catch(err => console.log("Auto-play prevented:", err));
             }
         }
 

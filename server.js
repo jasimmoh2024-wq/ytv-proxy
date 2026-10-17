@@ -2,21 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
-const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS بشكل كامل لكسر أي حظر أمني في الهواتف والمشغلات
 app.use(cors({ origin: '*' }));
 
-// متغيّر لحفظ القنوات في الذاكرة لتسريع تحميل القائمة فوراً
+// متغيّر لحفظ القنوات في الذاكرة (Cache) لتسريع تحميل القائمة فوراً
 let cachedChannels = null;
 
-// المعرف الإعلاني الصحيح والخاص بك لشركة Start.io
-const STARTAPP_ID = "209100049";
-
+// دالة سريعة وذكية لمعالجة ملف الـ M3U بدون استهلاك موارد السيرفر
 function loadChannelsOnce() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
@@ -57,51 +52,29 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
-    res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
+    res.type('text/plain').send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// إرسال القنوات للواجهة الأمامية بروابط وهمية مشفرة لحمايتها من السرقة
+// API فوري يرسل القنوات المحفوظة بالكاش دون أي تأخير
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
     }
-    
-    const safeChannels = cachedChannels.map((ch, idx) => ({
-        name: ch.name,
-        logo: ch.logo,
-        streamUrl: `/stream/channel-${idx}.m3u8`
-    }));
-    
-    res.json(safeChannels);
+    res.json(cachedChannels);
 });
 
-// 🌟 المسار الاحترافي والنهائي: كسر فخ ترميز الصوت وفتح الصورة كاملة (Light Proxy Pipe)
-app.get('/stream/channel-:id.m3u8', (req, res) => {
-    const id = parseInt(req.params.id);
-    if (!cachedChannels || !cachedChannels[id]) {
-        return res.status(404).send('القناة غير موجودة.');
-    }
-    
-    const targetUrl = cachedChannels[id].url;
-    const clientProtocol = targetUrl.startsWith('https') ? https : http;
-
-    // السيرفر يقوم بفتح جسر اتصال آمن ومخفي، ويقوم بضخ ترويسة الفيديو المباشرة الصريحة
-    clientProtocol.get(targetUrl, (streamResponse) => {
-        // إجبار نوع المحتوى ليكون بث ميديا حية وصورة وصوت كاملين (IPTV Stream Profile)
-        res.setHeader('Content-Type', 'application/x-mpegURL');
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        
-        // تمرير البيانات الفورية للمشغل الخارجي بالهاتف ليفهم ترميز الصورة فوراً
-        streamResponse.pipe(res);
-    }).on('error', () => {
-        // خيار احتياطي صامت عند حدوث أي انقطاع مفاجئ بالخادم لضمان عدم التوقف
-        res.redirect(targetUrl);
-    });
+// مسار إعادة التوجيه السريع لتفادي حظر الآي بي وحل مشكلة الـ CORS
+app.get('/stream', (req, res) => {
+    const urlIndex = req.url.indexOf('?url=');
+    if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
+    const decodedUrl = decodeURIComponent(req.url.substring(urlIndex + 5));
+    // تحويل مباشر للمشغل ليتصل من إنترنت الهاتف لتفادي حظر السيرفر السحابي
+    res.redirect(decodedUrl);
 });
 
 app.listen(PORT, () => {
+    // تحميل القنوات فور تشغيل السيرفر
     cachedChannels = loadChannelsOnce();
-    console.log(`Secured IPTV Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

@@ -1,22 +1,31 @@
 const express = require('express');
+const axios = require('axios');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
-const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
-let cachedChannels = null;
-const STARTAPP_ID = "209100049";
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-function loadChannelsOnce() {
+// 🌟 تم تحديث وحقن المعرف الإعلاني الصحيح والخاص بك هنا (209100049) لحفظ الأرباح بالدولار
+app.get('/app-ads.txt', (req, res) => {
+    res.type('text/plain');
+    res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
+});
+
+// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية
+app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
-    if (!fs.existsSync(filePath)) return [];
-    
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'ملف channels.m3u غير موجود' });
+    }
+
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
     const channels = [];
@@ -24,21 +33,28 @@ function loadChannelsOnce() {
     let currentLogo = '';
 
     for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
+        let line = lines[i].trim();
+        
         if (line.startsWith('#EXTINF:')) {
-            const logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
-            currentLogo = logoMatch ? logoMatch[1] : '';
-            
-            const nameMatch = line.match(/tvg-name="([^"]+)"/i);
-            if (nameMatch) {
+            // استخراج رابط الصورة أو الشعار بدقة وعمق من وسم tvg-logo
+            let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+            currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
+
+            let nameMatch = line.match(/tvg-name="([^"]+)"/i);
+            if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
             } else {
-                const commaIdx = line.lastIndexOf(',');
-                currentName = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : 'قناة بث';
+                let commaIndex = line.lastIndexOf(',');
+                if (commaIndex !== -1) {
+                    currentName = line.substring(commaIndex + 1).trim();
+                } else {
+                    currentName = 'عرض بدون اسم';
+                }
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
+            if (currentName === '') currentName = 'عرض غير مسمّى';
             channels.push({
-                name: currentName || 'قناة غير مسمى',
+                name: currentName,
                 logo: currentLogo,
                 url: line
             });
@@ -46,55 +62,42 @@ function loadChannelsOnce() {
             currentLogo = '';
         }
     }
-    return channels;
-}
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.json(channels);
 });
 
-app.get('/app-ads.txt', (req, res) => {
-    res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
-});
+// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد
+app.get('/stream', async (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
 
-app.get('/api/channels', (req, res) => {
-    if (!cachedChannels) {
-        cachedChannels = loadChannelsOnce();
-    }
-    
-    // إرسال روابط مقنعة تنتهي بـ .m3u8 لإجبار نظام الهاتف على تشغيل الفيديو كاملًا
-    const safeChannels = cachedChannels.map((ch, idx) => ({
-        name: ch.name,
-        logo: ch.logo,
-        url: `${req.protocol}://${req.get('host')}/stream/channel-${idx}.m3u8`
-    }));
-    
-    res.json(safeChannels);
-});
+    try {
+        const response = await axios({
+            method: 'get',
+            url: targetUrl,
+            responseType: 'stream',
+            timeout: 20000,
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
+                'Accept': '*/*'
+            }
+        });
 
-// 🌟 المسار السحري لحل مشكلة (الصوت بدون صورة) مع حماية الروابط من التجسس
-app.get('/stream/channel-:id.m3u8', (req, res) => {
-    const id = parseInt(req.params.id);
-    if (!cachedChannels || !cachedChannels[id]) {
-        return res.status(404).send('القناة غير موجودة.');
-    }
-    
-    const targetUrl = cachedChannels[id].url;
-    const clientProtocol = targetUrl.startsWith('https') ? https : http;
-
-    // السيرفر يتصل بالقناة نيابة عن المستخدم ويمرر البيانات مع ترويسة الفيديو المباشر لإجبار الصورة على العمل
-    clientProtocol.get(targetUrl, (streamResponse) => {
-        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+        // تمرير البيانات بنظام التدفق المستمر والآمن بدون تثبيت صيغة واحدة تسبب الترميش للأفلام
+        res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
+        res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
-        
-        // ضخ البث الحي مباشرة للمشغل الخارجي دون كشف رابطك الأصلي
-        streamResponse.pipe(res);
-    }).on('error', () => {
-        res.redirect(targetUrl); // خيار احتياطي آمن لضمان استمرارية التشغيل
-    });
+        res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Accept-Ranges', 'bytes'); 
+
+        response.data.pipe(res);
+
+        req.on('close', () => {
+            response.data.destroy();
+        });
+
+    } catch (error) {
+        res.status(500).send('خطأ في جلب البث المباشر.');
+    }
 });
 
-app.listen(PORT, () => {
-    cachedChannels = loadChannelsOnce();
-    console.log(`Secured Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

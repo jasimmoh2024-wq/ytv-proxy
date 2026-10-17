@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io تم تحديث المعرف الصحيح والجديد هنا لحفظ أرباحك بالدولار -->
+    <!-- إعلانات Start.io لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
@@ -152,9 +152,6 @@
 </head>
 <body>
 
-    <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند استدعاء مشغل الهاتف الخارجي -->
-    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
-
     <div class="video-background-container" id="fullscreenBg"></div>
     
     <div class="ui-layer">
@@ -212,7 +209,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة وإجبار مشغل الهاتف الخارجي على فتح الصوت والصورة معاً
+        // 2. معالج تشغيل القناة وإجبار نظام الهاتف على فتح الفيديو بالصوت والصورة عبر المشغلات الخارجية
         function playChannel(idx) {
             const channel = channelsData[idx];
             const safeUrl = channel.streamUrl; 
@@ -223,9 +220,15 @@
 
             triggerHoneyPotAd();
 
-            // 🌟 السحر الحقيقي: إطلاق الرابط عبر الإطار المخفي لاستدعاء مشغل الهاتف بالصورة والصوت وبدون وميض
+            // 🌟 القفزة البرمجية النهائية الحتمية لفتح الصورة والصوت معاً:
             setTimeout(() => {
-                document.getElementById('hiddenExecutionFrame').src = `${host}${safeUrl}`; 
+                const fullStreamUrl = `${host}${safeUrl}`;
+                
+                // نقوم بإنشاء رابط نية أندرويد قياسي صريح يجبر الـ WebView على تحويل الدفق فوراً للمشغل الخارجي بالهاتف كفيديو كامل
+                const androidIntentUrl = `intent:${fullStreamUrl}#Intent;type=video/*;package=com.mxtech.videoplayer.ad;package=org.videolan.vlc;end`;
+                
+                // توجيه فوري للمنظومة بدون إحداث وميض أو رمش في شاشة التطبيق
+                window.location.href = androidIntentUrl;
             }, 250); 
         }
 

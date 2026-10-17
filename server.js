@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل ميزه الـ CORS بشكل كامل لمنع مشاكل حظر المتصفحات للملفات الخارجية
+// تفعيل CORS بالكامل لمنع مشاكل حظر المتصفحات للملفات الخارجية
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 // تقديم الصفحة الرئيسية للموقع
@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار معالجة وقراءة ملف القنوات (تم إصلاح استخراج الاسم والشعار بنجاح هنا)
+// مسار معالجة وقراءة ملف القنوات (تم إصلاح استخراج النصوص النظيفة من المصفوفات)
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -33,10 +33,11 @@ app.get('/api/channels', (req, res) => {
         if (!line) continue; // تجاوز السطور الفارغة
         
         if (line.startsWith('#EXTINF:')) {
-            // سحب رابط الشعار بدقة وعمق من المجموعة الأولى [1]
+            // استخراج رابط الشعار بدقة عبر جلب العنصر الأول من نتيجة الماتش [1]
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
+            // استخراج اسم القناة بدقة عبر جلب العنصر الأول من نتيجة الماتش [1]
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -51,7 +52,7 @@ app.get('/api/channels', (req, res) => {
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'عرض غير مسمّى';
             
-            // حقن وتوجيه الرابط عبر مسار البروكسي السريع لتجاوز الحظر والتشفير
+            // توجيه الرابط عبر مسار البروكسي الداخلي /stream لتخطي قيود الحماية وضمان التشغيل
             const proxyUrl = `/stream?url=${encodeURIComponent(line)}`;
             
             channels.push({

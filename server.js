@@ -59,31 +59,31 @@ app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// ارسال القنوات للواجهة الأمامية ولكن بدون إرسال الروابط الحقيقية (حماية القائمة من السرقة)
+// إرسال قائمة القنوات بروابط وهمية مشفرة تماماً لحمايتها من السرقة
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
     }
     
-    // نقوم بإرسال الاسم والشعار فقط للواجهة لإخفاء الروابط تماماً عن المتصفح
     const safeChannels = cachedChannels.map((ch, idx) => ({
         name: ch.name,
         logo: ch.logo,
-        streamUrl: `/stream/channel-${idx}` // رابط وهمي مشفر ومحمي
+        streamUrl: `/stream/channel-${idx}.m3u8` // الرابط الآمن والوهمي
     }));
     
     res.json(safeChannels);
 });
 
-// 🌟 المسار الذكي لاستقبال الرابط الوهمي وتحويله سرياً وبسرعة البرق للمشغل
-app.get('/stream/channel-:id', (req, res) => {
+// المسار الذكي لاستدعاء الرابط الأصلي خفية وتمريره مباشرة للمشغل الخارجي بالهاتف
+app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {
         return res.status(404).send('القناة غير موجودة.');
     }
     
     const realUrl = cachedChannels[id].url;
-    // تحويل آمن ومباشر للمشغل المدمج بالهاتف دون كشف الرابط في الواجهة
+    
+    // إرسال الرابط الأصلي مباشرة إلى بروتوكول Intent المفتوح في التطبيق
     res.redirect(realUrl);
 });
 

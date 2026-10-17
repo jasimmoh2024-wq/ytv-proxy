@@ -6,6 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// تفعيل الـ CORS بشكل كامل لكسر أي حظر أمني في التطبيقات والهواتف
 app.use(cors({ origin: '*' }));
 
 // متغيّر لحفظ القنوات في الذاكرة لتسريع تحميل القائمة فوراً
@@ -75,7 +76,7 @@ app.get('/api/channels', (req, res) => {
     res.json(safeChannels);
 });
 
-// المسار الذكي: يوجه المشغل للرابط المباشر مع ترويسة الفيديو لإجبار الصوت والصورة على العمل فوراً
+// المسار الذكي: يوجه المشغل الخارجي للرابط المباشر مع ترويسة الفيديو لإجبار الصوت والصورة على العمل فوراً
 app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {

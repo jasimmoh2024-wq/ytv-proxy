@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
+    
+    <!-- استدعاء مكتبة Hls.js لتشغيل قنوات البث المباشر IPTV بكفاءة عالية -->
+    <script src="https://jsdelivr.net"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -27,7 +30,17 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #07070b; 
+            background: #000; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* عنصر الفيديو الفعلي */
+        #mainVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         /* طبقة الواجهة الشفافة فوق الفيديو */
@@ -147,8 +160,10 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية المدمجة -->
-    <div class="video-background-container" id="fullscreenBg"></div>
+    <!-- غرفة العرض السينمائية المدمجة المحتوية على مشغل الفيديو -->
+    <div class="video-background-container" id="fullscreenBg">
+        <video id="mainVideo" autoplay playsinline controls></video>
+    </div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
@@ -165,9 +180,11 @@
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
+        const videoElement = document.getElementById('mainVideo');
         let channelsData = [];
+        let hlsPlayer = null;
         
-        // 🔒 قفل عدم انطفاء الشاشة (Wake Lock)
+        // 🔒 قفل منع انطفاء الشاشة (Wake Lock)
         let wakeLock = null;
 
         async function requestWakeLock() {
@@ -181,15 +198,50 @@
             }
         }
 
-        function releaseWakeLock() {
-            if (wakeLock !== null) {
-                wakeLock.release();
-                wakeLock = null;
-                console.log('تم إطلاق قفل الشاشة لحفظ الطاقة 🔋');
+        // دالة تشغيل القنوات الاحترافية المتكاملة
+        function playChannel(channel) {
+            statusText.textContent = `جاري تحميل: ${channel.name}`;
+            
+            // تحويل الرابط عبر البروكسي الخاص بسيرفر Render
+            const streamUrl = `${host}/stream?url=${encodeURIComponent(channel.url)}`;
+
+            // تنظيف أي بث سابق لمنع التداخل والتعليق
+            if (hlsPlayer) {
+                hlsPlayer.destroy();
+                hlsPlayer = null;
+            }
+
+            // تشغيل الرابط باستخدام تقنية HLS المتطورة
+            if (Hls.isSupported()) {
+                hlsPlayer = new Hls({
+                    maxBufferLength: 10,
+                    liveDurationInfinity: true
+                });
+                hlsPlayer.loadSource(streamUrl);
+                hlsPlayer.attachMedia(videoElement);
+                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                    videoElement.play().catch(e => console.log("تحتاج لتفاعل المستخدم لبدء الصوت"));
+                    statusText.textContent = `يعرض الآن: ${channel.name} 🎬`;
+                });
+                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        statusText.textContent = "خطأ في تشغيل القناة ❌";
+                    }
+                });
+            } 
+            // دعم هواتف آيفون ومتصفح Safari بشكل مباشر
+            else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElement.src = streamUrl;
+                videoElement.addEventListener('loadedmetadata', () => {
+                    videoElement.play();
+                    statusText.textContent = `يعرض الآن: ${channel.name} 🎬`;
+                });
+            } else {
+                statusText.textContent = "المشغل غير مدعوم على هذا الجهاز ❌";
             }
         }
 
-        // الحفاظ على حيوية الشاشة لو خرج المستخدم وعاد ثانيةً والتطبيق مفتوح
+        // إعادة تفعيل قفل الشاشة تلقائياً إذا خرج المستخدم من التطبيق وعاد إليه
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') {
                 await requestWakeLock();
@@ -227,14 +279,11 @@
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         
-                        // تفعيل منع انطفاء الشاشة فوراً عند الضغط لتشغيل القناة
+                        // تفعيل منع انطفاء الشاشة فوراً
                         await requestWakeLock();
                         
-                        if (typeof playChannel === 'function') {
-                            playChannel(channel);
-                        } else {
-                            statusText.textContent = `جاري تشغيل: ${channel.name}`;
-                        }
+                        // استدعاء دالة التشغيل
+                        playChannel(channel);
                     };
                     playlistDiv.appendChild(card);
                 });

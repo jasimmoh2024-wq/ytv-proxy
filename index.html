@@ -25,7 +25,7 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة (تعرض رابط رند الخاص بك) */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة: سوداء صافية وفارغة تماماً لاستقبال البث */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -34,12 +34,6 @@
             height: 100vh; 
             z-index: 1; 
             background: #07070b; 
-        }
-        
-        .video-background-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
         }
 
         /* طبقة الواجهة الشفافة فوق الفيديو */
@@ -59,7 +53,7 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: 28% !important; /* حجم متوسط ومثالي جداً للهواتف والشاشات */
+            width: 28% !important; 
             max-width: 320px !important; 
             min-width: 180px !important; 
             height: 100vh; 
@@ -70,7 +64,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 15px; 
-            border-left: 2px solid rgba(255, 0, 60, 0.2); /* خط جانبي أحمر ناعم */
+            border-left: 2px solid rgba(255, 0, 60, 0.2); 
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
             opacity: 1;
             z-index: 5;
@@ -147,20 +141,8 @@
         }
         
         .channel-card-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; width: 100%; }
-        
-        /* عند تمرير الماوس أو اللمس يضيء الكارت بالأحمر */
-        .channel-card:hover { 
-            background: rgba(30, 30, 40, 0.8); 
-            border-color: rgba(255, 0, 60, 0.4); 
-        }
-        
-        /* كارت القناة النشطة حالياً */
-        .channel-card.active { 
-            border-color: #ff003c; 
-            background: rgba(255, 0, 60, 0.15); 
-            box-shadow: 0 0 12px rgba(255, 0, 60, 0.3); 
-        }
-        
+        .channel-card:hover { background: rgba(30, 30, 40, 0.8); border-color: rgba(255, 0, 60, 0.4); }
+        .channel-card.active { border-color: #ff003c; background: rgba(255, 0, 60, 0.15); box-shadow: 0 0 12px rgba(255, 0, 60, 0.3); }
         .channel-card.active .card-bg-blur { opacity: 0.22; }
         
         .ch-logo-wrapper { 
@@ -177,7 +159,8 @@
     <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند إطلاق البث -->
     <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
 
-    </div>
+    <!-- غرفة العرض السينمائية تم تطهيرها وحذف الـ iframe المسبب للمشكلة السابقة -->
+    <div class="video-background-container" id="fullscreenBg"></div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
@@ -248,7 +231,7 @@
 
             triggerHoneyPotAd();
 
-            // 🌟 الحل السحري: تمرير الرابط عبر الإطار المخفي لمنع الرمش وإبقاء الصفحة مستقرة وثابتة
+            // تمرير الرابط عبر الإطار المخفي لمنع الرمش تماماً وإبقاء الصفحة مستقرة وثابتة
             setTimeout(() => {
                 const streamUrl = `${host}/stream?url=` + encodeURIComponent(url);
                 document.getElementById('hiddenExecutionFrame').src = streamUrl;

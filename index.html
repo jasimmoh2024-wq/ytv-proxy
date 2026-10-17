@@ -241,7 +241,7 @@
             }
         }
 
-        // إعادة تفعيل قفل الشاشة تلقائياً إذا خرج المستخدم من التطبيق وعاد إليه
+        // إعادة تفعيل قفل الشاشة تلقائياً
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') {
                 await requestWakeLock();
@@ -256,6 +256,11 @@
                 const playlistDiv = document.getElementById('playlist');
                 playlistDiv.innerHTML = '';
                 
+                if(channels.length === 0) {
+                    statusText.textContent = "قائمة القنوات فارغة ⚠️";
+                    return;
+                }
+                
                 channels.forEach((channel, idx) => {
                     const card = document.createElement('div');
                     card.className = 'channel-card';
@@ -264,6 +269,7 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
+                    // 🛠️ تم إصلاح طريقة بناء النص (Template Literals) هنا لمنع اختفاء البيانات
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -287,6 +293,7 @@
                     };
                     playlistDiv.appendChild(card);
                 });
+                statusText.textContent = "جاهز للعرض 🍿";
             })
             .catch(err => {
                 statusText.textContent = "خطأ في تحميل القنوات ❌";

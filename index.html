@@ -16,7 +16,6 @@
         document.addEventListener("DOMContentLoaded", function() {
             if (window.startapp && typeof window.startapp.loadInterstitial === "function") {
                 window.startapp.loadInterstitial();
-                // إظهار الإعلان بعد تحميل الصفحة بـ 3 ثوانٍ لتجربة مستخدم ممتازة
                 setTimeout(function() {
                     window.startapp.showInterstitial();
                 }, 3000);
@@ -191,7 +190,7 @@
             <div class="status" id="status">اختر باقة 🍿</div>
             <div class="playlist" id="playlist"></div>
 
-            <!-- 📥 هنا شريط إعلان البانر لـ Start.io مدمج بشكل أنيق أسفل القائمة لمنع تداخل أزرار المشاهدة -->
+            <!-- 📥 شريط إعلان البانر لـ Start.io مدمج بشكل أنيق أسفل القائمة -->
             <div class="ad-banner-wrapper">
                 <div data-startapp-zone="banner"></div>
             </div>
@@ -237,10 +236,13 @@
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
 
-                        // استدعاء إعلان بيني عند نقر المستخدم على القنوات لزيادة أرباحك
+                        // 🎬 استدعاء إعلان بيني عند نقر المستخدم على القنوات لزيادة أرباحك
                         if (window.startapp && typeof window.startapp.showInterstitial === "function") {
                             window.startapp.showInterstitial();
                         }
+
+                        // هنا يتم تمرير وتحديث النص أو مشغل الفيديو الخاص بك
+                        statusText.innerText = `جاري تشغيل: ${channel.name} 🎬`;
                     };
                     playlistDiv.appendChild(card);
                 });

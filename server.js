@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار معالجة وقراءة ملف القنوات
+// مسار معالجة وقراءة ملف القنوات (تم إصلاح استخراج الاسم والشعار بنجاح هنا)
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -33,7 +33,7 @@ app.get('/api/channels', (req, res) => {
         if (!line) continue; // تجاوز السطور الفارغة
         
         if (line.startsWith('#EXTINF:')) {
-            // سحب رابط الشعار بدقة وعمق
+            // سحب رابط الشعار بدقة وعمق من المجموعة الأولى [1]
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 

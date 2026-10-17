@@ -11,6 +11,11 @@
     </script>
     <script src="https://startappcdn.com" async></script>
 
+    <!-- مكتبات مشغل Plyr.io الحديث ومكتبة تشغيل البث المباشر Hls.js لضمان عمل الروابط على الهواتف -->
+    <link rel="stylesheet" href="https://plyr.io" />
+    <script src="https://plyr.io"></script>
+    <script src="https://jsdelivr.net"></script>
+
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -25,7 +30,7 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة: سوداء صافية وفارغة تماماً لاستقبال البث */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة المتوافقة مع مشغل Plyr */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -33,7 +38,26 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #07070b; 
+            background: #000; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ضبط حجم وحواف مشغل Plyr ليملأ الخلفية تماماً كمنصة سينمائية */
+        .video-background-container .plyr {
+            width: 100% !important;
+            height: 100% !important;
+            background: #000;
+        }
+        .video-background-container video {
+            object-fit: contain !important;
+        }
+
+        /* تخصيص لون أزرار تحكم مشغل Plyr لتتناسب مع الطابع الأحمر النيون لموقعك */
+        :root {
+            --plyr-color-main: #ff003c;
+            --plyr-video-control-background-hover: rgba(255, 0, 60, 0.2);
         }
 
         /* طبقة الواجهة الشفافة فوق الفيديو */
@@ -46,6 +70,7 @@
             z-index: 2; 
             display: flex; 
             flex-direction: row;
+            pointer-events: none; /* السماح بالنقر من خلال الطبقة للتحكم بالمشغل */
         }
 
         /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
@@ -70,6 +95,7 @@
             z-index: 5;
             box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8);
             transform: translateX(0);
+            pointer-events: auto; /* إعادة تفعيل النقر داخل القائمة الجانبية */
         }
 
         /* تأثير الاختفاء والانزلاق جهة اليمين */
@@ -156,8 +182,10 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
-    <div class="video-background-container" id="fullscreenBg"></div>
+    <!-- غرفة العرض السينمائية المدمجة تحتوي الآن على مشغل Plyr الاحترافي الداخلي -->
+    <div class="video-background-container" id="fullscreenBg">
+        <video id="mainVideo" controls playsinline crossorigin></video>
+    </div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
@@ -174,8 +202,30 @@
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
+        const videoElement = document.getElementById('mainVideo');
+        
         let channelsData = [];
         let wakeLock = null; // كائن لمنع الهاتف من النوم والتوقف
+        let hlsPlayer = null;
+
+        // تهيئة وتثبيت مشغل Plyr.io بإعدادات سينمائية كاملة تتناسب مع الهواتف الذكية
+        const player = new Plyr(videoElement, {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'fullscreen'],
+            tooltips: { controls: true, seek: true },
+            keyboard: { focused: true, global: true },
+            i18n: {
+                play: 'تشغيل',
+                pause: 'إيقاف مؤقت',
+                mute: 'كتم الصوت',
+                unmute: 'إلغاء كتم الصوت',
+                settings: 'الإعدادات',
+                fullscreen: 'ملء الشاشة',
+                exitFullscreen: 'خروج من ملء الشاشة',
+                speed: 'السرعة',
+                normal: 'طبيعي',
+                quality: 'الجودة'
+            }
+        });
 
         // دالة لإبقاء شاشة الهاتف مستيقظة تماماً ومنع النظام من تجميد البث
         async function requestWakeLock() {
@@ -211,7 +261,6 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // تم تصحيح بناء السلسلة النصية وعرض صور الخلفية المضببة مباشرة بنجاح
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -222,7 +271,6 @@
                         </div>
                     `;
 
-                    // تم إكمال الكود المقطوع القديم وإغلاق الدالة بشكل سليم تماماً
                     card.onclick = (e) => {
                         e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
@@ -237,23 +285,43 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً وتفعيل الفخ الإعلاني ومنع النوم
+        // 2. معالج تشغيل القناة المحدث بالكامل للعمل داخل مشغل Plyr
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
             const name = channel.name;
             
             statusText.textContent = name;
-            playlistContainer.classList.add('hidden');
+            playlistContainer.classList.add('hidden'); // إخفاء القائمة تلقائياً لبدء المشاهدة السينمائية
             
             requestWakeLock(); // تشغيل ميزة إبقاء الشاشة مستيقظة لمنع تجمد الهاتف
             triggerHoneyPotAd();
             
-            setTimeout(() => {
-                window.location.href = url;
-            }, 250);
+            // تشغيل الروابط المباشرة و الـ IPTV الذكي (صيغة m3u8) بداخل المشغل الفخم
+            if (url.toLowerCase().includes('.m3u8')) {
+                if (Hls.isSupported()) {
+                    if (hlsPlayer) hlsPlayer.destroy(); // تنظيف البث القديم لحفظ الذاكرة
+                    
+                    hlsPlayer = new Hls();
+                    hlsPlayer.loadSource(url);
+                    hlsPlayer.attachMedia(videoElement);
+                    hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function() {
+                        player.play().catch(err => console.log("Auto-play prevented:", err));
+                    });
+                } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                    // دعم أصيل لمتصفحات Safari على أجهزة الآيفون
+                    videoElement.src = url;
+                    player.play().catch(err => console.log("Auto-play prevented:", err));
+                }
+            } else {
+                // تشغيل روابط الـ MP4 أو الروابط العادية المباشرة
+                if (hlsPlayer) hlsPlayer.destroy();
+                videoElement.src = url;
+                player.play().catch(err => console.log("Auto-play prevented:", err));
+            }
         }
 
+        // عند النقر على المنطقة الفارغة تظهر القائمة الجانبية مجدداً لاختيار قناة أخرى
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

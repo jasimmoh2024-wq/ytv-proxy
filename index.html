@@ -230,16 +230,11 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل البث الفوري وفك التشفير الآمن لحل مشاكل الـ CORS ومنع سرقة الروابط
+        // 2. معالج تشغيل البث الفوري لحل مشاكل الـ CORS ومنع سرقة الروابط
         function playChannel(idx) {
             const channel = channelsData[idx];
+            const safeStreamUrl = `${host}${channel.streamUrl}`;
             const name = channel.name;
-            
-            // 🔓 فك تشفير الـ Base64 الآمن داخلياً لتوليد الرابط الأصلي خفية عن أعين برامج التجسس
-            const decodedUrl = atob(channel.secureKey);
-            
-            // تمرير الرابط عبر مسار الـ stream المحمي في سيرفرك لحل مشاكل الـ CORS والـ Proxy
-            const safeStreamUrl = `${host}/stream?url=` + encodeURIComponent(decodedUrl);
 
             statusText.textContent = name;
             playlistContainer.classList.add('hidden');
@@ -248,19 +243,17 @@
 
             // تشغيل محرك Hls.js الفوري لتغذية شاشة العرض المدمجة بالبث بدون تعليق
             if (Hls.isSupported()) {
-                if (hls) { hls.destroy(); } // إنهاء القناة السابقة لتفريغ الذاكرة فوراً
+                if (hls) { hls.destroy(); } 
                 hls = new Hls();
                 hls.loadSource(safeStreamUrl);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
                     video.play().catch(() => {
-                        // كسر قيود التصفح المدمج في الهواتف وتفعيل التشغيل الفوري
                         video.muted = true;
                         video.play();
                     });
                 });
             } 
-            // دعم هواتف الآيفون والأجهزة القديمة التي تقرأ دفق الـ m3u8 بشكل تلقائي
             else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = safeStreamUrl;
                 video.addEventListener('loadedmetadata', function() {
@@ -269,7 +262,6 @@
             }
         }
 
-        // 3. نقر الشاشة الفارغة الجانبية لإعادة إظهار القائمة الجانبية بنعومة وسلاسة فوق البث
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

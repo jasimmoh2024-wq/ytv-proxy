@@ -6,12 +6,10 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// تفعيل الـ CORS لحل مشاكل التشغيل في جميع البيئات
 app.use(cors({ origin: '*' }));
 
-// متغيّر لحفظ القنوات في الذاكرة (Cache)
 let cachedChannels = null;
-
-// المعرف الإعلاني الصحيح والخاص بك
 const STARTAPP_ID = "209100049";
 
 function loadChannelsOnce() {
@@ -54,27 +52,26 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// إرسال قائمة القنوات بروابط وهمية مشفرة تماماً لحمايتها من السرقة
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
     }
     
+    // إخفاء الروابط الأصلية عن كود الـ HTML وإرسال مسارات مجهولة تماماً
     const safeChannels = cachedChannels.map((ch, idx) => ({
         name: ch.name,
         logo: ch.logo,
-        streamUrl: `/stream/channel-${idx}.m3u8` // الرابط الآمن والوهمي
+        streamUrl: `/stream/channel-${idx}.m3u8`
     }));
     
     res.json(safeChannels);
 });
 
-// المسار الذكي لاستدعاء الرابط الأصلي خفية وتمريره مباشرة للمشغل الخارجي بالهاتف
+// مسار فك التشفير والتوجيه المباشر السري للمشغل
 app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {
@@ -82,12 +79,10 @@ app.get('/stream/channel-:id.m3u8', (req, res) => {
     }
     
     const realUrl = cachedChannels[id].url;
-    
-    // إرسال الرابط الأصلي مباشرة إلى بروتوكول Intent المفتوح في التطبيق
     res.redirect(realUrl);
 });
 
 app.listen(PORT, () => {
     cachedChannels = loadChannelsOnce();
-    console.log(`Secured IPTV Server running on port ${PORT}`);
+    console.log(`Protected Server running on port ${PORT}`);
 });

@@ -6,7 +6,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS بشكل كامل لكسر أي حظر أمني في التطبيقات والهواتف
 app.use(cors({ origin: '*' }));
 
 // متغيّر لحفظ القنوات في الذاكرة لتسريع تحميل القائمة فوراً
@@ -29,7 +28,6 @@ function loadChannelsOnce() {
         const line = lines[i].trim();
         if (line.startsWith('#EXTINF:')) {
             const logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
-            // 🛠️ تم التصحيح هنا لالتقاط رابط الصورة الصريح بنجاح وعرض الشعارات
             currentLogo = logoMatch ? logoMatch[1] : '';
             
             const nameMatch = line.match(/tvg-name="([^"]+)"/i);
@@ -77,7 +75,7 @@ app.get('/api/channels', (req, res) => {
     res.json(safeChannels);
 });
 
-// 🌟 المسار السحري النهائي: يوجه المشغل للرابط المباشر مع ترويسة الفيديو لإجبار الصوت والصورة على العمل فوراً
+// المسار الذكي: يوجه المشغل للرابط المباشر مع ترويسة الفيديو لإجبار الصوت والصورة على العمل فوراً
 app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {
@@ -86,11 +84,10 @@ app.get('/stream/channel-:id.m3u8', (req, res) => {
     
     const realUrl = cachedChannels[id].url;
     
-    // إرسال نوع المحتوى الصريح للفيديو ليفهمه الهاتف وتعمل الصورة والصوت معاً
+    // إرسال ترويسات الفيديو والميديا ليفهمها مشغل الهاتف فوراً وتفتح الصورة والصوت معاً
     res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
     res.setHeader('Access-Control-Allow-Origin', '*');
     
-    // تحويل فوري وخفيف لا يستهلك موارد السيرفر ويحمي روابطك
     res.redirect(302, realUrl);
 });
 

@@ -156,9 +156,6 @@
 </head>
 <body>
 
-    <!-- الإطار المخفي السحري الذي يمنع وميض ورمش الشاشة تماماً -->
-    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
-
     <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
     <div class="video-background-container" id="fullscreenBg"></div>
     
@@ -171,3 +168,83 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+    
+    <script>
+        const host = window.location.origin; 
+        const statusText = document.getElementById('status');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const freeZone = document.getElementById('freeZone');
+        let channelsData = [];
+
+        // 1. جلب قائمة القنوات وتوليد الكروت بشكل صحيح 100%
+        fetch(`${host}/api/channels`)
+            .then(res => res.json())
+            .then(channels => {
+                channelsData = channels;
+                const playlistDiv = document.getElementById('playlist');
+                playlistDiv.innerHTML = '';
+                
+                channels.forEach((channel, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'channel-card';
+                    card.id = `card-${idx}`;
+                    
+                    let logoUrl = channel.logo || "";
+                    let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
+                    
+                    card.innerHTML = `
+                        ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
+                        <div class="channel-card-content">
+                            <div class="ch-logo-wrapper">${logoVisual}</div>
+                            <div class="ch-info-box">
+                                <span class="ch-title-name">${channel.name}</span>
+                            </div>
+                        </div>
+                    `;
+
+                    card.onclick = (e) => {
+                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
+                        document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        playChannel(idx);
+                    };
+                    playlistDiv.appendChild(card);
+                });
+                statusText.textContent = `جاهز لضخ البث.`;
+            })
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
+            });
+
+        // 2. معالج تشغيل البث المباشر الفوري والمحمي من التجسس وسرقة الروابط
+        function playChannel(idx) {
+            const channel = channelsData[idx];
+            const url = channel.url;
+            const name = channel.name;
+
+            statusText.textContent = name;
+            playlistContainer.classList.add('hidden');
+
+            triggerHoneyPotAd();
+
+            // توجيه الرابط الصافي والمؤمن للمشغل الخارجي بالصوت والصورة معاً
+            setTimeout(() => {
+                window.location.href = url; 
+            }, 250); 
+        }
+
+        freeZone.onclick = function(e) {
+            e.stopPropagation();
+            playlistContainer.classList.remove('hidden');
+        };
+
+        function triggerHoneyPotAd() {
+            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+        }
+
+        document.addEventListener('click', function() {
+            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+        });
+    </script>
+</body>
+</html>

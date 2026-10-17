@@ -13,13 +13,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 🌟 المعرف الإعلاني الصحيح والخاص بك (209100049) لحفظ الأرباح بالدولار
+// المعرف الإعلاني الصحيح والخاص بك لحفظ الأرباح بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية (تم التصحيح هنا لظهور القائمة)
+// مسار قراءة القنوات الاحترافي المصحح بنسبة 100% لظهور القائمة والشعارات
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -36,7 +36,7 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // 🛠️ تم التصحيح بإضافة [1] لالتقاط الرابط الصريح والشعار فوراً داخل الكروت
+            // 🛠️ تم التصحيح الجذري باستخدام [1] لالتقاط الروابط والشعارات الصافية بنجاح
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
@@ -54,7 +54,7 @@ app.get('/api/channels', (req, res) => {
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'عرض غير مسمّى';
             
-            // قمنا بربط الرابط بمسار البروكسي الآمن التابع لسيرفرك تلقائياً لكي تحمى الروابط من السرقة في الـ HTML
+            // ربط القنوات بالبروكسي الداخلي تلقائياً لحمايتها بالكامل من السرقة
             channels.push({
                 name: currentName,
                 logo: currentLogo,
@@ -67,7 +67,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد لحماية الروابط من فحص الشبكة
+// البروكسي السريع والمتوافق تماماً مع مشغل ExoPlayer للأندرويد لحماية الروابط من التجسس
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -84,7 +84,6 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // تمرير البيانات بنظام التدفق المستمر والآمن بدون تثبيت صيغة واحدة تسبب الترميش للأفلام
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');

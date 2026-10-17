@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=any">
-    <title>مكتبة السينما الاحترافية الخرافية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مكتبة السينما الاحترافية الحمراء</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -25,7 +25,7 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة (تعرض رابط رند الخاص بك) */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -33,14 +33,16 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #060713; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+            background: #07070b; 
         }
-        .welcome-box { text-align: center; font-size: 15px; color: #555; font-weight: bold; padding: 20px; }
+        
+        .video-background-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
-        /* طبقة الواجهة الشفافة */
+        /* طبقة الواجهة الشفافة فوق الفيديو */
         .ui-layer { 
             position: absolute; 
             top: 0; 
@@ -49,75 +51,77 @@
             height: 100vh; 
             z-index: 2; 
             display: flex; 
+            flex-direction: row;
         }
 
-        /* 🌟 القائمة الجانبية الأساسية (تأثير الزجاج الكريستالي الشفاف) */
+        /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
         .playlist-container { 
             position: absolute;
-            background: rgba(6, 7, 19, 0.65); 
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            top: 0;
+            right: 0;
+            width: 28% !important; /* حجم متوسط ومثالي جداً للهواتف والشاشات */
+            max-width: 320px !important; 
+            min-width: 180px !important; 
+            height: 100vh; 
+            background: rgba(10, 10, 15, 0.75); 
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 20px 12px; 
             display: flex; 
             flex-direction: column; 
+            gap: 15px; 
+            border-left: 2px solid rgba(255, 0, 60, 0.2); /* خط جانبي أحمر ناعم */
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
             opacity: 1;
             z-index: 5;
+            box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8);
+            transform: translateX(0);
         }
 
-        /* 📱 وضع التدوير التلقائي: الشاشات الأفقية (العرض والتابلت والتلفزيون) */
-        @media (orientation: landscape) {
-            .ui-layer { flex-direction: row; }
-            .playlist-container {
-                top: 0;
-                right: 0;
-                width: 25% !important; 
-                max-width: 320px !important; 
-                min-width: 240px !important; 
-                height: 100vh; 
-                padding: 20px 15px; 
-                gap: 15px; 
-                border-left: 1px solid rgba(255, 255, 255, 0.07);
-                transform: translateX(0);
-                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
-            }
-            .playlist-container.hidden {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            .video-free-zone { width: 75%; height: 100vh; margin-right: auto; }
+        /* تأثير الاختفاء والانزلاق جهة اليمين */
+        .playlist-container.hidden {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
         }
 
-        /* 📱 وضع التدوير التلقائي: الشاشات العمودية (الهاتف المحمول بالطول) */
-        @media (orientation: portrait) {
-            .ui-layer { flex-direction: column; }
-            .playlist-container {
-                bottom: 0;
-                left: 0;
-                width: 100vw !important;
-                height: 35vh !important; /* حجم متوسط في أسفل الشاشة */
-                padding: 15px 15px 25px 15px; 
-                gap: 10px; 
-                border-top: 1px solid rgba(255, 255, 255, 0.07);
-                transform: translateY(0);
-                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
-            }
-            .playlist-container.hidden {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            .video-free-zone { width: 100vw; height: 65vh; }
+        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
+        .video-free-zone { 
+            width: 72%; 
+            height: 100vh; 
+            margin-right: auto; 
+            pointer-events: auto; 
+            cursor: pointer; 
         }
         
-        .header { font-size: 16px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 10px rgba(0,255,255,0.6); }
-        .status { text-align: center; font-size: 11px; color: #00ffcc; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 5px; }
+        /* العناوين باللون الأحمر النيون الفخم */
+        .header { 
+            font-size: 15px; 
+            color: #ff003c; 
+            font-weight: bold; 
+            text-align: center; 
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.6); 
+            letter-spacing: 1px;
+        }
         
-        /* تصميم كروت القنوات الاحترافي جداً بصورة خلفية خافتة */
+        .status { 
+            text-align: center; 
+            font-size: 10px; 
+            color: #ff4d73; 
+            font-weight: bold; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        
+        .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
+        
+        /* 🎬 تصميم كروت القنوات السوداء الاحترافية مع خلفية الصورة الخافتة */
         .channel-card {
             position: relative;
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 10px 12px; 
+            background: rgba(20, 20, 25, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px; 
             border-radius: 8px; 
             display: flex; 
             align-items: center; 
@@ -125,7 +129,7 @@
             cursor: pointer; 
             transition: all 0.25s ease; 
             width: 100%; 
-            height: 52px;
+            height: 50px;
             overflow: hidden;
         }
         
@@ -136,34 +140,47 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.12; 
+            opacity: 0.1; 
             z-index: 1;
-            filter: blur(2px);
+            filter: blur(3px);
             transition: opacity 0.3s ease;
         }
         
-        .channel-card-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; width: 100%; }
-        .channel-card:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(0, 255, 255, 0.3); }
-        .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 12px rgba(0,255,255,0.3); }
-        .channel-card.active .card-bg-blur { opacity: 0.25; }
+        .channel-card-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; width: 100%; }
+        
+        /* عند تمرير الماوس أو اللمس يضيء الكارت بالأحمر */
+        .channel-card:hover { 
+            background: rgba(30, 30, 40, 0.8); 
+            border-color: rgba(255, 0, 60, 0.4); 
+        }
+        
+        /* كارت القناة النشطة حالياً */
+        .channel-card.active { 
+            border-color: #ff003c; 
+            background: rgba(255, 0, 60, 0.15); 
+            box-shadow: 0 0 12px rgba(255, 0, 60, 0.3); 
+        }
+        
+        .channel-card.active .card-bg-blur { opacity: 0.22; }
         
         .ch-logo-wrapper { 
-            width: 34px !important; height: 34px !important; min-width: 34px !important; max-width: 34px !important;
-            border-radius: 6px; background: rgba(0,0,0,0.4); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 14px; border: 1px solid rgba(255,255,255,0.15); 
+            width: 32px !important; height: 32px !important; min-width: 32px !important; max-width: 32px !important;
+            border-radius: 6px; background: rgba(0,0,0,0.5); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 13px; border: 1px solid rgba(255,255,255,0.1); 
         }
         .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
-        .ch-title-name { font-size: 13px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-        
-        .video-free-zone { pointer-events: auto; cursor: pointer; }
+        .ch-title-name { font-size: 12px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px rgba(0,0,0,0.9); }
     </style>
 </head>
 <body>
 
+    <!-- السيرفر أو مشغل المتصفح المدمج ليعرض رابط رند ملء الشاشة خلف القائمة -->
     <div class="video-background-container" id="fullscreenBg">
-        <div class="welcome-box" id="welcomeBox">اضغط على أي مكان فارغ لإظهار القائمة 🍿</div>
+        <!-- ضع رابط رند الفعلي الخاص بك مكان الرابط التجريبي أدناه -->
+        <iframe src="https://ytv-proxy.onrender.com" allowfullscreen></iframe>
     </div>
     
+    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
             <div class="header">📺 قائمة القنوات</div>
@@ -177,10 +194,9 @@
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
-        const fullscreenBg = document.getElementById('fullscreenBg');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات وتوليد الكروت الاحترافية مع صور الخلفية
+        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -196,7 +212,6 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // توليد تصميم الكارت مع الصورة الخلفية الخافتة
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -208,7 +223,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation(); // منع التداخل مع ضغطات الخلفية العامة
+                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -218,10 +233,10 @@
                 statusText.textContent = `جاهز لضخ البث.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:12px;">خطأ في الاتصال بالخادم</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً عند النقر لملء الشاشة
+        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً لمشاهدة سينمائية كاملة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -229,42 +244,29 @@
 
             statusText.textContent = name;
             
-            // إخفاء القائمة فوراً لمنح المستخدم تجربة عرض كاملة بدون حواف
+            // إخفاء القائمة الجانبية فوراً عند اختيار القناة لتفريغ الشاشة للبث
             playlistContainer.classList.add('hidden');
 
-            // تفعيل الفخ الإعلاني الذكي لحفظ الأرباح بالدولار
             triggerHoneyPotAd();
 
-            // توجيه الرابط ليفتح تلقائياً داخل المشغل المدمج للنظام
+            // تمرير الرابط وتوجيهه عبر مسار الـ stream الآمن والمحمي في سيرفرك
             setTimeout(() => {
-                window.location.href = url; 
+                window.location.href = `${host}/stream?url=` + encodeURIComponent(url); 
             }, 250); 
         }
 
-        // 3. السحر الحركي: إظهار القائمة مجدداً عند الضغط على أي منطقة فارغة بالشاشة
+        // 3. نقر المنطقة الحرة لإعادة إظهار القائمة الجانبية في أي وقت بسلاسة
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');
         };
 
-        fullscreenBg.onclick = function(e) {
-            e.stopPropagation();
-            playlistContainer.classList.remove('hidden');
-        };
-
-        // دالة استدعاء إعلانات بينية عند التفاعل الحركي
         function triggerHoneyPotAd() {
             if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
         }
 
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        });
-
-        // تحسين متقدم لدعم تدوير الشاشة عبر التحديث الفوري للأبعاد
-        window.addEventListener('orientationchange', function() {
-            // إعادة ضبط تموضع القائمة عند التدوير لضمان عدم حدوث تجميد بصري
-            playlistContainer.classList.remove('hidden'); 
         });
     </script>
 </body>

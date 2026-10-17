@@ -25,7 +25,7 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة: سوداء صافية وفارغة تماماً لاستقبال البث */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -72,14 +72,12 @@
             transform: translateX(0);
         }
 
-        /* تأثير الاختفاء والانزلاق جهة اليمين */
         .playlist-container.hidden {
             transform: translateX(100%);
             opacity: 0;
             pointer-events: none;
         }
 
-        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
         .video-free-zone { 
             width: 72%; 
             height: 100vh; 
@@ -88,7 +86,6 @@
             cursor: pointer; 
         }
         
-        /* العناوين باللون الأحمر النيون الفخم */
         .header { 
             font-size: 15px; 
             color: #ff003c; 
@@ -110,7 +107,6 @@
         
         .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* 🎬 تصميم كروت القنوات السوداء الاحترافية مع خلفية الصورة الخافتة */
         .channel-card {
             position: relative;
             background: rgba(20, 20, 25, 0.6); 
@@ -156,10 +152,8 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
     <div class="video-background-container" id="fullscreenBg"></div>
     
-    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
             <div class="header">📺 قائمة القنوات</div>
@@ -176,7 +170,7 @@
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بشكل صحيح 100%
+        // 1. جلب قائمة القنوات وتوليد الكروت بنجاح
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -203,7 +197,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
+                        e.stopPropagation();
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -216,10 +210,10 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل البث المباشر الفوري والمحمي من التجسس وسرقة الروابط
+        // 2. 🚀 المعالج السحري المعدل لفتح القنوات بالصوت والصورة معاً فوراً عبر الرابط المؤمن
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const url = channel.url;
+            const url = channel.url; // رابط البروكسي الآمن القادم من السيرفر
             const name = channel.name;
 
             statusText.textContent = name;
@@ -227,9 +221,11 @@
 
             triggerHoneyPotAd();
 
-            // توجيه الرابط الصافي والمؤمن للمشغل الخارجي بالصوت والصورة معاً
+            // 🌟 القفزة البرمجية القاطعة: نقوم بتحويل رابط البروكسي المحمي إلى نية أندرويد (Intent) صريحة
+            // هذا الأمر يجبر الهاتف على تشغيل الفيديو والصوت معاً فوراً عبر مشغل الهاتف المدمج (ExoPlayer) بدون تجميد الـ WebView
             setTimeout(() => {
-                window.location.href = url; 
+                const androidIntent = `intent:${url}#Intent;type=video/*;end`;
+                window.location.href = androidIntent; 
             }, 250); 
         }
 

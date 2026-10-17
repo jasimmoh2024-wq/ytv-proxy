@@ -11,31 +11,15 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, -apple-system, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
-        
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
         .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #07070b; display: flex; justify-content: center; align-items: center; }
-        
-        /* تصميم مشغل الفيديو المدمج ليملأ الشاشة خلف الواجهة */
         #mainVideo { width: 100%; height: 100%; object-fit: contain; background: #000; }
-        
-        /* طبقة الواجهة الشفافة فوق الفيديو */
         .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
-        
-        /* 🌟 القائمة الجانبية الاحترافية ثابتة عسكرياً على اليمين */
         .playlist-container { position: absolute; top: 0; right: 0; width: 28% !important; max-width: 320px !important; min-width: 180px !important; height: 100vh; background: rgba(10, 10, 15, 0.75); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 20px 12px; display: flex; flex-direction: column; gap: 15px; border-left: 2px solid rgba(255, 0, 60, 0.2); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; opacity: 1; z-index: 5; box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8); transform: translateX(0); pointer-events: auto; }
-        
-        /* تأثير الاختفاء والانزلاق جهة اليمين */
         .playlist-container.hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
-        
-        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
         .video-free-zone { width: 72%; height: 100vh; margin-right: auto; pointer-events: auto; cursor: pointer; }
-        
-        /* العناوين باللون الأحمر النيون */
         .header { font-size: 15px; color: #ff003c; font-weight: bold; text-align: center; text-shadow: 0 0 10px rgba(255, 0, 60, 0.6); letter-spacing: 1px; }
         .status { text-align: center; font-size: 10px; color: #ff4d73; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
-        
-        /* 🎬 تصميم كروت القنوات الاحترافية */
         .channel-card { position: relative; background: rgba(20, 20, 25, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.25s ease; width: 100%; height: 50px; overflow: hidden; }
         .card-bg-blur { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.1; z-index: 1; filter: blur(3px); transition: opacity 0.3s ease; }
         .channel-card-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; width: 100%; }
@@ -50,12 +34,10 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية المدمجة تحتوي الآن على مشغل فيديو مدمج -->
     <div class="video-background-container" id="fullscreenBg">
         <video id="mainVideo" controls autoplay playsinline></video>
     </div>
 
-    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
             <div class="header">📺 قائمة القنوات</div>
@@ -90,7 +72,6 @@
                 let logoUrl = channel.logo || "";
                 let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                 
-                // تم إصلاح السلسلة النصية لتعمل الصور المضببة بنجاح وبدون مشاكل رموز
                 card.innerHTML = `
                     ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                     <div class="channel-card-content">
@@ -119,16 +100,15 @@
     // 2. معالج تشغيل القناة وإعداد مشغل HLS بذكاء متكامل مع البروكسي
     function playChannel(idx) {
         const channel = channelsData[idx];
-        const proxyUrl = channel.url; // رابط البروكسي القادم من السيرفر
+        const proxyUrl = channel.url; 
         const name = channel.name;
         
         statusText.textContent = name;
-        playlistContainer.classList.add('hidden'); // إخفاء القائمة تلقائياً
+        playlistContainer.classList.add('hidden'); 
         
-        // التحقق الذكي من طبيعة الرابط الممرر داخل البروكسي لتحديد مكتبة التشغيل
         if (proxyUrl.toLowerCase().includes('.m3u8') || proxyUrl.toLowerCase().includes('video%2fm3u8')) {
             if (Hls.isSupported()) {
-                if (hls) hls.destroy(); // تنظيف الذاكرة من البث السابق
+                if (hls) hls.destroy(); 
                 hls = new Hls();
                 hls.loadSource(proxyUrl);
                 hls.attachMedia(videoElement);
@@ -136,20 +116,17 @@
                     videoElement.play().catch(err => console.log("Auto-play blocked:", err));
                 });
             } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                // دعم أجهزة آبل (آيفون / ماك / سفاري)
                 if (hls) hls.destroy();
                 videoElement.src = proxyUrl;
                 videoElement.play().catch(err => console.log("Auto-play blocked:", err));
             }
         } else {
-            // تشغيل الروابط والأفلام العادية (MP4 / WebM / TS وغيرها)
             if (hls) hls.destroy();
             videoElement.src = proxyUrl;
             videoElement.play().catch(err => console.log("Auto-play blocked:", err));
         }
     }
 
-    // إظهار القائمة مجدداً عند النقر على الشاشة الفارغة
     freeZone.onclick = function(e) {
         e.stopPropagation();
         playlistContainer.classList.remove('hidden');

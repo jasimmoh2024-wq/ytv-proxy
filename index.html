@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io تم تحديث المعرف الصحيح والجديد هنا لحفظ أرباحك بالدولار -->
+    <!-- إعلانات Start.io لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
@@ -25,7 +25,6 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -36,7 +35,6 @@
             background: #07070b; 
         }
 
-        /* طبقة الواجهة الشفافة فوق الفيديو */
         .ui-layer { 
             position: absolute; 
             top: 0; 
@@ -48,7 +46,6 @@
             flex-direction: row;
         }
 
-        /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
         .playlist-container { 
             position: absolute;
             top: 0;
@@ -170,7 +167,6 @@
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بشكل آمن
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -210,10 +206,10 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. تشغيل القناة وتمرير الرابط الوهمي المشفر لحمايتك من التجسس وسرقة الروابط
+        // 2. 🚀 معالج نيات الأندرويد الحتمي لإجبار التطبيق على استدعاء مشغل الفيديو الخارجي فوراً
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const safeUrl = channel.streamUrl; // هذا هو الرابط الوهمي المكتوب بالسيرفر
+            const safeUrl = channel.streamUrl; 
             const name = channel.name;
 
             statusText.textContent = name;
@@ -221,9 +217,14 @@
 
             triggerHoneyPotAd();
 
-            // إرسال الرابط الوهمي للمشغل لكي لا يعرف أحد الرابط الأصلي أبداً
             setTimeout(() => {
-                window.location.href = `${host}${safeUrl}`; 
+                // توليد الرابط الكامل المحمي الخاص بسيرفرك
+                const fullStreamUrl = `${host}${safeUrl}`;
+                
+                // 🌟 القفزة البرمجية المطلقة: تحويل الرابط إلى Android Intent يجبر الهاتف على تشغيل الفيديو فوراً عبر المشغلات الخارجية (كـ VLC أو MX Player)
+                const intentUrl = `intent:${fullStreamUrl}#Intent;type=video/*;end`;
+                
+                window.location.href = intentUrl; 
             }, 250); 
         }
 

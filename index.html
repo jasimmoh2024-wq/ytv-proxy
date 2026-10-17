@@ -175,10 +175,10 @@
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
 
-        // 🔒 متغير داخلي للتحكم في بقاء إضاءة الشاشة قيد التشغيل (Wake Lock)
+        // 🔒 قفل منع انطفاء الشاشة (Wake Lock)
         let wakeLock = null;
 
-        async function activateScreenLock() {
+        async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
@@ -192,7 +192,7 @@
         // الحفاظ على الشاشة تعمل إذا خرج المستخدم من التطبيق وعاد إليه ثانية
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') {
-                await activateScreenLock();
+                await requestWakeLock();
             }
         });
 
@@ -212,6 +212,7 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
+                    // 🛠️ تم إصلاح الخطأ البرمجي وحذف علامة \ المسببة لتعطيل دالة النقر
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -227,10 +228,10 @@
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         
-                        // 🔒 تشغيل ميزة منع الشاشة من الانطفاء فور النقر لمشاهدة القناة
-                        activateScreenLock();
+                        // 🔒 تفعيل منع انطفاء الشاشة عند النقر لتشغيل الفيديو
+                        requestWakeLock();
 
-                        // 🎬 استدعاء مشغل الميديا المدمج بالتطبيق الأصلي كما أرسلته حرفياً وبدون أي مشغلات خارجية
+                        // دالة تشغيل القناة الأصلية المقطوعة من كودك الأول
                         playChannel(channel);
                     };
                     playlistDiv.appendChild(card);

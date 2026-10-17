@@ -55,7 +55,7 @@
             flex-direction: row;
         }
 
-        /* 🌟 القائمة الجانبية الاحترافية الزجاجية */
+        /* القائمة الجانبية الاحترافية الزجاجية */
         .playlist-container { 
             position: absolute;
             top: 0;
@@ -114,7 +114,7 @@
         
         .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* 🎬 تصميم كروت القنوات الاحترافية */
+        /* تصميم كروت القنوات */
         .channel-card {
             position: relative;
             background: rgba(20, 20, 25, 0.6); 
@@ -202,16 +202,13 @@
         function playChannel(channel) {
             statusText.textContent = `جاري تحميل: ${channel.name}`;
             
-            // تحويل الرابط عبر البروكسي الخاص بسيرفر Render
             const streamUrl = `${host}/stream?url=${encodeURIComponent(channel.url)}`;
 
-            // تنظيف أي بث سابق لمنع التداخل والتعليق
             if (hlsPlayer) {
                 hlsPlayer.destroy();
                 hlsPlayer = null;
             }
 
-            // تشغيل الرابط باستخدام تقنية HLS المتطورة
             if (Hls.isSupported()) {
                 hlsPlayer = new Hls({
                     maxBufferLength: 10,
@@ -220,7 +217,7 @@
                 hlsPlayer.loadSource(streamUrl);
                 hlsPlayer.attachMedia(videoElement);
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    videoElement.play().catch(e => console.log("تحتاج لتفاعل المستخدم لبدء الصوت"));
+                    videoElement.play().catch(e => console.log("تفاعل مطلوب للتشغيل الصوتي"));
                     statusText.textContent = `يعرض الآن: ${channel.name} 🎬`;
                 });
                 hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
@@ -229,7 +226,6 @@
                     }
                 });
             } 
-            // دعم هواتف آيفون ومتصفح Safari بشكل مباشر
             else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 videoElement.src = streamUrl;
                 videoElement.addEventListener('loadedmetadata', () => {
@@ -241,7 +237,6 @@
             }
         }
 
-        // إعادة تفعيل قفل الشاشة تلقائياً
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') {
                 await requestWakeLock();
@@ -256,7 +251,7 @@
                 const playlistDiv = document.getElementById('playlist');
                 playlistDiv.innerHTML = '';
                 
-                if(channels.length === 0) {
+                if(!channels || channels.length === 0) {
                     statusText.textContent = "قائمة القنوات فارغة ⚠️";
                     return;
                 }
@@ -269,26 +264,21 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // 🛠️ تم إصلاح طريقة بناء النص (Template Literals) هنا لمنع اختفاء البيانات
-                    card.innerHTML = `
-                        ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
-                        <div class="channel-card-content">
-                            <div class="ch-logo-wrapper">${logoVisual}</div>
-                            <div class="ch-info-box">
-                                <span class="ch-title-name">${channel.name}</span>
-                            </div>
-                        </div>
-                    `;
+                    // تم إصلاح البناء البرمجي لحقن النصوص بـ JavaScript الصافي لمنع أي تعليق أو اختفاء
+                    card.innerHTML = (logoUrl ? '<img src="' + logoUrl + '" class="card-bg-blur" alt="bg">' : '') +
+                        '<div class="channel-card-content">' +
+                            '<div class="ch-logo-wrapper">' + logoVisual + '</div>' +
+                            '<div class="ch-info-box">' +
+                                '<span class="ch-title-name">' + channel.name + '</span>' +
+                            '</div>' +
+                        '</div>';
 
                     card.onclick = async (e) => {
                         e.stopPropagation(); 
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         
-                        // تفعيل منع انطفاء الشاشة فوراً
                         await requestWakeLock();
-                        
-                        // استدعاء دالة التشغيل
                         playChannel(channel);
                     };
                     playlistDiv.appendChild(card);

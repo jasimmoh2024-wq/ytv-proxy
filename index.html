@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الاحترافية الخرافية</title>
+    <title>مكتبة السينما الاحترافية الحمراء المحمية</title>
     
-    <!-- إعلانات Start.io بالمعرف الصحيح والجديد لحفظ أرباحك بالدولار -->
+    <!-- إعلانات Start.io بالمعرف الصحيح لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
-
-    <!-- تضمين مشغل HLS العالمي لتشغيل القنوات داخلياً بالصورة والصوت فوراً وبدون حظر -->
-    <script src="https://jsdelivr.net"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,7 +25,7 @@
             -webkit-user-select: none; 
         }
 
-        /* عنصر تشغيل الفيديو السينمائي ملء الشاشة بالخلفية */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -36,28 +33,10 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #000; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #07070b; 
         }
 
-        #videoPlayer {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* لحفظ أبعاد القنوات والعرض السينمائي الأصلي المريح للعين */
-            background: #000;
-        }
-
-        /* إخفاء عناصر التحكم الافتراضية المزعجة للمتصفح لمنع تشويه الواجهة */
-        video::-webkit-media-controls-start-playback-button, 
-        video::-webkit-media-controls-poster-attribute, 
-        video::-webkit-media-controls-panel {
-            display: none !important;
-            -webkit-appearance: none;
-        }
-
-        /* طبقة الواجهة الشفافة الفاخرة فوق الفيديو */
+        /* طبقة الواجهة الشفافة فوق الفيديو */
         .ui-layer { 
             position: absolute; 
             top: 0; 
@@ -69,7 +48,7 @@
             flex-direction: row;
         }
 
-        /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
+        /* 🌟 القائمة الجانبية الفاخرة: ثابتة عسكرياً على اليمين باللون الأسود والتوهج الأحمر النيون */
         .playlist-container { 
             position: absolute;
             top: 0;
@@ -78,7 +57,7 @@
             max-width: 320px !important; 
             min-width: 180px !important; 
             height: 100vh; 
-            background: rgba(10, 10, 15, 0.85); 
+            background: rgba(10, 10, 15, 0.75); 
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             padding: 20px 12px; 
@@ -173,10 +152,10 @@
 </head>
 <body>
 
-    <!-- مشغل الفيديو السينمائي المدمج الداخلي ملء الشاشة -->
-    <div class="video-background-container" id="fullscreenBg">
-        <video id="videoPlayer" autoplay playsinline></video>
-    </div>
+    <!-- الإطار المخفي السحري الذي يمنع وميض ورمش الشاشة تماماً -->
+    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
+
+    <div class="video-background-container" id="fullscreenBg"></div>
     
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
@@ -186,77 +165,58 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+
     <script>
+        const host = window.location.origin; 
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
-        const video = document.getElementById('videoPlayer');
-        let hls = null;
+        let channelsData = [];
 
-        /* 
-           🔒 مصفوفة القنوات المحمية والمشفرة عسكرياً بترميز Base64 المجهول
-           يمكنك إضافة وتعديل قنواتك هنا في المستقبل بكل سهولة.
-           رابط القناة يتم تحويله لرموز معقدة بالخلفية لكي لا يستطيع أي شخص سرقته أو قراءته بفحص الشبكة.
-        */
-        const channelsData = [
-            {
-                name: "قناة روتانا سينما HD",
-                logo: "https://example.com",
-                // الرابط مشفر بالكامل ولا يمكن قراءته (مثال لرابط بث حقيقي)
-                secureUrl: "YUhSMGNITTZMeTluYlhCc2FXNW5iM0p6TG1OdmJTOXphR2Z6Y0M5bVpYTXRhVzVuYm05MllXdzZNWGwwY1hNdVkyRnVZVzV6TG10MWV0NXpMbmc9PQ=="
-            },
-            {
-                name: "قناة بي إن سبورت 1",
-                logo: "https://example.com",
-                secureUrl: "YUhSMGNITTZMeTluYlhCc2FXNW5iM0p6TG1OdmJTOXphR2Z6Y0M5bVpYTXRhVzVuYm05MllXdzZTWGwwY1hNdVkyRnVZVzV6TG10MWV0NXpMbmc9PQ=="
-            },
-            {
-                name: "قناة إم بي سي 1",
-                logo: "https://example.com",
-                secureUrl: "YUhSMGNITTZMeTluYlhCc2FXNW5iM0p6TG1OdmJTOXphR2Z6Y0M5bVpYTXRhVzVuYm05MllXdzZNWGwwY1hNdVkyRnVZVzV6TG10MWV0NXpMbmc9PQ=="
-            }
-        ];
-
-        // 1. توليد قائمة القنوات بلمحة بصر (أقل من ثانية) لأن البيانات مخزنة داخلياً
-        function initPlaylist() {
-            const playlistDiv = document.getElementById('playlist');
-            playlistDiv.innerHTML = '';
-            
-            channelsData.forEach((channel, idx) => {
-                const card = document.createElement('div');
-                card.className = 'channel-card';
-                card.id = `card-${idx}`;
+        // 1. جلب قائمة القنوات وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تأخير
+        fetch(`${host}/api/channels`)
+            .then(res => res.json())
+            .then(channels => {
+                channelsData = channels;
+                const playlistDiv = document.getElementById('playlist');
+                playlistDiv.innerHTML = '';
                 
-                let logoUrl = channel.logo || "";
-                let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
-                
-                card.innerHTML = `
-                    ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
-                    <div class="channel-card-content">
-                        <div class="ch-logo-wrapper">${logoVisual}</div>
-                        <div class="ch-info-box">
-                            <span class="ch-title-name">${channel.name}</span>
+                channels.forEach((channel, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'channel-card';
+                    card.id = `card-${idx}`;
+                    
+                    let logoUrl = channel.logo || "";
+                    let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
+                    
+                    card.innerHTML = `
+                        ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
+                        <div class="channel-card-content">
+                            <div class="ch-logo-wrapper">${logoVisual}</div>
+                            <div class="ch-info-box">
+                                <span class="ch-title-name">${channel.name}</span>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
 
-                card.onclick = (e) => {
-                    e.stopPropagation(); // منع تداخل الضغطات مع الواجهة الخلفية
-                    document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    playChannel(idx);
-                };
-                playlistDiv.appendChild(card);
+                    card.onclick = (e) => {
+                        e.stopPropagation();
+                        document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        playChannel(idx);
+                    };
+                    playlistDiv.appendChild(card);
+                });
+                statusText.textContent = `جاهز لضخ البث.`;
+            })
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
-            statusText.textContent = `جاهز لضخ البث فوراُ.`;
-        }
 
-        // 2. معالج فك التشفير الصامت والتشغيل الفوري بالصورة والصوت معاً بدون وميض
+        // 2. معالج فك التشفير الصامت الفوري لتشغيل تطبيق المشغل الخارجي بالصوت والصورة
         function playChannel(idx) {
             const channel = channelsData[idx];
-            
-            // 🔓 فك التشفير السحري داخلياً بلمحة بصر وإظهار الرابط الحقيقي للمشغل فقط بالذاكرة
-            const decodedUrl = atob(channel.secureUrl);
+            const safeUrl = channel.streamUrl; 
             const name = channel.name;
 
             statusText.textContent = name;
@@ -264,46 +224,12 @@
 
             triggerHoneyPotAd();
 
-            // تشغيل محرك Hls.js الفوري لتغذية شاشة العرض المدمجة بالبث بدون تعليق وبدون حظر CORS
-            if (Hls.isSupported()) {
-                if (hls) { hls.destroy(); } // تصفية القناة السابقة تماماً لمنع أي تعليق في الذاكرة
-                hls = new Hls();
-                hls.loadSource(decodedUrl);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(() => {
-                        // تخطي قيود التشغيل التلقائي في بعض الهواتف الذكية والأجهزة
-                        video.muted = true;
-                        video.play();
-                    });
-                });
-
-                // معالجة الأخطاء التلقائية في الخلفية لضمان استمرارية التشغيل
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                hls.startLoad();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                hls.recoverMediaError();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-            } 
-            // دعم أجهزة أبل (iOS) التي تقرأ دفق الـ m3u8 تلقائياً بدون مكتبات خارجية
-            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = decodedUrl;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
-            }
+            // الاستدعاء الصامت عبر الإطار المخفي لتشغيل مشغل الهاتف الخارجي فوراً وبدون وميض
+            setTimeout(() => {
+                document.getElementById('hiddenExecutionFrame').src = `${host}${safeUrl}`; 
+            }, 250); 
         }
 
-        // 3. نقر المنطقة الجانبية الفارغة لإعادة إظهار القائمة فوراً وبسلاسة تامة فوق الفيديو
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');
@@ -316,9 +242,6 @@
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
         });
-
-        // تشغيل توليد القائمة فور تحميل الصفحة
-        window.onload = initPlaylist;
     </script>
 </body>
 </html>

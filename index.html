@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io لحفظ أرباحك بالدولار بالمعرف الصحيح -->
+    <!-- إعلانات Start.io لحفظ أرباحك بالدولار بالمعرف الصحيح والجديد -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
 
-    <!-- تضمين مشغل HLS العالمي لتشغيل قنوات الـ IPTV داخل التطبيق فوراً وبدون برامج خارجية -->
+    <!-- تضمين مشغل HLS العالمي لتشغيل قنوات الـ IPTV داخل التطبيق فوراً وبدون تعليق -->
     <script src="https://jsdelivr.net"></script>
 
     <style>
@@ -45,7 +45,7 @@
         #videoPlayer {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* لحفظ أبعاد القنوات والعرض السينمائي الأصلي */
+            object-fit: contain; /* لحفظ أبعاد القنوات والعرض السينمائي الأصلي المريح للعين */
         }
 
         /* طبقة الواجهة الشفافة فوق الفيديو */
@@ -76,7 +76,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 15px; 
-            border-left: 2px solid rgba(255, 0, 60, 0.2); 
+            border-left: 2px solid rgba(255, 0, 60, 0.2); /* خط جانبي أحمر نيون فخم */
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
             opacity: 1;
             z-index: 5;
@@ -84,12 +84,14 @@
             transform: translateX(0);
         }
 
+        /* تأثير الاختفاء والانزلاق السلس جهة اليمين */
         .playlist-container.hidden {
             transform: translateX(100%);
             opacity: 0;
             pointer-events: none;
         }
 
+        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
         .video-free-zone { 
             width: 72%; 
             height: 100vh; 
@@ -98,6 +100,7 @@
             cursor: pointer; 
         }
         
+        /* العناوين باللون الأحمر النيون الفخم المقتبس من طراز Netflix */
         .header { 
             font-size: 15px; 
             color: #ff003c; 
@@ -119,6 +122,7 @@
         
         .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
+        /* 🎬 تصميم كروت القنوات السوداء الاحترافية مع خلفية الصورة الخافتة */
         .channel-card {
             position: relative;
             background: rgba(20, 20, 25, 0.6); 
@@ -186,7 +190,7 @@
         let channelsData = [];
         let hls = null;
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بشكل آمن تماماً بدون كشف الروابط الأصلية
+        // 1. جلب قائمة القنوات وتوليد الكروت بشكل فوري من ذاكرة الكاش السريعة بالسيرفر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -226,34 +230,39 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل البث المباشر داخل المشغل السينمائي الداخلي بدون الخروج من التطبيق وبدون رمش
+        // 2. معالج تشغيل البث الفوري وفك التشفير الآمن لحل مشاكل الـ CORS ومنع سرقة الروابط
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const safeUrl = `${host}${channel.streamUrl}`; 
             const name = channel.name;
+            
+            // 🔓 فك تشفير الـ Base64 الآمن داخلياً لتوليد الرابط الأصلي خفية عن أعين برامج التجسس
+            const decodedUrl = atob(channel.secureKey);
+            
+            // تمرير الرابط عبر مسار الـ stream المحمي في سيرفرك لحل مشاكل الـ CORS والـ Proxy
+            const safeStreamUrl = `${host}/stream?url=` + encodeURIComponent(decodedUrl);
 
             statusText.textContent = name;
             playlistContainer.classList.add('hidden');
 
             triggerHoneyPotAd();
 
-            // تشغيل محرك Hls.js الفوري لتغذية شاشة العرض المدمجة بالبث
+            // تشغيل محرك Hls.js الفوري لتغذية شاشة العرض المدمجة بالبث بدون تعليق
             if (Hls.isSupported()) {
-                if (hls) { hls.destroy(); } // إنهاء دفق القناة السابقة لتفادي تعليق الذاكرة
+                if (hls) { hls.destroy(); } // إنهاء القناة السابقة لتفريغ الذاكرة فوراً
                 hls = new Hls();
-                hls.loadSource(safeUrl);
+                hls.loadSource(safeStreamUrl);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
                     video.play().catch(() => {
-                        // كسر قيود WebView إذا منع التشغيل التلقائي الصامت
+                        // كسر قيود التصفح المدمج في الهواتف وتفعيل التشغيل الفوري
                         video.muted = true;
                         video.play();
                     });
                 });
             } 
-            // دعم أجهزة Apple ومتصفحات الهواتف التي تقرأ الـ m3u8 أصلياً وتلقائياً
+            // دعم هواتف الآيفون والأجهزة القديمة التي تقرأ دفق الـ m3u8 بشكل تلقائي
             else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = safeUrl;
+                video.src = safeStreamUrl;
                 video.addEventListener('loadedmetadata', function() {
                     video.play();
                 });

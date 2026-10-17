@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الحصرية الشفافة الصغيرة</title>
+    <title>مكتبة السينما الاحترافية الحمراء</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -13,122 +13,161 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: #000; 
+            color: #fff; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            height: 100vh; 
+            overflow: hidden; 
+            user-select: none; 
+            -webkit-user-select: none; 
+        }
 
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
-        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة: سوداء صافية وفارغة تماماً لاستقبال البث */
+        .video-background-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            z-index: 1; 
+            background: #07070b; 
+        }
 
-        .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
+        /* طبقة الواجهة الشفافة فوق الفيديو */
+        .ui-layer { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            z-index: 2; 
+            display: flex; 
+            flex-direction: row;
+        }
 
+        /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
         .playlist-container { 
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 28% !important; 
             max-width: 320px !important; 
             min-width: 180px !important; 
             height: 100vh; 
-            pointer-events: auto; 
-            background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
-            padding: 10px 5px; 
+            background: rgba(10, 10, 15, 0.75); 
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 20px 12px; 
             display: flex; 
             flex-direction: column; 
-            gap: 6px; 
-            border-left: 1px solid rgba(255, 255, 255, 0.02);
+            gap: 15px; 
+            border-left: 2px solid rgba(255, 0, 60, 0.2); 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            opacity: 1;
+            z-index: 5;
+            box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8);
+            transform: translateX(0);
+        }
+
+        /* تأثير الاختفاء والانزلاق جهة اليمين */
+        .playlist-container.hidden {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
+        .video-free-zone { 
+            width: 72%; 
+            height: 100vh; 
+            margin-right: auto; 
+            pointer-events: auto; 
+            cursor: pointer; 
         }
         
-        .header { font-size: 11px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 6px #00ffff; margin-bottom: 2px; }
-        .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
+        /* العناوين باللون الأحمر النيون الفخم */
+        .header { 
+            font-size: 15px; 
+            color: #ff003c; 
+            font-weight: bold; 
+            text-align: center; 
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.6); 
+            letter-spacing: 1px;
+        }
         
+        .status { 
+            text-align: center; 
+            font-size: 10px; 
+            color: #ff4d73; 
+            font-weight: bold; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        
+        .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
+        
+        /* 🎬 تصميم كروت القنوات السوداء الاحترافية مع خلفية الصورة الخافتة */
         .channel-card {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
+            position: relative;
+            background: rgba(20, 20, 25, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            cursor: pointer; 
+            transition: all 0.25s ease; 
+            width: 100%; 
+            height: 50px;
+            overflow: hidden;
         }
-        .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 6px rgba(0,255,255,0.4); }
+        
+        .card-bg-blur {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1; 
+            z-index: 1;
+            filter: blur(3px);
+            transition: opacity 0.3s ease;
+        }
+        
+        .channel-card-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; width: 100%; }
+        .channel-card:hover { background: rgba(30, 30, 40, 0.8); border-color: rgba(255, 0, 60, 0.4); }
+        .channel-card.active { border-color: #ff003c; background: rgba(255, 0, 60, 0.15); box-shadow: 0 0 12px rgba(255, 0, 60, 0.3); }
+        .channel-card.active .card-bg-blur { opacity: 0.22; }
         
         .ch-logo-wrapper { 
-            width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important;
-            border-radius: 3px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 9px; border: 1px solid rgba(255,255,255,0.12); 
+            width: 32px !important; height: 32px !important; min-width: 32px !important; max-width: 32px !important;
+            border-radius: 6px; background: rgba(0,0,0,0.5); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 13px; border: 1px solid rgba(255,255,255,0.1); 
         }
         .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
-        .ch-title-name { font-size: 10px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .video-free-zone { flex: 1; height: 100vh; pointer-events: none; }
+        .ch-title-name { font-size: 12px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px rgba(0,0,0,0.9); }
     </style>
 </head>
 <body>
 
-    <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ المباشر 🍿</div>
-    </div>
+    <!-- الإطار المخفي السحري الذي يمنع وميض ورمش الشاشة تماماً -->
+    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
+
+    <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
+    <div class="video-background-container" id="fullscreenBg"></div>
     
+    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
-        <div class="playlist-container">
+        <div class="playlist-container" id="playlistContainer">
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
             <div class="playlist" id="playlist"></div>
         </div>
-        <div class="video-free-zone"></div>
+        <div class="video-free-zone" id="freeZone"></div>
     </div>
-
-    <script>
-        const host = window.location.origin; 
-        const statusText = document.getElementById('status');
-        let channelsData = [];
-
-        fetch(`${host}/api/channels`)
-            .then(res => res.json())
-            .then(channels => {
-                channelsData = channels;
-                const playlistDiv = document.getElementById('playlist');
-                playlistDiv.innerHTML = '';
-                
-                channels.forEach((channel, idx) => {
-                    const card = document.createElement('div');
-                    card.className = 'channel-card';
-                    card.id = `card-${idx}`;
-                    
-                    let logoUrl = channel.logo || "";
-                    let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
-
-                    card.innerHTML = `
-                        <div class="ch-logo-wrapper">${logoVisual}</div>
-                        <div class="ch-info-box">
-                            <span class="ch-title-name">${channel.name}</span>
-                        </div>
-                    `;
-
-                    card.onclick = (e) => {
-                        document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
-                        card.classList.add('active');
-                        playChannel(idx);
-                    };
-                    playlistDiv.appendChild(card);
-                });
-                statusText.textContent = `جاهز لضخ البث.`;
-            })
-            .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
-            });
-
-        function playChannel(idx) {
-            const channel = channelsData[idx];
-            const url = channel.url;
-            const name = channel.name;
-
-            statusText.textContent = name;
-            triggerHoneyPotAd();
-
-            // إرسال الرابط المشفر القياسي للمشغل الخارجي بالصوت والصورة
-            window.location.href = url; 
-        }
-
-        function triggerHoneyPotAd() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        }
-
-        document.addEventListener('click', function() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        });
-    </script>
-</body>
-</html>

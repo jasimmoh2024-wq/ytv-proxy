@@ -8,13 +8,16 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS بشكل كامل لكسر أي حظر أمني في التطبيقات
+// تفعيل الـ CORS بشكل كامل لمنع أي حظر أمني في التطبيقات
 app.use(cors({ origin: '*' }));
 
 // متغيّر حفظ القنوات في الذاكرة الحية (Cache) لضمان السرعة الفائقة
 let cachedChannels = [];
+
+// المعرف الإعلاني الصحيح والخاص بك لشركة Start.io
 const STARTAPP_ID = "209100049";
 
+// دالة ذكية لمعالجة ملف الـ M3U مرة واحدة فقط وحفظه بالكاش لعدم التأخير
 function loadChannelsIntoMemory() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
@@ -55,6 +58,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });

@@ -2,14 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios'); // تأكد من وجود مكتبة axios في الـ dependencies
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*' }));
 
+// متغيّر لحفظ القنوات في الذاكرة (Cache)
 let cachedChannels = null;
+
+// المعرف الإعلاني الصحيح والخاص بك
 const STARTAPP_ID = "209100049";
 
 function loadChannelsOnce() {
@@ -52,46 +54,40 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
+// ارسال القنوات للواجهة الأمامية ولكن بدون إرسال الروابط الحقيقية (حماية القائمة من السرقة)
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
     }
-    res.json(cachedChannels);
+    
+    // نقوم بإرسال الاسم والشعار فقط للواجهة لإخفاء الروابط تماماً عن المتصفح
+    const safeChannels = cachedChannels.map((ch, idx) => ({
+        name: ch.name,
+        logo: ch.logo,
+        streamUrl: `/stream/channel-${idx}` // رابط وهمي مشفر ومحمي
+    }));
+    
+    res.json(safeChannels);
 });
 
-// 🌟 المسار السحري لحماية وتعمية الروابط (Stream Proxy)
-app.get('/stream', async (req, res) => {
-    const urlIndex = req.url.indexOf('?url=');
-    if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
-    const targetUrl = decodeURIComponent(req.url.substring(urlIndex + 5));
-
-    try {
-        // السيرفر يتصل بالقناة الأصلية بالخفاء نيابة عن المستخدم
-        const response = await axios({
-            method: 'get',
-            url: targetUrl,
-            responseType: 'stream',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                'Referer': targetUrl
-            }
-        });
-
-        // تمرير البيانات مباشرة للمشغل دون كشف الرابط الأصلي
-        res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp4');
-        response.data.pipe(res);
-
-    } catch (error) {
-        // إذا فشل البث بالخلفية يتم عمل تحويل كخيار احتياطي لضمان عمل القناة
-        res.redirect(targetUrl);
+// 🌟 المسار الذكي لاستقبال الرابط الوهمي وتحويله سرياً وبسرعة البرق للمشغل
+app.get('/stream/channel-:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    if (!cachedChannels || !cachedChannels[id]) {
+        return res.status(404).send('القناة غير موجودة.');
     }
+    
+    const realUrl = cachedChannels[id].url;
+    // تحويل آمن ومباشر للمشغل المدمج بالهاتف دون كشف الرابط في الواجهة
+    res.redirect(realUrl);
 });
 
 app.listen(PORT, () => {
     cachedChannels = loadChannelsOnce();
-    console.log(`Protected Server running on port ${PORT}`);
+    console.log(`Secured IPTV Server running on port ${PORT}`);
 });

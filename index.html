@@ -167,7 +167,7 @@
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
         
-        // 🔒 قفل عدم انطفاء الشاشة والتحكم بالتدفق المستمر
+        // 🔒 قفل عدم انطفاء الشاشة (Wake Lock)
         let wakeLock = null;
 
         async function requestWakeLock() {
@@ -189,13 +189,14 @@
             }
         }
 
+        // الحفاظ على حيوية الشاشة لو خرج المستخدم وعاد ثانيةً والتطبيق مفتوح
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') {
                 await requestWakeLock();
             }
         });
 
-        // 1. جلب بيانات البث المباشر
+        // 1. جلب بيانات البث المباشر وقائمة القنوات
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -226,7 +227,7 @@
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         
-                        // تفعيل بقاء الشاشة مضيئة فوراً عند البدء
+                        // تفعيل منع انطفاء الشاشة فوراً عند الضغط لتشغيل القناة
                         await requestWakeLock();
                         
                         if (typeof playChannel === 'function') {

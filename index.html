@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io لحفظ أرباحك بالدولار -->
+    <!-- إعلانات Start.io لحفظ أرباحك بالدولار المعرف الصحيح -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
+
+    <!-- تضمين مكتبة HLS العالمية لتشغيل قنوات الـ IPTV داخلياً بأعلى كفاءة ودقة -->
+    <script src="https://jsdelivr.net"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -25,7 +28,7 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
+        /* عنصر تشغيل الفيديو السينمائي ملء الشاشة بالخلفية */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -33,10 +36,29 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #07070b; 
+            background: #000; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* طبقة الواجهة الشفافة فوق الفيديو */
+        /* 🎬 تحسين أبعاد الشاشة وإلغاء أي عناصر أو علامات تحميل افتراضية مشوهة للمظهر */
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* ضبط أبعاد الصورة تلقائياً بشكل مريح للعين */
+            background: #000;
+        }
+
+        /* إخفاء قرص التحميل الدائري وعناصر التحكم الافتراضية المزعجة للمتصفح */
+        video::-webkit-media-controls-start-playback-button, 
+        video::-webkit-media-controls-poster-attribute, 
+        video::-webkit-media-controls-panel {
+            display: none !important;
+            -webkit-appearance: none;
+        }
+
+        /* طبقة الواجهة الشفافة الفاخرة فوق الفيديو */
         .ui-layer { 
             position: absolute; 
             top: 0; 
@@ -152,7 +174,10 @@
 </head>
 <body>
 
-    <div class="video-background-container" id="fullscreenBg"></div>
+    <!-- مشغل الفيديو السينمائي المدمج الداخلي ملء الشاشة -->
+    <div class="video-background-container" id="fullscreenBg">
+        <video id="videoPlayer" autoplay playsinline></video>
+    </div>
     
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
@@ -167,9 +192,11 @@
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
+        const video = document.getElementById('videoPlayer');
         let channelsData = [];
+        let hls = null;
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بشكل فوري من السيرفر وعرض الشعارات
+        // 1. جلب قائمة القنوات وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تأخير
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -184,7 +211,7 @@
                     
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
-                    
+
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -196,7 +223,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
+                        e.stopPropagation(); // منع تداخل الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -209,10 +236,10 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة وإجبار نظام الهاتف على فتح الفيديو بالصوت والصورة عبر المشغلات الخارجية
+        // 2. معالج تشغيل البث الفوري الداخلي بالصورة والصوت معاً بدون الخروج من التطبيق
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const safeUrl = channel.streamUrl; 
+            const safeStreamUrl = `${host}${channel.streamUrl}`;
             const name = channel.name;
 
             statusText.textContent = name;
@@ -220,19 +247,46 @@
 
             triggerHoneyPotAd();
 
-            // 🌟 القفزة البرمجية النهائية الحتمية لفتح الصورة والصوت معاً:
-            setTimeout(() => {
-                const fullStreamUrl = `${host}${safeUrl}`;
-                
-                // نقوم بإنشاء رابط نية أندرويد قياسي صريح يجبر الـ WebView على تحويل الدفق فوراً للمشغل الخارجي بالهاتف كفيديو كامل
-                const androidIntentUrl = `intent:${fullStreamUrl}#Intent;type=video/*;package=com.mxtech.videoplayer.ad;package=org.videolan.vlc;end`;
-                
-                // توجيه فوري للمنظومة بدون إحداث وميض أو رمش في شاشة التطبيق
-                window.location.href = androidIntentUrl;
-            }, 250); 
+            // تشغيل محرك Hls.js العالمي لتشغيل الفيديو والصوت معاً داخل التطبيق
+            if (Hls.isSupported()) {
+                if (hls) { hls.destroy(); } // إنهاء القناة السابقة لتفريغ الذاكرة تماماً
+                hls = new Hls();
+                hls.loadSource(safeStreamUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(() => {
+                        // تخطي قيود التشغيل التلقائي الصارم في بعض الهواتف والأجهزة
+                        video.muted = true;
+                        video.play();
+                    });
+                });
+
+                // معالجة الأخطاء الذكية لضمان عدم تعليق أو توقف البث الحي
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+            } 
+            // دعم أجهزة أبل (iOS) ومتصفحات الهاتف التي تدعم دفق الـ m3u8 تلقائياً بالخلفية
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = safeStreamUrl;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
         }
 
-        // نقر المنطقة الفارغة لإعادة إظهار القائمة الجانبية بنعومة في أي وقت
+        // 3. نقر المنطقة الجانبية الفارغة لإعادة إظهار القائمة الجانبية بنعومة وسلاسة فوق الفيديو
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

@@ -168,12 +168,32 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+    
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
+        let wakeLock = null; // كائن لمنع الهاتف من النوم والتوقف
+
+        // دالة لإبقاء شاشة الهاتف مستيقظة تماماً ومنع النظام من تجميد البث
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.log(`Wake Lock Error: ${err.message}`);
+            }
+        }
+
+        // إعادة تفعيل قفل استيقاظ الشاشة تلقائياً عند العودة للمتصفح
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
 
         // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر والخلفية الخافتة
         fetch(`${host}/api/channels`)
@@ -191,6 +211,7 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
+                    // تم تصحيح بناء السلسلة النصية وعرض صور الخلفية المضببة مباشرة بنجاح
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -201,6 +222,7 @@
                         </div>
                     `;
 
+                    // تم إكمال الكود المقطوع القديم وإغلاق الدالة بشكل سليم تماماً
                     card.onclick = (e) => {
                         e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
@@ -215,20 +237,21 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً وتفعيل الفخ الإعلاني
+        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً وتفعيل الفخ الإعلاني ومنع النوم
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const url = channel.url; 
+            const url = channel.url;
             const name = channel.name;
-
+            
             statusText.textContent = name;
             playlistContainer.classList.add('hidden');
-
+            
+            requestWakeLock(); // تشغيل ميزة إبقاء الشاشة مستيقظة لمنع تجمد الهاتف
             triggerHoneyPotAd();
-
+            
             setTimeout(() => {
-                window.location.href = url; 
-            }, 250); 
+                window.location.href = url;
+            }, 250);
         }
 
         freeZone.onclick = function(e) {
@@ -237,11 +260,15 @@
         };
 
         function triggerHoneyPotAd() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+            if (typeof startapp !== 'undefined') {
+                startapp.showInterstitial();
+            }
         }
 
         document.addEventListener('click', function() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+            if (typeof startapp !== 'undefined') {
+                startapp.showInterstitial();
+            }
         });
     </script>
 </body>

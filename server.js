@@ -2,16 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*' }));
 
-// متغيّر لحفظ القنوات في الذاكرة (Cache) لتسريع تحميل القائمة فوراً
 let cachedChannels = null;
+const STARTAPP_ID = "209100049";
 
-// دالة سريعة وذكية لمعالجة ملف الـ M3U بدون استهلاك موارد السيرفر
 function loadChannelsOnce() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
@@ -53,28 +54,47 @@ app.get('/', (req, res) => {
 });
 
 app.get('/app-ads.txt', (req, res) => {
-    res.type('text/plain').send('start.io, 110183401, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
+    res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// API فوري يرسل القنوات المحفوظة بالكاش دون أي تأخير
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
     }
-    res.json(cachedChannels);
+    
+    // إرسال روابط مقنعة تنتهي بـ .m3u8 لإجبار نظام الهاتف على تشغيل الفيديو كاملًا
+    const safeChannels = cachedChannels.map((ch, idx) => ({
+        name: ch.name,
+        logo: ch.logo,
+        url: `${req.protocol}://${req.get('host')}/stream/channel-${idx}.m3u8`
+    }));
+    
+    res.json(safeChannels);
 });
 
-// مسار إعادة التوجيه السريع لتفادي حظر الآي بي وحل مشكلة الـ CORS
-app.get('/stream', (req, res) => {
-    const urlIndex = req.url.indexOf('?url=');
-    if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
-    const decodedUrl = decodeURIComponent(req.url.substring(urlIndex + 5));
-    // تحويل مباشر للمشغل ليتصل من إنترنت الهاتف لتفادي حظر السيرفر السحابي
-    res.redirect(decodedUrl);
+// 🌟 المسار السحري لحل مشكلة (الصوت بدون صورة) مع حماية الروابط من التجسس
+app.get('/stream/channel-:id.m3u8', (req, res) => {
+    const id = parseInt(req.params.id);
+    if (!cachedChannels || !cachedChannels[id]) {
+        return res.status(404).send('القناة غير موجودة.');
+    }
+    
+    const targetUrl = cachedChannels[id].url;
+    const clientProtocol = targetUrl.startsWith('https') ? https : http;
+
+    // السيرفر يتصل بالقناة نيابة عن المستخدم ويمرر البيانات مع ترويسة الفيديو المباشر لإجبار الصورة على العمل
+    clientProtocol.get(targetUrl, (streamResponse) => {
+        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        
+        // ضخ البث الحي مباشرة للمشغل الخارجي دون كشف رابطك الأصلي
+        streamResponse.pipe(res);
+    }).on('error', () => {
+        res.redirect(targetUrl); // خيار احتياطي آمن لضمان استمرارية التشغيل
+    });
 });
 
 app.listen(PORT, () => {
-    // تحميل القنوات فور تشغيل السيرفر
     cachedChannels = loadChannelsOnce();
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Secured Server running on port ${PORT}`);
 });

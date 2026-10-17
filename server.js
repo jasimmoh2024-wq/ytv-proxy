@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل CORS بالكامل لحل مشكلة عدم تشغيل الروابط في المتصفح
+// تفعيل CORS بالكامل لمنع مشاكل حظر المتصفحات للملفات الخارجية للـ IPTV
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 // تقديم الصفحة الرئيسية للموقع
@@ -33,11 +33,11 @@ app.get('/api/channels', (req, res) => {
         if (!line) continue; 
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج نص الرابط الخاص بالشعار بشكل نقي ومباشر
+            // استخراج نص الرابط الخاص بالشعار بشكل نقي وصافي مباشرة بدون مصفوفات كائنات
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
-            // استخراج اسم القناة بشكل نقي ومباشر
+            // استخراج اسم القناة بشكل نقي وصافي مباشرة بدون مصفوفات كائنات
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -52,7 +52,7 @@ app.get('/api/channels', (req, res) => {
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'عرض غير مسمّى';
             
-            // تمرير الرابط المباشر إلى الـ HTML لضمان قراءته وتشغيله
+            // تمرير الرابط المباشر إلى الـ HTML لضمان قراءته وتشغيله عبر السيرفر
             channels.push({
                 name: currentName,
                 logo: currentLogo,
@@ -65,7 +65,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الآمن لمعالجة تدفق البث وتخطي الحظر بدون كراش السيرفر
+// البروكسي الآمن لمعالجة تدفق البث وتخطي الحظر وتثبيت العمل على Render
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');

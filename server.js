@@ -7,19 +7,20 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// تفعيل حماية وتجاوز قيود CORS لجميع الطلبات القادمة من التطبيق
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 🌟 تم تحديث وحقن المعرف الإعلاني الصحيح والخاص بك هنا (209100049) لحفظ الأرباح بالدولار
+// ملف إثبات ملكية الإعلانات لزواحف شركات الإعلانات على سيرفر Render
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية
+// مسار قراءة وتحليل ملف القنوات وعرض الشعارات والأسماء بدقة
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -36,10 +37,11 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الصورة أو الشعار بدقة وعمق من وسم tvg-logo
+            // استخراج رابط الصورة أو الشعار من وسم tvg-logo بشكل صحيح
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
+            // استخراج اسم القناة بشكل صحيح
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -65,7 +67,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد
+// البروكسي السريع والمتطور المتوافق مع التطبيقات لمنع انقطاع تدفق البث
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -75,41 +77,37 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 30000, // زيادة المهلة إلى 30 ثانية لضمان الاستقرار عند ضعف الشبكة
+            timeout: 30000, // مهلة 30 ثانية لتفادي انقطاع الشبكة المؤقت
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
                 'Accept': '*/*',
-                'Connection': 'keep-alive' // إبقاء الاتصال حياً مع مصدر البث الرئيسي
+                'Connection': 'keep-alive'
             }
         });
 
-        // ترويسات متطورة لمنع النظام من تجميد تدفق الفيديو أو اعتباره خمولاً
+        // ترويسات متطورة تجبر الهاتف على اعتبار التدفق نشطاً وتمنع إيقافه عند النوم
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Expires', '0');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Keep-Alive', 'timeout=15, max=100'); // الحفاظ على حيوية القناة
+        res.setHeader('Keep-Alive', 'timeout=15, max=100');
         res.setHeader('Accept-Ranges', 'bytes'); 
 
-        // تمرير البيانات بنظام التدفق المستمر والآمن
         response.data.pipe(res);
 
-        // حماية الخادم من الانهيار عند حدوث خطأ مفاجئ في التدفق
+        // حماية السيرفر من التوقف المفاجئ في حال قفل المستخدم للهاتف
         response.data.on('error', (err) => {
-            console.error('حدث خطأ أثناء تدفق البيانات من المصدر:', err.message);
+            console.error('خطأ في تدفق بيانات المصدر:', err.message);
             response.data.destroy();
-            if (!res.headersSent) res.status(500).send('انقطع الاتصال بالمصدر.');
         });
 
-        // تنظيف الذاكرة وإغلاق التدفق فور قيام المستخدم بإغلاق القناة أو التطبيق
         req.on('close', () => {
             response.data.destroy();
         });
 
     } catch (error) {
-        console.error('فشل جلب البث المباشر:', error.message);
         if (!res.headersSent) res.status(500).send('خطأ في جلب البث المباشر.');
     }
 });

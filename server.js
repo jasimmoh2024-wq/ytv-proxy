@@ -7,15 +7,15 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل CORS لجميع المسارات لضمان عدم حجب المشغل للملفات
+// تفعيل ميزه الـ CORS بشكل كامل لمنع مشاكل حظر المتصفحات للملفات الخارجية
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
-// تقديم ملف الواجهة الرئيسي
+// تقديم الصفحة الرئيسية للموقع
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار قراءة القنوات وبناء مصفوفة البيانات الذكية
+// مسار معالجة وقراءة ملف القنوات
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -30,10 +30,10 @@ app.get('/api/channels', (req, res) => {
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
-        if (!line) continue; // تخطي السطور الفارغة
+        if (!line) continue; // تجاوز السطور الفارغة
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الصورة أو الشعار بدقة من وسم tvg-logo
+            // سحب رابط الشعار بدقة وعمق
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
@@ -51,7 +51,7 @@ app.get('/api/channels', (req, res) => {
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'عرض غير مسمّى';
             
-            // تمرير الرابط الأصلي عبر البروكسي الداخلي المدمج /stream لضمان تخطي القيود وتشغيل مستقر
+            // حقن وتوجيه الرابط عبر مسار البروكسي السريع لتجاوز الحظر والتشفير
             const proxyUrl = `/stream?url=${encodeURIComponent(line)}`;
             
             channels.push({
@@ -66,7 +66,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الآمن والسريع المتوافق مع المتصفحات ومشغلات البث المباشر
+// البروكسي الآمن لمعالجة التدفق ومنع كراش السيرفر في Render
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -83,18 +83,18 @@ app.get('/stream', async (req, res) => {
             }
         });
 
-        // إعداد الهيدرز لتثبيت التدفق ومنع التقطيع في الأفلام والقنوات المباشرة
+        // إعدادات الـ Headers لضمان توافق التدفق مع المشغلات الحديثة
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('Accept-Ranges', 'bytes'); 
 
-        // معالجة تدفق البيانات مع الحماية من توقف أو كراش السيرفر في حال إغلاق المستخدم للمشاهدة فجأة
+        // حماية السيرفر من الانهيار (Crash) إذا أغلق العميل التدفّق فجأة
         response.data.on('error', (err) => {
             console.error('Stream processing error:', err.message);
             if (!res.headersSent) {
-                res.status(500).send('انقطع البث أثناء التدفق.');
+                res.status(500).send('انقطع البث أثناء المعالجة.');
             }
         });
 

@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار معالجة وقراءة ملف القنوات (تم إصلاح استخراج النصوص النظيفة من المصفوفات)
+// مسار معالجة وقراءة ملف القنوات
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -33,11 +33,11 @@ app.get('/api/channels', (req, res) => {
         if (!line) continue; // تجاوز السطور الفارغة
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الشعار بدقة عبر جلب العنصر الأول من نتيجة الماتش [1]
+            // استخراج رابط الشعار النقي [1] من المصفوفة
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
-            // استخراج اسم القناة بدقة عبر جلب العنصر الأول من نتيجة الماتش [1]
+            // استخراج اسم القناة النقي [1] من المصفوفة
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];

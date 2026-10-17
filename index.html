@@ -156,10 +156,10 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية المدمجة ملء الشاشة: سوداء صافية وفارغة تماماً لاستقبال البث -->
+    <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
     <div class="video-background-container" id="fullscreenBg"></div>
     
-    <!-- طبقة الواجهة الشفافة فوق الفيديو -->
+    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
             <div class="header">📺 قائمة القنوات</div>
@@ -205,44 +205,43 @@
                         e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
-                        
-                        // 🔒 استدعاء وظيفة منع الشاشة من الانطفاء فور النقر لبدء البث
-                        requestWakeLock();
-                        
-                        playC
+                        playChannel(idx);
                     };
                     playlistDiv.appendChild(card);
                 });
+                statusText.textContent = `جاهز لضخ البث.`;
             })
-            .catch(err => {
-                statusText.textContent = "خطأ في تحميل القنوات ❌";
-                console.error(err);
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // تحكم في إخفاء وإظهار القائمة عند الضغط على المنطقة الحرة للفيديو
-        freeZone.onclick = () => {
-            playlistContainer.classList.toggle('hidden');
-        };
+        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً وتفعيل الفخ الإعلاني
+        function playChannel(idx) {
+            const channel = channelsData[idx];
+            const url = channel.url; 
+            const name = channel.name;
 
-        // 🔒 🛠️ كود حقن خاصية إبقاء الشاشة مستيقظة (Wake Lock API) بشكل خارجي ومستقل
-        let wakeLock = null;
+            statusText.textContent = name;
+            playlistContainer.classList.add('hidden');
 
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('تم تنشيط منع قفل الشاشة بنجاح 🌟');
-                }
-            } catch (err) {
-                console.error(`فشل تهيئة Wake Lock: ${err.message}`);
-            }
+            triggerHoneyPotAd();
+
+            setTimeout(() => {
+                window.location.href = url; 
+            }, 250); 
         }
 
-        // الحفاظ على الشاشة تعمل إذا خرج المستخدم من التطبيق وعاد إليه ثانية والتطبيق مفتوح
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                await requestWakeLock();
-            }
+        freeZone.onclick = function(e) {
+            e.stopPropagation();
+            playlistContainer.classList.remove('hidden');
+        };
+
+        function triggerHoneyPotAd() {
+            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+        }
+
+        document.addEventListener('click', function() {
+            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
         });
     </script>
 </body>

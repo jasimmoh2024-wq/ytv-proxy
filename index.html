@@ -212,16 +212,15 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // 🛠️ تم إصلاح الخطأ البرمجي وحذف علامة \ المسببة لتعطيل دالة النقر
-                    card.innerHTML = `
-                        ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
-                        <div class="channel-card-content">
-                            <div class="ch-logo-wrapper">${logoVisual}</div>
-                            <div class="ch-info-box">
-                                <span class="ch-title-name">${channel.name}</span>
-                            </div>
-                        </div>
-                    `;
+                    // 🛠️ تم الإصلاح الجذري هنا عبر التخلص من الـ \ والـ Backticks المسببة لتعطيل المتصفح ودالة النقر
+                    let backgroundHtml = logoUrl ? '<img src="' + logoUrl + '" class="card-bg-blur" alt="bg">' : '';
+                    card.innerHTML = backgroundHtml + 
+                        '<div class="channel-card-content">' +
+                            '<div class="ch-logo-wrapper">' + logoVisual + '</div>' +
+                            '<div class="ch-info-box">' +
+                                '<span class="ch-title-name">' + channel.name + '</span>' +
+                            '</div>' +
+                        '</div>';
 
                     card.onclick = (e) => {
                         e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
@@ -231,7 +230,7 @@
                         // 🔒 تفعيل منع انطفاء الشاشة عند النقر لتشغيل الفيديو
                         requestWakeLock();
 
-                        // دالة تشغيل القناة الأصلية المقطوعة من كودك الأول
+                        // استدعاء دالة تشغيل القناة الأصلية المقطوعة من كودك الأول دون أي تدخل خارجي
                         playChannel(channel);
                     };
                     playlistDiv.appendChild(card);

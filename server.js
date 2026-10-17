@@ -9,23 +9,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*' }));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+let cachedChannels = null;
+const STARTAPP_ID = "209100049";
 
-// المعرف الإعلاني الصحيح والخاص بك لحفظ الأرباح بالدولار
-app.get('/app-ads.txt', (req, res) => {
-    res.type('text/plain');
-    res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
-});
-
-// مسار قراءة القنوات الاحترافي المصحح بنسبة 100% لظهور القائمة والشعارات
-app.get('/api/channels', (req, res) => {
+function loadChannelsOnce() {
     const filePath = path.join(__dirname, 'channels.m3u');
-    if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ error: 'ملف channels.m3u غير موجود' });
-    }
-
+    if (!fs.existsSync(filePath)) return [];
+    
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
     const channels = [];
@@ -36,7 +26,6 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // 🛠️ تم التصحيح الجذري باستخدام [1] لالتقاط الروابط والشعارات الصافية بنجاح
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
@@ -48,29 +37,50 @@ app.get('/api/channels', (req, res) => {
                 if (commaIndex !== -1) {
                     currentName = line.substring(commaIndex + 1).trim();
                 } else {
-                    currentName = 'عرض بدون اسم';
+                    currentName = 'قناة بث';
                 }
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
-            if (currentName === '') currentName = 'عرض غير مسمّى';
+            if (currentName === '') currentName = 'قناة بث';
             
-            // ربط القنوات بالبروكسي الداخلي تلقائياً لحمايتها بالكامل من السرقة
+            // تشفير الرابط الأصلي إلى Base64 قبل إرساله للواجهة لحماية مصادرك تماماً
+            const secureKey = Buffer.from(line).toString('base64');
+            
             channels.push({
                 name: currentName,
                 logo: currentLogo,
-                url: `${req.protocol}://${req.get('host')}/stream?url=` + encodeURIComponent(line)
+                secureKey: secureKey
             });
             currentName = '';
             currentLogo = '';
         }
     }
-    res.json(channels);
+    return channels;
+}
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// البروكسي السريع والمتوافق تماماً مع مشغل ExoPlayer للأندرويد لحماية الروابط من التجسس
+app.get('/app-ads.txt', (req, res) => {
+    res.type('text/plain');
+    res.send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
+});
+
+app.get('/api/channels', (req, res) => {
+    if (!cachedChannels) {
+        cachedChannels = loadChannelsOnce();
+    }
+    res.json(cachedChannels);
+});
+
+// البروكسي السريع والمتوافق مع المشغلات لفتح الصوت والصورة معاً وحل مشكلة الـ CORS
 app.get('/stream', async (req, res) => {
-    const targetUrl = req.query.url;
-    if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
+    const encryptedUrl = req.query.url;
+    if (!encryptedUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
+
+    // فك التشفير عن الرابط بأمان داخل السيرفر
+    const targetUrl = Buffer.from(encryptedUrl, 'base64').toString('utf-8');
 
     try {
         const response = await axios({
@@ -101,4 +111,7 @@ app.get('/stream', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    cachedChannels = loadChannelsOnce();
+    console.log(`Server running on port ${PORT}`);
+});

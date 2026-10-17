@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
-    
-    <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار المعرف الصحيح -->
-    <script>
-        window.startapp_app_id = "209100049"; 
-    </script>
-    <script src="https://startappcdn.com" async></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -25,7 +19,7 @@
             -webkit-user-select: none; 
         }
 
-        /* شاشة العرض السينمائية المدمجة ملء الشاشة: سوداء صافية وفارغة تماماً لاستقبال البث */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -48,7 +42,7 @@
             flex-direction: row;
         }
 
-        /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
+        /* 🌟 القائمة الجانبية الاحترافية الزجاجية */
         .playlist-container { 
             position: absolute;
             top: 0;
@@ -72,14 +66,12 @@
             transform: translateX(0);
         }
 
-        /* تأثير الاختفاء والانزلاق جهة اليمين */
         .playlist-container.hidden {
             transform: translateX(100%);
             opacity: 0;
             pointer-events: none;
         }
 
-        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
         .video-free-zone { 
             width: 72%; 
             height: 100vh; 
@@ -88,7 +80,6 @@
             cursor: pointer; 
         }
         
-        /* العناوين باللون الأحمر النيون الفخم */
         .header { 
             font-size: 15px; 
             color: #ff003c; 
@@ -110,7 +101,7 @@
         
         .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* 🎬 تصميم كروت القنوات السوداء الاحترافية مع خلفية الصورة الخافتة */
+        /* 🎬 تصميم كروت القنوات الاحترافية */
         .channel-card {
             position: relative;
             background: rgba(20, 20, 25, 0.6); 
@@ -156,7 +147,7 @@
 </head>
 <body>
 
-    <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
+    <!-- غرفة العرض السينمائية المدمجة -->
     <div class="video-background-container" id="fullscreenBg"></div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
@@ -168,14 +159,43 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
+        
+        // 🔒 قفل عدم انطفاء الشاشة والتحكم بالتدفق المستمر
+        let wakeLock = null;
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر والخلفية الخافتة
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('تم تفعيل منع انطفاء الشاشة بنجاح 🌟');
+                }
+            } catch (err) {
+                console.error(`Wake Lock Error: ${err.message}`);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+                console.log('تم إطلاق قفل الشاشة لحفظ الطاقة 🔋');
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        // 1. جلب بيانات البث المباشر
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -201,48 +221,31 @@
                         </div>
                     `;
 
-                    card.onclick = (e) => {
-                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
+                    card.onclick = async (e) => {
+                        e.stopPropagation(); 
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
-                        playChannel(idx);
+                        
+                        // تفعيل بقاء الشاشة مضيئة فوراً عند البدء
+                        await requestWakeLock();
+                        
+                        if (typeof playChannel === 'function') {
+                            playChannel(channel);
+                        } else {
+                            statusText.textContent = `جاري تشغيل: ${channel.name}`;
+                        }
                     };
                     playlistDiv.appendChild(card);
                 });
-                statusText.textContent = `.`;
             })
-            .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
+            .catch(err => {
+                statusText.textContent = "خطأ في تحميل القنوات ❌";
+                console.error(err);
             });
 
-        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً وتفعيل الفخ الإعلاني
-        function playChannel(idx) {
-            const channel = channelsData[idx];
-            const url = channel.url; 
-            const name = channel.name;
-
-            statusText.textContent = name;
-            playlistContainer.classList.add('hidden');
-
-            triggerHoneyPotAd();
-
-            setTimeout(() => {
-                window.location.href = url; 
-            }, 250); 
-        }
-
-        freeZone.onclick = function(e) {
-            e.stopPropagation();
-            playlistContainer.classList.remove('hidden');
+        freeZone.onclick = () => {
+            playlistContainer.classList.toggle('hidden');
         };
-
-        function triggerHoneyPotAd() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        }
-
-        document.addEventListener('click', function() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        });
     </script>
 </body>
 </html>

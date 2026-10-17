@@ -2,20 +2,19 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS بشكل كامل لكسر أي حظر أمني في التطبيقات والهواتف
+// تفعيل الـ CORS بشكل كامل لمنع أي حظر أمني في المشغل الداخلي
 app.use(cors({ origin: '*' }));
 
-// متغيّر لحفظ القنوات في الذاكرة لتسريع تحميل القائمة فوراً
-let cachedChannels = null;
-
-// المعرف الإعلاني الصحيح والخاص بك لشركة Start.io
+let cachedChannels = [];
 const STARTAPP_ID = "209100049";
 
-function loadChannelsOnce() {
+function loadChannelsIntoMemory() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
     
@@ -55,44 +54,40 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// إرسال القنوات للواجهة الأمامية بروابط وهمية مشفرة لحمايتها من السرقة
 app.get('/api/channels', (req, res) => {
-    if (!cachedChannels) {
-        cachedChannels = loadChannelsOnce();
-    }
-    
-    // روابط وهمية تمنع السرقة وتجبر المشغل على تشغيل الفيديو والصوت معاً
     const safeChannels = cachedChannels.map((ch, idx) => ({
         name: ch.name,
         logo: ch.logo,
-        streamUrl: `/stream/channel-${idx}.m3u8`
+        streamUrl: `/stream/channel-${idx}.m3u8` // روابط وهمية محمية بالكامل
     }));
-    
     res.json(safeChannels);
 });
 
-// المسار الذكي: يوجه المشغل الخارجي للرابط المباشر مع ترويسة الفيديو لإجبار الصوت والصورة على العمل فوراً
+// 🌟 مسار الـ Proxy المطور: يقرأ البث سرياً بالخلفية ويضخه مباشرة للمشغل الداخلي لمنع حظر الصورة
 app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {
         return res.status(404).send('القناة غير موجودة.');
     }
     
-    const realUrl = cachedChannels[id].url;
-    
-    // إرسال ترويسات الفيديو والميديا ليفهمها مشغل الهاتف فوراً وتفتح الصورة والصوت معاً
-    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    
-    res.redirect(302, realUrl);
+    const targetUrl = cachedChannels[id].url;
+    const clientProtocol = targetUrl.startsWith('https') ? https : http;
+
+    // السيرفر يتصل بالقناة الأصلية بالخفاء نيابة عن المستخدم ويمرر البث مباشرة مع ترويسة الفيديو الصريحة
+    clientProtocol.get(targetUrl, (streamResponse) => {
+        res.setHeader('Content-Type', 'application/x-mpegURL');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        streamResponse.pipe(res);
+    }).on('error', () => {
+        res.status(500).send('خطأ في جلب البث المباشر.');
+    });
 });
 
 app.listen(PORT, () => {
-    cachedChannels = loadChannelsOnce();
-    console.log(`Secured IPTV Server running on port ${PORT}`);
+    cachedChannels = loadChannelsIntoMemory();
+    console.log(`Secured IPTV Server running on port ${PORT}. Cached ${cachedChannels.length} channels.`);
 });

@@ -11,18 +11,6 @@
     </script>
     <script src="https://startappcdn.com" async></script>
 
-    <!-- سكربت استدعاء الإعلان البيني الشاشة الكاملة (Interstitial) تلقائياً عند الدخول -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            if (window.startapp && typeof window.startapp.loadInterstitial === "function") {
-                window.startapp.loadInterstitial();
-                setTimeout(function() {
-                    window.startapp.showInterstitial();
-                }, 3000);
-            }
-        });
-    </script>
-
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -164,18 +152,6 @@
         .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
         .ch-title-name { font-size: 12px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px rgba(0,0,0,0.9); }
-
-        /* تنسيق الحاوية الخاصة بـ البانر الإعلاني المدمج بأسفل القائمة */
-        .ad-banner-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255, 0, 60, 0.15);
-            background: rgba(5, 5, 10, 0.5);
-            min-height: 60px;
-        }
     </style>
 </head>
 <body>
@@ -189,15 +165,9 @@
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
             <div class="playlist" id="playlist"></div>
-
-            <!-- 📥 شريط إعلان البانر لـ Start.io مدمج بشكل أنيق أسفل القائمة -->
-            <div class="ad-banner-wrapper">
-                <div data-startapp-zone="banner"></div>
-            </div>
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
-
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
@@ -235,22 +205,44 @@
                         e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
-
-                        // 🎬 استدعاء إعلان بيني عند نقر المستخدم على القنوات لزيادة أرباحك
-                        if (window.startapp && typeof window.startapp.showInterstitial === "function") {
-                            window.startapp.showInterstitial();
-                        }
-
-                        // هنا يتم تمرير وتحديث النص أو مشغل الفيديو الخاص بك
-                        statusText.innerText = `جاري تشغيل: ${channel.name} 🎬`;
+                        playChannel(idx);
                     };
                     playlistDiv.appendChild(card);
                 });
+                statusText.textContent = `جاهز لضخ البث.`;
             })
-            .catch(err => {
-                statusText.innerText = "خطأ في تحميل القنوات ❌";
-                console.error(err);
+            .catch(() => {
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
+
+        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً وتفعيل الفخ الإعلاني
+        function playChannel(idx) {
+            const channel = channelsData[idx];
+            const url = channel.url; 
+            const name = channel.name;
+
+            statusText.textContent = name;
+            playlistContainer.classList.add('hidden');
+
+            triggerHoneyPotAd();
+
+            setTimeout(() => {
+                window.location.href = url; 
+            }, 250); 
+        }
+
+        freeZone.onclick = function(e) {
+            e.stopPropagation();
+            playlistContainer.classList.remove('hidden');
+        };
+
+        function triggerHoneyPotAd() {
+            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+        }
+
+        document.addEventListener('click', function() {
+            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+        });
     </script>
 </body>
 </html>

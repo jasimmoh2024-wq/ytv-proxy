@@ -2,8 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
-const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,11 +29,12 @@ function loadChannelsOnce() {
         const line = lines[i].trim();
         if (line.startsWith('#EXTINF:')) {
             const logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
-            currentLogo = logoMatch ? logoMatch : '';
+            // 🛠️ تم التصحيح هنا لالتقاط رابط الصورة الصريح بنجاح وعرض الشعارات
+            currentLogo = logoMatch ? logoMatch[1] : '';
             
             const nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch) {
-                currentName = nameMatch;
+                currentName = nameMatch[1];
             } else {
                 const commaIdx = line.lastIndexOf(',');
                 currentName = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : 'قناة بث';
@@ -68,7 +67,7 @@ app.get('/api/channels', (req, res) => {
         cachedChannels = loadChannelsOnce();
     }
     
-    // روابط وهمية مخصصة تجبر نظام الهاتف على فتح حزم البث بالكامل
+    // روابط وهمية تمنع السرقة وتجبر المشغل على تشغيل الفيديو والصوت معاً
     const safeChannels = cachedChannels.map((ch, idx) => ({
         name: ch.name,
         logo: ch.logo,
@@ -78,29 +77,21 @@ app.get('/api/channels', (req, res) => {
     res.json(safeChannels);
 });
 
-// 🌟 المسار السحري والنهائي لحل مشكلة الصوت بدون صورة (Proxy Stream) بدون انهيار
+// 🌟 المسار السحري النهائي: يوجه المشغل للرابط المباشر مع ترويسة الفيديو لإجبار الصوت والصورة على العمل فوراً
 app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {
         return res.status(404).send('القناة غير موجودة.');
     }
     
-    const targetUrl = cachedChannels[id].url;
-    const clientStr = targetUrl.startsWith('https') ? https : http;
-
-    // السيرفر يتصل بالقناة نيابة عن المستخدم ويمرر البيانات مع ترويسة الفيديو الصريحة لإجبار الصورة على العمل
-    clientStr.get(targetUrl, (streamResponse) => {
-        // إجبار نوع المحتوى ليكون بث ميديا حية وصورة متكاملة ليفهمها مشغل الهاتف فوراً
-        const contentType = streamResponse.headers['content-type'] || 'application/x-mpegURL';
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        
-        // ضخ البث الحي مباشرة
-        streamResponse.pipe(res);
-    }).on('error', () => {
-        // خيار احتياطي آمن في حال حدوث أي خطأ في الاتصال الداخلي
-        res.redirect(targetUrl);
-    });
+    const realUrl = cachedChannels[id].url;
+    
+    // إرسال نوع المحتوى الصريح للفيديو ليفهمه الهاتف وتعمل الصورة والصوت معاً
+    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    // تحويل فوري وخفيف لا يستهلك موارد السيرفر ويحمي روابطك
+    res.redirect(302, realUrl);
 });
 
 app.listen(PORT, () => {

@@ -7,19 +7,19 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
+app.use(cors({ origin: '*' }));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 🌟 تم تحديث وحقن المعرف الإعلاني الصحيح والخاص بك هنا (209100049) لحفظ الأرباح بالدولار
+// 🌟 المعرف الإعلاني الصحيح والخاص بك (209100049) لحفظ الأرباح بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية
+// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية (تم التصحيح هنا لظهور القائمة)
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -36,8 +36,8 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الصورة أو الشعار بدقة وعمق من وسم tvg-logo
-            let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+            // 🛠️ تم التصحيح بإضافة [1] لالتقاط الرابط الصريح والشعار فوراً داخل الكروت
+            let logoMatch = line.match(/tvg-logo="([^"]+)"/i) || line.match(/logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
@@ -53,10 +53,12 @@ app.get('/api/channels', (req, res) => {
             }
         } else if (line.startsWith('http://') || line.startsWith('https://')) {
             if (currentName === '') currentName = 'عرض غير مسمّى';
+            
+            // قمنا بربط الرابط بمسار البروكسي الآمن التابع لسيرفرك تلقائياً لكي تحمى الروابط من السرقة في الـ HTML
             channels.push({
                 name: currentName,
                 logo: currentLogo,
-                url: line
+                url: `${req.protocol}://${req.get('host')}/stream?url=` + encodeURIComponent(line)
             });
             currentName = '';
             currentLogo = '';
@@ -65,7 +67,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
-// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد
+// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد لحماية الروابط من فحص الشبكة
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار المعرف الصحيح -->
+    <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
@@ -70,7 +70,7 @@
             z-index: 2; 
             display: flex; 
             flex-direction: row;
-            pointer-events: none; /* السماح بالنقر من خلال الطبقة للتحكم بالمشغل */
+            pointer-events: none;
         }
 
         /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
@@ -95,7 +95,7 @@
             z-index: 5;
             box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8);
             transform: translateX(0);
-            pointer-events: auto; /* إعادة تفعيل النقر داخل القائمة الجانبية */
+            pointer-events: auto;
         }
 
         /* تأثير الاختفاء والانزلاق جهة اليمين */
@@ -205,7 +205,7 @@
         const videoElement = document.getElementById('mainVideo');
         
         let channelsData = [];
-        let wakeLock = null; // كائن لمنع الهاتف من النوم والتوقف
+        let wakeLock = null; 
         let hlsPlayer = null;
 
         // تهيئة وتثبيت مشغل Plyr.io بإعدادات سينمائية كاملة تتناسب مع الهواتف الذكية
@@ -245,7 +245,7 @@
             }
         });
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر والخلفية الخافتة
+        // 1. جلب قائمة القنوات وتوليد الكروت بتأثير السينما الأسود والأحمر وخلفية الصورة الخافتة
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -261,6 +261,7 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
+                    // تم إصلاح كود النصوص ليعمل المتصفح بشكل سليم تماماً وبدون أخطاء رموز أو سلاش زائد
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -272,7 +273,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
+                        e.stopPropagation(); 
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -285,43 +286,42 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة المحدث بالكامل للعمل داخل مشغل Plyr
+        // 2. معالج تشغيل القناة المحدث بالكامل للعمل داخل مشغل Plyr وتخطي حظر الـ CORS
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const url = channel.url;
+            const originalUrl = channel.url;
             const name = channel.name;
             
             statusText.textContent = name;
-            playlistContainer.classList.add('hidden'); // إخفاء القائمة تلقائياً لبدء المشاهدة السينمائية
+            playlistContainer.classList.add('hidden'); 
             
-            requestWakeLock(); // تشغيل ميزة إبقاء الشاشة مستيقظة لمنع تجمد الهاتف
+            requestWakeLock(); 
             triggerHoneyPotAd();
             
-            // تشغيل الروابط المباشرة و الـ IPTV الذكي (صيغة m3u8) بداخل المشغل الفخم
-            if (url.toLowerCase().includes('.m3u8')) {
+            // تمرير البث عبر البروكسي الداخلي المدمج في السيرفر لتجنب مشاكل التوقف وحجب المتصفحات
+            const playbackUrl = `${host}/stream?url=${encodeURIComponent(originalUrl)}`;
+
+            if (originalUrl.toLowerCase().includes('.m3u8')) {
                 if (Hls.isSupported()) {
-                    if (hlsPlayer) hlsPlayer.destroy(); // تنظيف البث القديم لحفظ الذاكرة
+                    if (hlsPlayer) hlsPlayer.destroy(); 
                     
                     hlsPlayer = new Hls();
-                    hlsPlayer.loadSource(url);
+                    hlsPlayer.loadSource(playbackUrl);
                     hlsPlayer.attachMedia(videoElement);
                     hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function() {
                         player.play().catch(err => console.log("Auto-play prevented:", err));
                     });
                 } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                    // دعم أصيل لمتصفحات Safari على أجهزة الآيفون
-                    videoElement.src = url;
+                    videoElement.src = playbackUrl;
                     player.play().catch(err => console.log("Auto-play prevented:", err));
                 }
             } else {
-                // تشغيل روابط الـ MP4 أو الروابط العادية المباشرة
                 if (hlsPlayer) hlsPlayer.destroy();
-                videoElement.src = url;
+                videoElement.src = playbackUrl;
                 player.play().catch(err => console.log("Auto-play prevented:", err));
             }
         }
 
-        // عند النقر على المنطقة الفارغة تظهر القائمة الجانبية مجدداً لاختيار قناة أخرى
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

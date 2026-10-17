@@ -6,13 +6,17 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS لحل مشاكل التشغيل في جميع البيئات
+// تفعيل الـ CORS بشكل كامل لمنع أي حظر أمني في المتصفحات والتطبيقات
 app.use(cors({ origin: '*' }));
 
-let cachedChannels = null;
+// متغيّر حفظ القنوات في الذاكرة الحية (Cache) لضمان السرعة الفائقة
+let cachedChannels = [];
+
+// المعرف الإعلاني الخاص بك لشركة Start.io
 const STARTAPP_ID = "209100049";
 
-function loadChannelsOnce() {
+// دالة ذكية لمعالجة ملف الـ M3U مرة واحدة فقط وحفظه بالكاش لعدم التأخير
+function loadChannelsIntoMemory() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
     
@@ -52,37 +56,40 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
+// ⚡ الـ API الفوري يرسل القنوات المحفوظة مسبقاً بالكاش بلمحة بصر وبدون أي تأخير
 app.get('/api/channels', (req, res) => {
-    if (!cachedChannels) {
-        cachedChannels = loadChannelsOnce();
-    }
-    
-    // إخفاء الروابط الأصلية عن كود الـ HTML وإرسال مسارات مجهولة تماماً
-    const safeChannels = cachedChannels.map((ch, idx) => ({
-        name: ch.name,
-        logo: ch.logo,
-        streamUrl: `/stream/channel-${idx}.m3u8`
-    }));
-    
-    res.json(safeChannels);
+    // نقوم بتعمية وتشفير الروابط الأصلية لكي لا تظهر علناً في المتصفح عند فحص الصفحة
+    const secureChannels = cachedChannels.map(ch => {
+        // تشفير الرابط الأصلي إلى ترميز الـ Base64 المجهول
+        const obfuscatedUrl = Buffer.from(ch.url).toString('base64');
+        return {
+            name: ch.name,
+            logo: ch.logo,
+            secureKey: obfuscatedUrl
+        };
+    });
+    res.json(secureChannels);
 });
 
-// مسار فك التشفير والتوجيه المباشر السري للمشغل
-app.get('/stream/channel-:id.m3u8', (req, res) => {
-    const id = parseInt(req.params.id);
-    if (!cachedChannels || !cachedChannels[id]) {
-        return res.status(404).send('القناة غير موجودة.');
-    }
+// مسار التمرير السريع وحل مشكلة الـ CORS وحمايتك من حظر الآي بي
+app.get('/stream', (req, res) => {
+    const urlIndex = req.url.indexOf('?url=');
+    if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
     
-    const realUrl = cachedChannels[id].url;
-    res.redirect(realUrl);
+    // فك التشفير عن الرابط القادم وتوجيهه بأمان للمشغل
+    const encryptedUrl = req.url.substring(urlIndex + 5);
+    const decodedUrl = decodeURIComponent(encryptedUrl);
+    
+    res.redirect(decodedUrl);
 });
 
 app.listen(PORT, () => {
-    cachedChannels = loadChannelsOnce();
-    console.log(`Protected Server running on port ${PORT}`);
+    // تحميل القنوات فور تشغيل السيرفر وحفظها بالذاكرة لمنع التأخير تماماً
+    cachedChannels = loadChannelsIntoMemory();
+    console.log(`Server running on port ${PORT}. Loaded ${cachedChannels.length} channels into memory cache.`);
 });

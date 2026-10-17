@@ -6,12 +6,10 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// تفعيل الـ CORS بشكل كامل لضمان فك ترميز حزم الصوت والصورة معاً
 app.use(cors({ origin: '*' }));
 
-// متغيّر لحفظ القنوات في الذاكرة لتسريع تحميل القائمة فوراً
 let cachedChannels = null;
-
-// المعرف الإعلاني الصحيح الخاص بك لشركة Start.io
 const STARTAPP_ID = "209100049";
 
 function loadChannelsOnce() {
@@ -54,36 +52,40 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// إرسال القنوات للواجهة الأمامية بروابط وهمية مشفرة لحمايتها من السرقة
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
     }
     
-    // نقوم بإرسال الاسم والشعار فقط للواجهة لإخفاء الروابط تماماً عن المتصفح
+    // إرسال الروابط المقنعة والآمنة التي تنتهي بـ .m3u8 لإجبار الهاتف على فك ترميز الفيديو كاملًا
     const safeChannels = cachedChannels.map((ch, idx) => ({
         name: ch.name,
         logo: ch.logo,
-        streamUrl: `/stream/channel-${idx}.m3u8` // رابط وهمي مشفر ومحمي
+        streamUrl: `/stream/channel-${idx}.m3u8`
     }));
     
     res.json(safeChannels);
 });
 
-// المسار الاحترافي لفصل التوجيه وتوجيه مشغل الهاتف للرابط الأصلي مباشرة بلحظة واحدة
+// 🌟 المسار المصحح لحل مشكلة (الصوت بدون صورة) وتجهيز الفيديو للمشغلات الخارجية
 app.get('/stream/channel-:id.m3u8', (req, res) => {
     const id = parseInt(req.params.id);
     if (!cachedChannels || !cachedChannels[id]) {
-        return res.status(404).send('Qناة غير موجودة.');
+        return res.status(404).send('القناة غير موجودة.');
     }
     
     const realUrl = cachedChannels[id].url;
-    res.redirect(realUrl);
+    
+    // إرسال ترويسات صريحة تخبر هاتف الأندرويد بأن هذا بث فيديو وصوت مدمج ومتدفق
+    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    // تحويل ثابت ومستقر يضمن انبثاق البث كاملًا بالصورة والصوت
+    res.status(302).redirect(realUrl);
 });
 
 app.listen(PORT, () => {

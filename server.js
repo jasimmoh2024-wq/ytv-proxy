@@ -2,19 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios'); // تأكد من وجود مكتبة axios في الـ dependencies
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*' }));
 
-// متغيّر لحفظ القنوات في الذاكرة (Cache) لتسريع تحميل القائمة فوراً
 let cachedChannels = null;
-
-// المعرف الإعلاني الخاص بك لشركة Start.io تم حقنه هنا بأمان
 const STARTAPP_ID = "209100049";
 
-// دالة سريعة وذكية لمعالجة ملف الـ M3U بدون استهلاك موارد السيرفر
 function loadChannelsOnce() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
@@ -55,12 +52,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار من جيت هاب أو السيرفر
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// API فوري يرسل القنوات المحفوظة بالكاش دون أي تأخير
 app.get('/api/channels', (req, res) => {
     if (!cachedChannels) {
         cachedChannels = loadChannelsOnce();
@@ -68,18 +63,35 @@ app.get('/api/channels', (req, res) => {
     res.json(cachedChannels);
 });
 
-// مسار إعادة التوجيه السريع وحل مشكلة الـ CORS وحمايتك من حظر الآي بي
-app.get('/stream', (req, res) => {
+// 🌟 المسار السحري لحماية وتعمية الروابط (Stream Proxy)
+app.get('/stream', async (req, res) => {
     const urlIndex = req.url.indexOf('?url=');
     if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
-    const decodedUrl = decodeURIComponent(req.url.substring(urlIndex + 5));
-    // تحويل مباشر ومحمي للمشغل ليتصل بأمان
-    res.redirect(decodedUrl);
+    const targetUrl = decodeURIComponent(req.url.substring(urlIndex + 5));
+
+    try {
+        // السيرفر يتصل بالقناة الأصلية بالخفاء نيابة عن المستخدم
+        const response = await axios({
+            method: 'get',
+            url: targetUrl,
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Referer': targetUrl
+            }
+        });
+
+        // تمرير البيانات مباشرة للمشغل دون كشف الرابط الأصلي
+        res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp4');
+        response.data.pipe(res);
+
+    } catch (error) {
+        // إذا فشل البث بالخلفية يتم عمل تحويل كخيار احتياطي لضمان عمل القناة
+        res.redirect(targetUrl);
+    }
 });
 
 app.listen(PORT, () => {
-    // تحميل القنوات فور تشغيل السيرفر
     cachedChannels = loadChannelsOnce();
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Start.io Ad ID Active: ${STARTAPP_ID}`);
+    console.log(`Protected Server running on port ${PORT}`);
 });

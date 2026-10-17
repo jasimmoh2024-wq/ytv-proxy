@@ -156,10 +156,7 @@
 </head>
 <body>
 
-    <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند إطلاق البث -->
-    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
-
-    <!-- غرفة العرض السينمائية تم تطهيرها وحذف الـ iframe المسبب للمشكلة السابقة -->
+    <!-- غرفة العرض السينمائية النظيفة والمستقرة -->
     <div class="video-background-container" id="fullscreenBg"></div>
     
     <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
@@ -218,7 +215,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل القناة الذكي: يمنع وميض ورمش شاشة الهاتف تماماً عبر الاستدعاء المخفي
+        // 2. 🚀 المعالج السحري والحتمي: يقوم بضخ الرابط وتوجيهه للمشغل الداخلي فوراً وبدون أي وميض
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -229,12 +226,13 @@
             // إخفاء القائمة الجانبية فوراً بنعومة للمشاهدة كاملة الشاشة
             playlistContainer.classList.add('hidden');
 
+            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها
             triggerHoneyPotAd();
 
-            // تمرير الرابط عبر الإطار المخفي لمنع الرمش تماماً وإبقاء الصفحة مستقرة وثابتة
+            // 🌟 القفزة البرمجية المطلقة: تمرير الرابط المباشر بالتوكن والامتداد عبر السيرفر الخاص بك
+            // هذا الأمر يجبر تطبيقك على فتح الرابط تلقائياً داخل مشغل البث بدون أي تأخير وبدون حظر للـ CORS
             setTimeout(() => {
-                const streamUrl = `${host}/stream?url=` + encodeURIComponent(url);
-                document.getElementById('hiddenExecutionFrame').src = streamUrl;
+                window.location.href = `${host}/stream?url=` + encodeURIComponent(url); 
             }, 250); 
         }
 

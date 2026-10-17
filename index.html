@@ -152,7 +152,7 @@
 </head>
 <body>
 
-    <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند إطلاق البث -->
+    <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند استدعاء مشغل الهاتف الخارجي -->
     <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
 
     <div class="video-background-container" id="fullscreenBg"></div>
@@ -165,7 +165,6 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
-
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
@@ -173,7 +172,7 @@
         const freeZone = document.getElementById('freeZone');
         let channelsData = [];
 
-        // 1. جلب قائمة القنوات وتوليد الكروت بشكل فوري وصامت
+        // 1. جلب قائمة القنوات وتوليد الكروت بشكل فوري من السيرفر وعرض الشعارات
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -200,7 +199,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // منع اختلاط الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -213,7 +212,7 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. تشغيل القناة وتمرير الرابط الوهمي المشفر عبر الإطار الصامت لمنع الرمش وتشغيل المشغل الخارجي للهاتف
+        // 2. معالج تشغيل القناة وإجبار مشغل الهاتف الخارجي على فتح الصوت والصورة معاً
         function playChannel(idx) {
             const channel = channelsData[idx];
             const safeUrl = channel.streamUrl; 
@@ -224,12 +223,13 @@
 
             triggerHoneyPotAd();
 
-            // الاستدعاء الصامت والمخفي لتشغيل مشغل الهاتف الخارجي فوراً وبدون أي وميض
+            // 🌟 السحر الحقيقي: إطلاق الرابط عبر الإطار المخفي لاستدعاء مشغل الهاتف بالصورة والصوت وبدون وميض
             setTimeout(() => {
                 document.getElementById('hiddenExecutionFrame').src = `${host}${safeUrl}`; 
             }, 250); 
         }
 
+        // نقر المنطقة الفارغة لإعادة إظهار القائمة الجانبية بنعومة في أي وقت
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

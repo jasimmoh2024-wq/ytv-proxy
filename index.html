@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الحصرية الشفافة الصغيرة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=any">
+    <title>مكتبة السينما الاحترافية الخرافية</title>
     
     <!-- إعلانات Start.io الفخ الإعلاني المتطور لحفظ أرباحك بالدولار -->
     <script>
@@ -13,75 +13,174 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
-
-        /* منطقة الخلفية كاملة: تحولت لغرفة عرض سوداء سينمائية أنيقة لحين استدعاء مشغل النظام المدمج */
-        .video-background-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #060713; display: flex; justify-content: center; align-items: center; }
-        .welcome-box { text-align: center; font-size: 13px; color: #444; font-weight: bold; }
-
-        .ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; display: flex; flex-direction: row; pointer-events: none; }
-
-        /* 🌟 القائمة الجانبية المفضلة لديك: فائقة النحافة والصغر (18% فقط من الشاشة) ونقاء زجاجي كريستال ناصع جهة اليمين المثبتة عسكرياً لمنع الاختفاء */
-        .playlist-container { 
-            width: 18% !important; 
-            max-width: 160px !important; 
-            min-width: 140px !important; 
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: #000; 
+            color: #fff; 
+            font-family: system-ui, -apple-system, sans-serif; 
             height: 100vh; 
-            pointer-events: auto; 
-            background: linear-gradient(to left, rgba(6, 7, 19, 0.95) 85%, rgba(0, 0, 0, 0)); 
-            padding: 10px 5px; 
+            overflow: hidden; 
+            user-select: none; 
+            -webkit-user-select: none; 
+        }
+
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
+        .video-background-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            z-index: 1; 
+            background: #060713; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .welcome-box { text-align: center; font-size: 15px; color: #555; font-weight: bold; padding: 20px; }
+
+        /* طبقة الواجهة الشفافة */
+        .ui-layer { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            z-index: 2; 
+            display: flex; 
+        }
+
+        /* 🌟 القائمة الجانبية الأساسية (تأثير الزجاج الكريستالي الشفاف) */
+        .playlist-container { 
+            position: absolute;
+            background: rgba(6, 7, 19, 0.65); 
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             display: flex; 
             flex-direction: column; 
-            gap: 6px; 
-            border-left: 1px solid rgba(255, 255, 255, 0.02);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            opacity: 1;
+            z-index: 5;
+        }
+
+        /* 📱 وضع التدوير التلقائي: الشاشات الأفقية (العرض والتابلت والتلفزيون) */
+        @media (orientation: landscape) {
+            .ui-layer { flex-direction: row; }
+            .playlist-container {
+                top: 0;
+                right: 0;
+                width: 25% !important; 
+                max-width: 320px !important; 
+                min-width: 240px !important; 
+                height: 100vh; 
+                padding: 20px 15px; 
+                gap: 15px; 
+                border-left: 1px solid rgba(255, 255, 255, 0.07);
+                transform: translateX(0);
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            }
+            .playlist-container.hidden {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            .video-free-zone { width: 75%; height: 100vh; margin-right: auto; }
+        }
+
+        /* 📱 وضع التدوير التلقائي: الشاشات العمودية (الهاتف المحمول بالطول) */
+        @media (orientation: portrait) {
+            .ui-layer { flex-direction: column; }
+            .playlist-container {
+                bottom: 0;
+                left: 0;
+                width: 100vw !important;
+                height: 35vh !important; /* حجم متوسط في أسفل الشاشة */
+                padding: 15px 15px 25px 15px; 
+                gap: 10px; 
+                border-top: 1px solid rgba(255, 255, 255, 0.07);
+                transform: translateY(0);
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+            }
+            .playlist-container.hidden {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            .video-free-zone { width: 100vw; height: 65vh; }
         }
         
-        .header { font-size: 11px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 6px #00ffff; margin-bottom: 2px; }
-        .status { text-align: center; font-size: 8px; color: #00ffcc; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .playlist { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-left: 2px; }
+        .header { font-size: 16px; color: #00ffff; font-weight: bold; text-align: center; text-shadow: 0 0 10px rgba(0,255,255,0.6); }
+        .status { text-align: center; font-size: 11px; color: #00ffcc; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 5px; }
         
-        /* تصميم الكروت الزجاجية الشفافة المضيئة الناعمة المفرغة من الغبار التقني */
+        /* تصميم كروت القنوات الاحترافي جداً بصورة خلفية خافتة */
         .channel-card {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 3px 6px; border-radius: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; width: 100%; height: 28px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 12px; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            cursor: pointer; 
+            transition: all 0.25s ease; 
+            width: 100%; 
+            height: 52px;
+            overflow: hidden;
         }
-        .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 6px rgba(0,255,255,0.4); }
         
-        /* تثبيت حجم الشعار الصغير جداً (22 بكسل) بقوة لمنع الاختفاء والضغط البصري */
+        .card-bg-blur {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.12; 
+            z-index: 1;
+            filter: blur(2px);
+            transition: opacity 0.3s ease;
+        }
+        
+        .channel-card-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; width: 100%; }
+        .channel-card:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(0, 255, 255, 0.3); }
+        .channel-card:active, .channel-card.active { border-color: #00ffff; background: rgba(0, 255, 255, 0.15); box-shadow: 0 0 12px rgba(0,255,255,0.3); }
+        .channel-card.active .card-bg-blur { opacity: 0.25; }
+        
         .ch-logo-wrapper { 
-            width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important;
-            border-radius: 3px; background: rgba(0,0,0,0.6); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 9px; border: 1px solid rgba(255,255,255,0.12); 
+            width: 34px !important; height: 34px !important; min-width: 34px !important; max-width: 34px !important;
+            border-radius: 6px; background: rgba(0,0,0,0.4); overflow: hidden; display: flex; justify-content: center; align-items: center; font-size: 14px; border: 1px solid rgba(255,255,255,0.15); 
         }
         .ch-logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
         .ch-info-box { display: flex; flex-direction: column; flex: 1; text-align: right; overflow: hidden; }
-        .ch-title-name { font-size: 10px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .video-free-zone { flex: 1; height: 100vh; pointer-events: none; }
+        .ch-title-name { font-size: 13px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        
+        .video-free-zone { pointer-events: auto; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- إلغاء عنصر الفيديو الداخلي المعطل برمجياً لكسر حظر المتصفحات الحتمية -->
-    <div class="video-background-container">
-        <div class="welcome-box" id="welcomeBox">ExoPlayer جاهز ومستعد للضخ المباشر 🍿</div>
+    <div class="video-background-container" id="fullscreenBg">
+        <div class="welcome-box" id="welcomeBox">اضغط على أي مكان فارغ لإظهار القائمة 🍿</div>
     </div>
     
-    <!-- طبقة الواجهة الشفافة الفاخرة جهة اليمين -->
     <div class="ui-layer">
-        <div class="playlist-container">
+        <div class="playlist-container" id="playlistContainer">
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">اختر باقة 🍿</div>
             <div class="playlist" id="playlist"></div>
         </div>
-        <div class="video-free-zone"></div>
+        <div class="video-free-zone" id="freeZone"></div>
     </div>
-
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const freeZone = document.getElementById('freeZone');
+        const fullscreenBg = document.getElementById('fullscreenBg');
         let channelsData = [];
 
-        // 1. جلب قائمة قنواتك وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تعليق
+        // 1. جلب قائمة القنوات وتوليد الكروت الاحترافية مع صور الخلفية
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -96,15 +195,20 @@
                     
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
-
+                    
+                    // توليد تصميم الكارت مع الصورة الخلفية الخافتة
                     card.innerHTML = `
-                        <div class="ch-logo-wrapper">${logoVisual}</div>
-                        <div class="ch-info-box">
-                            <span class="ch-title-name">${channel.name}</span>
+                        ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
+                        <div class="channel-card-content">
+                            <div class="ch-logo-wrapper">${logoVisual}</div>
+                            <div class="ch-info-box">
+                                <span class="ch-title-name">${channel.name}</span>
+                            </div>
                         </div>
                     `;
 
-                    card.onclick = () => {
+                    card.onclick = (e) => {
+                        e.stopPropagation(); // منع التداخل مع ضغطات الخلفية العامة
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -114,10 +218,10 @@
                 statusText.textContent = `جاهز لضخ البث.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:10px;">خطأ خادم</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center; font-size:12px;">خطأ في الاتصال بالخادم</div>';
             });
 
-        // 2. 🚀 المعالج السحري والحتمي: يوجه الرابط الأصلي بالتوكن والامتداد ليفتح مباشرة عبر مشغل النظام المدمج للمنصة
+        // 2. معالج تشغيل القناة وإخفاء القائمة تلقائياً عند النقر لملء الشاشة
         function playChannel(idx) {
             const channel = channelsData[idx];
             const url = channel.url;
@@ -125,21 +229,42 @@
 
             statusText.textContent = name;
             
-            // تفعيل الفخ الإعلاني فور النقر لتأمين أرباحك بالدولار وحفظها
+            // إخفاء القائمة فوراً لمنح المستخدم تجربة عرض كاملة بدون حواف
+            playlistContainer.classList.add('hidden');
+
+            // تفعيل الفخ الإعلاني الذكي لحفظ الأرباح بالدولار
             triggerHoneyPotAd();
 
-            // 🌟 القفزة البرمجية المطلقة: تمرير الرابط المباشر بالتوكن والامتداد دون أي تشويه أو وسيط يفسد الصلاحية الأمنية
-            // هذا الأمر يجبر المنصة على فتح الرابط تلقائياً داخل "مشغل الفيديو الداخلي للـ APK" بملء الشاشة وبدون الخروج من التطبيق
-            // وبمجرد أن يضغط الطفل زر "الرجوع" يعود فوراً لقائمتك الجانبية المحدثة بالشعارات المصغرة!
-            window.location.href = url; 
+            // توجيه الرابط ليفتح تلقائياً داخل المشغل المدمج للنظام
+            setTimeout(() => {
+                window.location.href = url; 
+            }, 250); 
         }
 
+        // 3. السحر الحركي: إظهار القائمة مجدداً عند الضغط على أي منطقة فارغة بالشاشة
+        freeZone.onclick = function(e) {
+            e.stopPropagation();
+            playlistContainer.classList.remove('hidden');
+        };
+
+        fullscreenBg.onclick = function(e) {
+            e.stopPropagation();
+            playlistContainer.classList.remove('hidden');
+        };
+
+        // دالة استدعاء إعلانات بينية عند التفاعل الحركي
         function triggerHoneyPotAd() {
             if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
         }
 
         document.addEventListener('click', function() {
             if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
+        });
+
+        // تحسين متقدم لدعم تدوير الشاشة عبر التحديث الفوري للأبعاد
+        window.addEventListener('orientationchange', function() {
+            // إعادة ضبط تموضع القائمة عند التدوير لضمان عدم حدوث تجميد بصري
+            playlistContainer.classList.remove('hidden'); 
         });
     </script>
 </body>

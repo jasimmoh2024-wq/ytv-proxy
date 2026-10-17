@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الاحترافية الفورية</title>
+    <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io بالمعرف الصحيح لحفظ أرباحك بالدولار -->
+    <!-- إعلانات Start.io تم تحديث المعرف الصحيح والجديد هنا لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
-
-    <!-- تضمين مشغل HLS العالمي لتشغيل قنوات الـ IPTV داخل التطبيق فوراً وبدون تعليق -->
-    <script src="https://jsdelivr.net"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,7 +25,7 @@
             -webkit-user-select: none; 
         }
 
-        /* عنصر تشغيل الفيديو السينمائي ملء الشاشة بالخلفية */
+        /* شاشة العرض السينمائية المدمجة ملء الشاشة */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -36,16 +33,7 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #000; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #videoPlayer {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* لحفظ أبعاد القنوات والعرض السينمائي الأصلي المريح للعين */
+            background: #07070b; 
         }
 
         /* طبقة الواجهة الشفافة فوق الفيديو */
@@ -69,14 +57,14 @@
             max-width: 320px !important; 
             min-width: 180px !important; 
             height: 100vh; 
-            background: rgba(10, 10, 15, 0.85); 
+            background: rgba(10, 10, 15, 0.75); 
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             padding: 20px 12px; 
             display: flex; 
             flex-direction: column; 
             gap: 15px; 
-            border-left: 2px solid rgba(255, 0, 60, 0.2); /* خط جانبي أحمر نيون فخم */
+            border-left: 2px solid rgba(255, 0, 60, 0.2); 
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
             opacity: 1;
             z-index: 5;
@@ -84,14 +72,12 @@
             transform: translateX(0);
         }
 
-        /* تأثير الاختفاء والانزلاق السلس جهة اليمين */
         .playlist-container.hidden {
             transform: translateX(100%);
             opacity: 0;
             pointer-events: none;
         }
 
-        /* المنطقة الفارغة المخصصة للمشاهدة ونقر إظهار القائمة */
         .video-free-zone { 
             width: 72%; 
             height: 100vh; 
@@ -100,7 +86,6 @@
             cursor: pointer; 
         }
         
-        /* العناوين باللون الأحمر النيون الفخم المقتبس من طراز Netflix */
         .header { 
             font-size: 15px; 
             color: #ff003c; 
@@ -122,7 +107,6 @@
         
         .playlist { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-left: 2px; }
         
-        /* 🎬 تصميم كروت القنوات السوداء الاحترافية مع خلفية الصورة الخافتة */
         .channel-card {
             position: relative;
             background: rgba(20, 20, 25, 0.6); 
@@ -168,10 +152,10 @@
 </head>
 <body>
 
-    <!-- مشغل الفيديو السينمائي المدمج الداخلي ملء الشاشة -->
-    <div class="video-background-container" id="fullscreenBg">
-        <video id="videoPlayer" autoplay playsinline></video>
-    </div>
+    <!-- الإطار المخفي السحري الذي يمنع رمش الشاشة نهائياً عند إطلاق البث -->
+    <iframe id="hiddenExecutionFrame" style="display:none; width:0; height:0; border:none;"></iframe>
+
+    <div class="video-background-container" id="fullscreenBg"></div>
     
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
@@ -181,16 +165,15 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
-        const video = document.getElementById('videoPlayer');
         let channelsData = [];
-        let hls = null;
 
-        // 1. جلب ملف القنوات من السيرفر ومعالجته فوراً في واجهة التطبيق لضمان سرعة خيالية بلمحة بصر
+        // 1. جلب قائمة القنوات وتوليد الكروت بشكل فوري وصامت
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -206,7 +189,6 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // توليد الكروت وحماية الرابط الأصلي برموز وهمية مشفرة في الواجهة
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">
@@ -218,7 +200,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation(); // منع تداخل الضغطات مع الواجهة الخلفية
+                        e.stopPropagation();
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -228,14 +210,13 @@
                 statusText.textContent = `جاهز لضخ البث.`;
             })
             .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في جلب القنوات</div>';
+                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. معالج تشغيل البث المباشر الفوري وفك التشفير الآمن من السيرفر دون استهلاك موارد رندر
+        // 2. تشغيل القناة وتمرير الرابط الوهمي المشفر عبر الإطار الصامت لمنع الرمش وتشغيل المشغل الخارجي للهاتف
         function playChannel(idx) {
             const channel = channelsData[idx];
-            // استخدام رابط الـ Stream Proxy المعتمد والمحمي بامتداد البث الحي
-            const safeStreamUrl = `${host}${channel.streamUrl}`;
+            const safeUrl = channel.streamUrl; 
             const name = channel.name;
 
             statusText.textContent = name;
@@ -243,46 +224,12 @@
 
             triggerHoneyPotAd();
 
-            // إطلاق دفق الفيديو فوراً داخل المشغل المدمج للتطبيق وبدون حظر أو شاشة سوداء
-            if (Hls.isSupported()) {
-                if (hls) { hls.destroy(); } // تصفية القناة السابقة تماماً لمنع أي تعليق في ذاكرة الهاتف
-                hls = new Hls();
-                hls.loadSource(safeStreamUrl);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(() => {
-                        // تخطي قيود التشغيل التلقائي الصارم في بعض الهواتف
-                        video.muted = true;
-                        video.play();
-                    });
-                });
-                
-                // معالجة الأخطاء الذكية في الخلفية لضمان استمرارية التشغيل التلقائي
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                hls.startLoad();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                hls.recoverMediaError();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-            } 
-            // دعم أجهزة أبل ومتصفحات الموبايل التي تشغل الـ m3u8 أصلياً بالخلفية
-            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = safeStreamUrl;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
-            }
+            // الاستدعاء الصامت والمخفي لتشغيل مشغل الهاتف الخارجي فوراً وبدون أي وميض
+            setTimeout(() => {
+                document.getElementById('hiddenExecutionFrame').src = `${host}${safeUrl}`; 
+            }, 250); 
         }
 
-        // 3. نقر المنطقة الجانبية الفارغة لإعادة إظهار القائمة فوراً وبسلاسة تامة فوق الفيديو
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

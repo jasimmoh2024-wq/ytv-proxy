@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكتبة السينما الاحترافية الحمراء</title>
+    <title>مكتبة السينما الاحترافية الخرافية</title>
     
-    <!-- إعلانات Start.io لحفظ أرباحك بالدولار المعرف الصحيح -->
+    <!-- إعلانات Start.io بالمعرف الصحيح والجديد لحفظ أرباحك بالدولار -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
 
-    <!-- تضمين مكتبة HLS العالمية لتشغيل قنوات الـ IPTV داخلياً بأعلى كفاءة ودقة -->
+    <!-- تضمين مشغل HLS العالمي لتشغيل القنوات داخلياً بالصورة والصوت فوراً وبدون حظر -->
     <script src="https://jsdelivr.net"></script>
 
     <style>
@@ -42,15 +42,14 @@
             align-items: center;
         }
 
-        /* 🎬 تحسين أبعاد الشاشة وإلغاء أي عناصر أو علامات تحميل افتراضية مشوهة للمظهر */
         #videoPlayer {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* ضبط أبعاد الصورة تلقائياً بشكل مريح للعين */
+            object-fit: contain; /* لحفظ أبعاد القنوات والعرض السينمائي الأصلي المريح للعين */
             background: #000;
         }
 
-        /* إخفاء قرص التحميل الدائري وعناصر التحكم الافتراضية المزعجة للمتصفح */
+        /* إخفاء عناصر التحكم الافتراضية المزعجة للمتصفح لمنع تشويه الواجهة */
         video::-webkit-media-controls-start-playback-button, 
         video::-webkit-media-controls-poster-attribute, 
         video::-webkit-media-controls-panel {
@@ -79,7 +78,7 @@
             max-width: 320px !important; 
             min-width: 180px !important; 
             height: 100vh; 
-            background: rgba(10, 10, 15, 0.75); 
+            background: rgba(10, 10, 15, 0.85); 
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             padding: 20px 12px; 
@@ -187,118 +186,3 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
-    <script>
-        const host = window.location.origin; 
-        const statusText = document.getElementById('status');
-        const playlistContainer = document.getElementById('playlistContainer');
-        const freeZone = document.getElementById('freeZone');
-        const video = document.getElementById('videoPlayer');
-        let channelsData = [];
-        let hls = null;
-
-        // 1. جلب قائمة القنوات وعرضها بالشعارات المصغرة الملونة فوراً وبدون أي تأخير
-        fetch(`${host}/api/channels`)
-            .then(res => res.json())
-            .then(channels => {
-                channelsData = channels;
-                const playlistDiv = document.getElementById('playlist');
-                playlistDiv.innerHTML = '';
-                
-                channels.forEach((channel, idx) => {
-                    const card = document.createElement('div');
-                    card.className = 'channel-card';
-                    card.id = `card-${idx}`;
-                    
-                    let logoUrl = channel.logo || "";
-                    let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
-
-                    card.innerHTML = `
-                        ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
-                        <div class="channel-card-content">
-                            <div class="ch-logo-wrapper">${logoVisual}</div>
-                            <div class="ch-info-box">
-                                <span class="ch-title-name">${channel.name}</span>
-                            </div>
-                        </div>
-                    `;
-
-                    card.onclick = (e) => {
-                        e.stopPropagation(); // منع تداخل الضغطات مع الواجهة الخلفية
-                        document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
-                        card.classList.add('active');
-                        playChannel(idx);
-                    };
-                    playlistDiv.appendChild(card);
-                });
-                statusText.textContent = `جاهز لضخ البث.`;
-            })
-            .catch(() => {
-                document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
-            });
-
-        // 2. معالج تشغيل البث الفوري الداخلي بالصورة والصوت معاً بدون الخروج من التطبيق
-        function playChannel(idx) {
-            const channel = channelsData[idx];
-            const safeStreamUrl = `${host}${channel.streamUrl}`;
-            const name = channel.name;
-
-            statusText.textContent = name;
-            playlistContainer.classList.add('hidden');
-
-            triggerHoneyPotAd();
-
-            // تشغيل محرك Hls.js العالمي لتشغيل الفيديو والصوت معاً داخل التطبيق
-            if (Hls.isSupported()) {
-                if (hls) { hls.destroy(); } // إنهاء القناة السابقة لتفريغ الذاكرة تماماً
-                hls = new Hls();
-                hls.loadSource(safeStreamUrl);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(() => {
-                        // تخطي قيود التشغيل التلقائي الصارم في بعض الهواتف والأجهزة
-                        video.muted = true;
-                        video.play();
-                    });
-                });
-
-                // معالجة الأخطاء الذكية لضمان عدم تعليق أو توقف البث الحي
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                hls.startLoad();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                hls.recoverMediaError();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-            } 
-            // دعم أجهزة أبل (iOS) ومتصفحات الهاتف التي تدعم دفق الـ m3u8 تلقائياً بالخلفية
-            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = safeStreamUrl;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
-            }
-        }
-
-        // 3. نقر المنطقة الجانبية الفارغة لإعادة إظهار القائمة الجانبية بنعومة وسلاسة فوق الفيديو
-        freeZone.onclick = function(e) {
-            e.stopPropagation();
-            playlistContainer.classList.remove('hidden');
-        };
-
-        function triggerHoneyPotAd() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        }
-
-        document.addEventListener('click', function() {
-            if (typeof startapp !== 'undefined') { startapp.showInterstitial(); }
-        });
-    </script>
-</body>
-</html>

@@ -2,20 +2,19 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل الـ CORS بشكل كامل لمنع أي حظر أمني في المتصفحات والتطبيقات
+// تفعيل الـ CORS بشكل كامل لكسر أي حظر أمني في التطبيقات
 app.use(cors({ origin: '*' }));
 
 // متغيّر حفظ القنوات في الذاكرة الحية (Cache) لضمان السرعة الفائقة
 let cachedChannels = [];
-
-// المعرف الإعلاني الخاص بك لشركة Start.io
 const STARTAPP_ID = "209100049";
 
-// دالة ذكية لمعالجة ملف الـ M3U مرة واحدة فقط وحفظه بالكاش لعدم التأخير
 function loadChannelsIntoMemory() {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return [];
@@ -56,40 +55,41 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// مسار المطورين المعتمد والمحمي لقراءة أرباحك بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain').send(`start.io, ${STARTAPP_ID}, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b`);
 });
 
-// ⚡ الـ API الفوري يرسل القنوات المحفوظة مسبقاً بالكاش بلمحة بصر وبدون أي تأخير
+// ⚡ الـ API الفوري يرسل القائمة بروابط وهمية تابعة لسيرفرك فقط لحمايتها من السرقة
 app.get('/api/channels', (req, res) => {
-    // نقوم بتعمية وتشفير الروابط الأصلية لكي لا تظهر علناً في المتصفح عند فحص الصفحة
-    const secureChannels = cachedChannels.map(ch => {
-        // تشفير الرابط الأصلي إلى ترميز الـ Base64 المجهول
-        const obfuscatedUrl = Buffer.from(ch.url).toString('base64');
-        return {
-            name: ch.name,
-            logo: ch.logo,
-            secureKey: obfuscatedUrl
-        };
-    });
-    res.json(secureChannels);
+    const safeChannels = cachedChannels.map((ch, idx) => ({
+        name: ch.name,
+        logo: ch.logo,
+        streamUrl: `/stream/channel-${idx}.m3u8` // رابط وهمي آمن تماماً
+    }));
+    res.json(safeChannels);
 });
 
-// مسار التمرير السريع وحل مشكلة الـ CORS وحمايتك من حظر الآي بي
-app.get('/stream', (req, res) => {
-    const urlIndex = req.url.indexOf('?url=');
-    if (urlIndex === -1) return res.status(400).send('الرجاء إدخال رابط القناة.');
+// 🌟 المسار السحري الاحترافي (Stream Proxy): يقوم بطلب البث في الخلفية وتمريره للمشغل مباشرة
+app.get('/stream/channel-:id.m3u8', (req, res) => {
+    const id = parseInt(req.params.id);
+    if (!cachedChannels || !cachedChannels[id]) {
+        return res.status(404).send('القناة غير موجودة.');
+    }
     
-    // فك التشفير عن الرابط القادم وتوجيهه بأمان للمشغل
-    const encryptedUrl = req.url.substring(urlIndex + 5);
-    const decodedUrl = decodeURIComponent(encryptedUrl);
-    
-    res.redirect(decodedUrl);
+    const targetUrl = cachedChannels[id].url;
+    const clientStr = targetUrl.startsWith('https') ? https : http;
+
+    // السيرفر يتصل بالقناة الأصلية بالخفاء نيابة عن المستخدم ويمرر البث مباشرة
+    clientStr.get(targetUrl, (streamResponse) => {
+        res.setHeader('Content-Type', streamResponse.headers['content-type'] || 'application/vnd.apple.mpegurl');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        streamResponse.pipe(res);
+    }).on('error', () => {
+        res.status(500).send('خطأ في جلب البث المباشر.');
+    });
 });
 
 app.listen(PORT, () => {
-    // تحميل القنوات فور تشغيل السيرفر وحفظها بالذاكرة لمنع التأخير تماماً
     cachedChannels = loadChannelsIntoMemory();
-    console.log(`Server running on port ${PORT}. Loaded ${cachedChannels.length} channels into memory cache.`);
+    console.log(`Server running on port ${PORT}. Loaded ${cachedChannels.length} channels.`);
 });

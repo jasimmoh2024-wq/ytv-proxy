@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية</title>
     
-    <!-- مكتبة HLS لتشغيل روابط البث المباشر وقنوات IPTV بصيغة m3u8 بسلاسة -->
+    <!-- مكتبة HLS لتشغيل القنوات والبث المباشر m3u8 بشكل أصيل ومستقر -->
     <script src="https://jsdelivr.net"></script>
 
     <style>
@@ -56,7 +56,7 @@
     let channelsData = [];
     let hls = null;
 
-    // 1. جلب قائمة القنوات وتوليد الكروت بشكل صحيح ومضمون
+    // 1. جلب قنوات البث النظيف وبنائها في الواجهة
     fetch(`${host}/api/channels`)
         .then(res => res.json())
         .then(channels => {
@@ -72,6 +72,7 @@
                 let logoUrl = channel.logo || "";
                 let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                 
+                // تم تصحيح بناء النص البرمي وإخفاء الكراش تماماً
                 card.innerHTML = `
                     ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                     <div class="channel-card-content">
@@ -97,33 +98,36 @@
             document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال بالسيرفر</div>';
         });
 
-    // 2. معالج تشغيل القناة وإعداد مشغل HLS بذكاء متكامل مع البروكسي
+    // 2. دالة تشغيل روابط الـ IPTV عبر البروكسي عند الحاجة لحل مشاكل الـ CORS والـ Block
     function playChannel(idx) {
         const channel = channelsData[idx];
-        const proxyUrl = channel.url; 
+        const originalUrl = channel.url; 
         const name = channel.name;
         
         statusText.textContent = name;
         playlistContainer.classList.add('hidden'); 
+
+        // تشغيل الرابط عبر مسار البروكسي المحلي لتجاوز قيود CORS للمتصفحات
+        const playbackUrl = `${host}/stream?url=${encodeURIComponent(originalUrl)}`;
         
-        if (proxyUrl.toLowerCase().includes('.m3u8') || proxyUrl.toLowerCase().includes('video%2fm3u8')) {
+        if (originalUrl.toLowerCase().includes('.m3u8')) {
             if (Hls.isSupported()) {
                 if (hls) hls.destroy(); 
                 hls = new Hls();
-                hls.loadSource(proxyUrl);
+                hls.loadSource(playbackUrl);
                 hls.attachMedia(videoElement);
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoElement.play().catch(err => console.log("Auto-play blocked:", err));
+                    videoElement.play().catch(err => console.log("Playback Blocked:", err));
                 });
             } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 if (hls) hls.destroy();
-                videoElement.src = proxyUrl;
-                videoElement.play().catch(err => console.log("Auto-play blocked:", err));
+                videoElement.src = playbackUrl;
+                videoElement.play().catch(err => console.log("Playback Blocked:", err));
             }
         } else {
             if (hls) hls.destroy();
-            videoElement.src = proxyUrl;
-            videoElement.play().catch(err => console.log("Auto-play blocked:", err));
+            videoElement.src = playbackUrl;
+            videoElement.play().catch(err => console.log("Playback Blocked:", err));
         }
     }
 

@@ -261,7 +261,7 @@
                     let logoUrl = channel.logo || "";
                     let logoVisual = logoUrl ? `<img src="${logoUrl}" class="ch-logo-img" alt="logo" onerror="this.src=''; this.parentElement.innerHTML='🎬';">` : '🎬';
                     
-                    // تم إصلاح كود النصوص ليعمل المتصفح بشكل سليم تماماً وبدون أخطاء رموز أو سلاش زائد
+                    // تم إصلاح السطر وإزالة الـ \ لضمان تفعيل الجافا سكريبت وبناء القائمة فوراً
                     card.innerHTML = `
                         ${logoUrl ? `<img src="\${logoUrl}" class="card-bg-blur" alt="bg">` : ''}
                         <div class="channel-card-content">

@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة السينما الاحترافية الحمراء</title>
     
-    <!-- إعلانات Start.io لحفظ أرباحك بالدولار -->
+    <!-- إعلانات Start.io لحفظ أرباحك بالدولار بالمعرف الصحيح -->
     <script>
         window.startapp_app_id = "209100049"; 
     </script>
     <script src="https://startappcdn.com" async></script>
+
+    <!-- تضمين مشغل HLS العالمي لتشغيل قنوات الـ IPTV داخل التطبيق فوراً وبدون برامج خارجية -->
+    <script src="https://jsdelivr.net"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -25,6 +28,7 @@
             -webkit-user-select: none; 
         }
 
+        /* عنصر تشغيل الفيديو السينمائي ملء الشاشة بالخلفية */
         .video-background-container { 
             position: absolute; 
             top: 0; 
@@ -32,9 +36,19 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1; 
-            background: #07070b; 
+            background: #000; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* لحفظ أبعاد القنوات والعرض السينمائي الأصلي */
+        }
+
+        /* طبقة الواجهة الشفافة فوق الفيديو */
         .ui-layer { 
             position: absolute; 
             top: 0; 
@@ -46,6 +60,7 @@
             flex-direction: row;
         }
 
+        /* 🌟 القائمة الجانبية الاحترافية: ثابتة عسكرياً على اليمين باللون الأسود والشفافية الزجاجية */
         .playlist-container { 
             position: absolute;
             top: 0;
@@ -149,7 +164,10 @@
 </head>
 <body>
 
-    <div class="video-background-container" id="fullscreenBg"></div>
+    <!-- مشغل الفيديو السينمائي المدمج الداخلي ملء الشاشة -->
+    <div class="video-background-container" id="fullscreenBg">
+        <video id="videoPlayer" autoplay playsinline></video>
+    </div>
     
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
@@ -159,14 +177,16 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
-
     <script>
         const host = window.location.origin; 
         const statusText = document.getElementById('status');
         const playlistContainer = document.getElementById('playlistContainer');
         const freeZone = document.getElementById('freeZone');
+        const video = document.getElementById('videoPlayer');
         let channelsData = [];
+        let hls = null;
 
+        // 1. جلب قائمة القنوات وتوليد الكروت بشكل آمن تماماً بدون كشف الروابط الأصلية
         fetch(`${host}/api/channels`)
             .then(res => res.json())
             .then(channels => {
@@ -193,7 +213,7 @@
                     `;
 
                     card.onclick = (e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // منع تداخل الضغطات مع الواجهة الخلفية
                         document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
                         playChannel(idx);
@@ -206,10 +226,10 @@
                 document.getElementById('playlist').innerHTML = '<div style="padding:10px; color:#ff003c; text-align:center; font-size:11px;">خطأ في الاتصال</div>';
             });
 
-        // 2. 🚀 معالج نيات الأندرويد الحتمي لإجبار التطبيق على استدعاء مشغل الفيديو الخارجي فوراً
+        // 2. معالج تشغيل البث المباشر داخل المشغل السينمائي الداخلي بدون الخروج من التطبيق وبدون رمش
         function playChannel(idx) {
             const channel = channelsData[idx];
-            const safeUrl = channel.streamUrl; 
+            const safeUrl = `${host}${channel.streamUrl}`; 
             const name = channel.name;
 
             statusText.textContent = name;
@@ -217,17 +237,30 @@
 
             triggerHoneyPotAd();
 
-            setTimeout(() => {
-                // توليد الرابط الكامل المحمي الخاص بسيرفرك
-                const fullStreamUrl = `${host}${safeUrl}`;
-                
-                // 🌟 القفزة البرمجية المطلقة: تحويل الرابط إلى Android Intent يجبر الهاتف على تشغيل الفيديو فوراً عبر المشغلات الخارجية (كـ VLC أو MX Player)
-                const intentUrl = `intent:${fullStreamUrl}#Intent;type=video/*;end`;
-                
-                window.location.href = intentUrl; 
-            }, 250); 
+            // تشغيل محرك Hls.js الفوري لتغذية شاشة العرض المدمجة بالبث
+            if (Hls.isSupported()) {
+                if (hls) { hls.destroy(); } // إنهاء دفق القناة السابقة لتفادي تعليق الذاكرة
+                hls = new Hls();
+                hls.loadSource(safeUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(() => {
+                        // كسر قيود WebView إذا منع التشغيل التلقائي الصامت
+                        video.muted = true;
+                        video.play();
+                    });
+                });
+            } 
+            // دعم أجهزة Apple ومتصفحات الهواتف التي تقرأ الـ m3u8 أصلياً وتلقائياً
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = safeUrl;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
         }
 
+        // 3. نقر الشاشة الفارغة الجانبية لإعادة إظهار القائمة الجانبية بنعومة وسلاسة فوق البث
         freeZone.onclick = function(e) {
             e.stopPropagation();
             playlistContainer.classList.remove('hidden');

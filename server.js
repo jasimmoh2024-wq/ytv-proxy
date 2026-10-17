@@ -18,7 +18,7 @@ app.get('/app-ads.txt', (req, res) => {
     res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// مسار فك وتحليل قنوات M3U البرمجية المصلح بالكامل
+// المسار الذكي المصلح لقراءة وفك تشفير ملفات البث M3U وإرسال نصوص صريحة
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -35,11 +35,11 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // 🛠️ تم التصحيح: استخراج نص رابط الشعار الصافي بدقة
+            // استخراج رابط الصورة أو الشعار كنص صافي
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
-            // 🛠️ تم التصحيح: استخراج نص الاسم الصافي بدقة
+            // استخراج اسم القناة الصافي المنبثق
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];

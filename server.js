@@ -13,12 +13,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// 🌟 تم تحديث وحقن المعرف الإعلاني الصحيح والخاص بك هنا (209100049) لحفظ الأرباح بالدولار
 app.get('/app-ads.txt', (req, res) => {
     res.type('text/plain');
     res.send('start.io, 209100049, DIRECT\npubnative.net, 1007349, reseller, d641df8625486a7b');
 });
 
-// المسار الذكي المصلح لقراءة وفك تشفير ملفات البث M3U وإرسال نصوص صريحة
+// مسار قراءة القنوات وبناء قائمة الشعارات والبوسترات الذكية
 app.get('/api/channels', (req, res) => {
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) {
@@ -35,11 +36,10 @@ app.get('/api/channels', (req, res) => {
         let line = lines[i].trim();
         
         if (line.startsWith('#EXTINF:')) {
-            // استخراج رابط الصورة أو الشعار كنص صافي
+            // استخراج رابط الصورة أو الشعار بدقة وعمق من وسم tvg-logo
             let logoMatch = line.match(/tvg-logo="([^"]+)"/i);
             currentLogo = (logoMatch && logoMatch[1]) ? logoMatch[1] : '';
 
-            // استخراج اسم القناة الصافي المنبثق
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             if (nameMatch && nameMatch[1]) {
                 currentName = nameMatch[1];
@@ -65,6 +65,7 @@ app.get('/api/channels', (req, res) => {
     res.json(channels);
 });
 
+// البروكسي الصافي السريع المتوافق تماماً مع مشغل ExoPlayer للأندرويد
 app.get('/stream', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('الرجاء إدخال رابط القناة.');
@@ -74,36 +75,28 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 30000,
+            timeout: 20000,
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
-                'Accept': '*/*',
-                'Connection': 'keep-alive'
+                'Accept': '*/*'
             }
         });
 
+        // تمرير البيانات بنظام التدفق المستمر والآمن بدون تثبيت صيغة واحدة تسبب الترميش للأفلام
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        res.setHeader('Expires', '0');
-        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Keep-Alive', 'timeout=15, max=100');
         res.setHeader('Accept-Ranges', 'bytes'); 
 
         response.data.pipe(res);
-
-        response.data.on('error', (err) => {
-            console.error('خطأ في تدفق بيانات المصدر:', err.message);
-            response.data.destroy();
-        });
 
         req.on('close', () => {
             response.data.destroy();
         });
 
     } catch (error) {
-        if (!res.headersSent) res.status(500).send('خطأ في جلب البث المباشر.');
+        res.status(500).send('خطأ في جلب البث المباشر.');
     }
 });
 

@@ -75,28 +75,42 @@ app.get('/stream', async (req, res) => {
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 20000,
+            timeout: 30000, // زيادة المهلة إلى 30 ثانية لضمان الاستقرار عند ضعف الشبكة
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36',
-                'Accept': '*/*'
+                'Accept': '*/*',
+                'Connection': 'keep-alive' // إبقاء الاتصال حياً مع مصدر البث الرئيسي
             }
         });
 
-        // تمرير البيانات بنظام التدفق المستمر والآمن بدون تثبيت صيغة واحدة تسبب الترميش للأفلام
+        // ترويسات متطورة لمنع النظام من تجميد تدفق الفيديو أو اعتباره خمولاً
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
-        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Expires', '0');
+        res.setHeader('Pragma', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Keep-Alive', 'timeout=15, max=100'); // الحفاظ على حيوية القناة
         res.setHeader('Accept-Ranges', 'bytes'); 
 
+        // تمرير البيانات بنظام التدفق المستمر والآمن
         response.data.pipe(res);
 
+        // حماية الخادم من الانهيار عند حدوث خطأ مفاجئ في التدفق
+        response.data.on('error', (err) => {
+            console.error('حدث خطأ أثناء تدفق البيانات من المصدر:', err.message);
+            response.data.destroy();
+            if (!res.headersSent) res.status(500).send('انقطع الاتصال بالمصدر.');
+        });
+
+        // تنظيف الذاكرة وإغلاق التدفق فور قيام المستخدم بإغلاق القناة أو التطبيق
         req.on('close', () => {
             response.data.destroy();
         });
 
     } catch (error) {
-        res.status(500).send('خطأ في جلب البث المباشر.');
+        console.error('فشل جلب البث المباشر:', error.message);
+        if (!res.headersSent) res.status(500).send('خطأ في جلب البث المباشر.');
     }
 });
 

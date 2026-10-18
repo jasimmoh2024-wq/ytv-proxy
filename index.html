@@ -6,7 +6,7 @@
     <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>window.startapp_app_id="209100049";</script>
-    <script src="https://startappcdn.com" async></script>
+    <script src="https://static.startappcdn.com/js/loader.js" async></script>
     <style>
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
@@ -26,10 +26,6 @@
         .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
         .ch-logo-img{width:100%;height:100%;object-fit:cover}
         .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        /* تدوير تلقائي - ما يغطي الاعلان */
-        @media screen and (orientation: landscape){
-            .video-background-container video{width:100vw!important;height:100vh!important}
-        }
     </style>
 </head>
 <body>
@@ -42,6 +38,10 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+
+    <!-- بنر START.IO - ثابت تحت وما يغطي الفيديو -->
+    <div id="startio-banner" style="position:fixed; bottom:0; left:0; width:100%; height:50px; z-index:10; display:none;"></div>
+
 <script>
     const host = window.location.origin;
     const statusText = document.getElementById('status');
@@ -49,43 +49,61 @@
     const freeZone = document.getElementById('freeZone');
     const video = document.getElementById('player');
     let channelsData = [], hls = null, wakeLock = null;
+    let clickCount = 0;
 
     async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
     document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
 
-    // === اصلاح التدوير التلقائي - طريقة آمنة للاعلانات ===
-    function unlockRotation(){
-        try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
-    }
-    // شغلها عند اول تفاعل فقط
+    function unlockRotation(){ try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){} }
     unlockRotation();
     document.addEventListener('click', unlockRotation, {once:true});
-    window.addEventListener('orientationchange', ()=>{ setTimeout(unlockRotation, 200); });
 
-    fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
-        channelsData=channels;
-        const playlistDiv=document.getElementById('playlist');
-        playlistDiv.innerHTML='';
-        channels.forEach((channel,idx)=>{
-            const card=document.createElement('div');
-            card.className='channel-card';
-            let logoUrl=channel.logo||"";
-            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
-            card.innerHTML=`${logoUrl?`<img src="${logoUrl}" class="card-bg-blur">`:''}<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
-            card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
-            playlistDiv.appendChild(card);
-        });
-        statusText.textContent=`تم تحميل ${channels.length} قناة`;
-    }).catch(()=>{ document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في الاتصال بـ API</div>'; });
+    // === جلب القنوات بطريقة محمية (توكن + فك تشفير) ===
+    async function loadChannels(){
+        try{
+            const tokenRes = await fetch(`${host}/api/get-token`);
+            const tokenData = await tokenRes.json();
+            const channelsRes = await fetch(`${host}/api/channels?token=${tokenData.token}`);
+            if(!channelsRes.ok) throw new Error("توكن منتهي");
+            const channels = await channelsRes.json();
+            channelsData=channels;
+            const playlistDiv=document.getElementById('playlist');
+            playlistDiv.innerHTML='';
+            channels.forEach((channel,idx)=>{
+                const card=document.createElement('div');
+                card.className='channel-card';
+                let logoUrl=channel.logo||"";
+                let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
+                card.innerHTML=`${logoUrl?`<img src="${logoUrl}" class="card-bg-blur">`:''}<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
+                card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
+                playlistDiv.appendChild(card);
+            });
+            statusText.textContent=`تم تحميل ${channels.length} قناة محمية`;
+        }catch(e){
+            document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في التحميل المحمي</div>';
+        }
+    }
+    loadChannels();
 
     function playChannel(idx){
         const channel=channelsData[idx];
         statusText.textContent=channel.name;
         playlistContainer.classList.add('hidden');
-        requestWakeLock();
-        unlockRotation(); // مهم للتدوير
-        if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
-        const url=channel.url;
+        requestWakeLock(); unlockRotation();
+
+        // === اعلان START.IO كل 4 نقرات فقط - حتى لا يتعارض مع ادموب ===
+        clickCount++;
+        if(clickCount % 4 === 0){
+            if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
+        }
+
+        // === فك تشفير الرابط وقت التشغيل فقط ===
+        let url;
+        try{ url = atob(channel.url); }catch(e){ url = channel.url; }
+
+        // استخدم البروكسي مالك للحماية
+        const finalUrl = `${host}/stream?url=${encodeURIComponent(btoa(url))}`;
+
         if(hls){ hls.destroy(); hls=null; }
         if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
         else{ video.src=url; video.play(); }

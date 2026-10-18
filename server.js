@@ -1,4 +1,4 @@
-شconst express = require('express');
+const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const fs = require('fs');
@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 const SECRET_TOKENS = new Map();
 
+// === السماح فقط لدومينك ===
 const ALLOWED_DOMAINS = [
     'jasimmoh2024-wq.github.io',
     'ytv-proxy',
@@ -19,18 +20,13 @@ const ALLOWED_DOMAINS = [
 
 app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
 
-// === كود ملف app-ads.txt لشركة START.IO ===
-app.get('/app-ads.txt', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send('start.io, 110183401, DIRECT, d4c1a32e9ccbda8e');
-});
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/api/get-token', (req, res) => {
     const ref = req.headers.referer || req.headers.origin || "";
+    // اذا الطلب مو من دومينك لا تنطيه توكن
     if(ref && !ALLOWED_DOMAINS.some(d => ref.includes(d))){
         console.log("محاولة سرقة من:", ref);
         return res.status(403).json({error: "ممنوع"});
@@ -47,12 +43,15 @@ app.get('/api/channels', (req, res) => {
         return res.status(403).json({ error: 'ممنوع - توكن غير صالح' });
     }
     SECRET_TOKENS.delete(token);
+
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'ملف channels.m3u غير موجود' });
+
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
     const channels = [];
     let currentName = '', currentLogo = '';
+
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue; 
@@ -79,7 +78,7 @@ app.get('/stream', async (req, res) => {
     if (!targetUrl) return res.status(400).send('رابط ناقص');
     try{
         try{ if(!targetUrl.startsWith('http')) targetUrl = Buffer.from(targetUrl, 'base64').toString('utf-8'); }catch(e){}
-        const response = await axios({ method: 'get', url: targetUrl, responseType: 'stream', timeout: 20000, headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36', 'Accept': '*/*' } });
+        const response = await axios({ method: 'get', url: targetUrl, responseType: 'stream', timeout: 20000, headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36', 'Accept': '/' } });
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -88,4 +87,4 @@ app.get('/stream', async (req, res) => {
     }catch(e){ if (!res.headersSent) res.status(500).send('خطأ في البث'); }
 });
 
-app.listen(PORT, () => console.log(`Protected Server for jasimmoh2024-wq running on ${PORT}`));
+app.listen(PORT, () => console.log(Protected Server for jasimmoh2024-wq running on ${PORT}));

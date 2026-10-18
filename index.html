@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>window.startapp_app_id="209100049";</script>
@@ -11,11 +11,11 @@
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
         .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#000}
-        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000}
+        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000; padding-bottom:50px;}
         .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
-        .playlist-container{position:absolute;top:0;right:0;width:28%!important;max-width:320px!important;min-width:180px!important;height:100vh;background:rgba(10,10,15,0.85);backdrop-filter:blur(30px);padding:20px 12px;display:flex;flex-direction:column;gap:15px;border-left:2px solid rgba(255,0,60,0.2);transition:transform 0.4s ease,opacity 0.4s;z-index:5}
+        .playlist-container{position:absolute;top:0;right:0;width:28%!important;max-width:320px!important;min-width:180px!important;height:calc(100vh - 50px);background:rgba(10,10,15,0.85);backdrop-filter:blur(30px);padding:20px 12px;display:flex;flex-direction:column;gap:15px;border-left:2px solid rgba(255,0,60,0.2);transition:transform 0.4s ease,opacity 0.4s;z-index:5}
         .playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
-        .video-free-zone{width:72%;height:100vh;margin-right:auto;cursor:pointer}
+        .video-free-zone{width:72%;height:calc(100vh - 50px);margin-right:auto;cursor:pointer}
         .header{font-size:15px;color:#ff003c;font-weight:bold;text-align:center}
         .status{text-align:center;font-size:11px;color:#ff4d73;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .playlist{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
@@ -26,6 +26,7 @@
         .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
         .ch-logo-img{width:100%;height:100%;object-fit:cover}
         .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        #startio-banner{position:fixed;bottom:0;left:0;width:100%;height:50px;z-index:100;background:#111;display:flex;justify-content:center;align-items:center;}
     </style>
 </head>
 <body>
@@ -39,8 +40,7 @@
         <div class="video-free-zone" id="freeZone"></div>
     </div>
 
-    <!-- بنر START.IO - ثابت تحت وما يغطي الفيديو -->
-    <div id="startio-banner" style="position:fixed; bottom:0; left:0; width:100%; height:50px; z-index:10; display:none;"></div>
+    <div id="startio-banner">جاري تحميل الاعلان...</div>
 
 <script>
     const host = window.location.origin;
@@ -54,11 +54,15 @@
     async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
     document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
 
-    function unlockRotation(){ try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){} }
-    unlockRotation();
-    document.addEventListener('click', unlockRotation, {once:true});
+    // اعلان بداية التطبيق بعد 3 ثواني
+    window.addEventListener('load', ()=>{
+        setTimeout(()=>{
+            if(typeof startapp !== 'undefined'){
+                try{ startapp.showSplash(); }catch(e){ try{ startapp.showInterstitial(); }catch(e2){} }
+            }
+        }, 3000);
+    });
 
-    // === جلب القنوات بطريقة محمية (توكن + فك تشفير) ===
     async function loadChannels(){
         try{
             const tokenRes = await fetch(`${host}/api/get-token`);
@@ -78,9 +82,9 @@
                 card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
                 playlistDiv.appendChild(card);
             });
-            statusText.textContent=`تم تحميل ${channels.length} قناة محمية`;
+            statusText.textContent=`تم تحميل ${channels.length} قناة`;
         }catch(e){
-            document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في التحميل المحمي</div>';
+            document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في التحميل</div>';
         }
     }
     loadChannels();
@@ -89,26 +93,21 @@
         const channel=channelsData[idx];
         statusText.textContent=channel.name;
         playlistContainer.classList.add('hidden');
-        requestWakeLock(); unlockRotation();
+        requestWakeLock();
 
-        // === اعلان START.IO كل 4 نقرات فقط - حتى لا يتعارض مع ادموب ===
         clickCount++;
-        if(clickCount % 4 === 0){
+        if(clickCount % 3 === 0){
             if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
         }
 
-        // === فك تشفير الرابط وقت التشغيل فقط ===
         let url;
         try{ url = atob(channel.url); }catch(e){ url = channel.url; }
-
-        // استخدم البروكسي مالك للحماية
-        const finalUrl = `${host}/stream?url=${encodeURIComponent(btoa(url))}`;
 
         if(hls){ hls.destroy(); hls=null; }
         if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
         else{ video.src=url; video.play(); }
     }
-    freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); unlockRotation(); };
+    freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
 </script>
 </body>
 </html>

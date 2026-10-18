@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script>window.startapp_app_id="209100049";</script>
-    <script src="https://static.startappcdn.com/js/loader.js" async></script>
     <style>
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
         .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#000}
-        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000; padding-bottom:50px;}
+        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000; padding-bottom:50px; transition:0.3s;}
         .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
         .playlist-container{position:absolute;top:0;right:0;width:28%!important;max-width:320px!important;min-width:180px!important;height:calc(100vh - 50px);background:rgba(10,10,15,0.85);backdrop-filter:blur(30px);padding:20px 12px;display:flex;flex-direction:column;gap:15px;border-left:2px solid rgba(255,0,60,0.2);transition:transform 0.4s ease,opacity 0.4s;z-index:5}
         .playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
@@ -26,7 +24,7 @@
         .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
         .ch-logo-img{width:100%;height:100%;object-fit:cover}
         .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        #startio-banner{position:fixed;bottom:0;left:0;width:100%;height:50px;z-index:100;background:#111;display:flex;justify-content:center;align-items:center;}
+        #startio-banner{position:fixed;bottom:0;left:0;width:100%;height:50px;z-index:100;background:transparent;display:flex;justify-content:center;align-items:center;}
     </style>
 </head>
 <body>
@@ -40,7 +38,12 @@
         <div class="video-free-zone" id="freeZone"></div>
     </div>
 
-    <div id="startio-banner">جاري تحميل الاعلان...</div>
+    <div id="startio-banner"></div>
+
+<script>
+    window.startapp_app_id = "209100049";
+</script>
+<script src="https://static.startappcdn.com/js/loader.js" async></script>
 
 <script>
     const host = window.location.origin;
@@ -53,6 +56,17 @@
 
     async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
     document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
+
+    // اذا الاعلان ما حمل خلال 8 ثواني اخفي البنر حتى لا يبقى فراغ اسود
+    setTimeout(()=>{
+        const banner = document.getElementById('startio-banner');
+        if(banner && banner.innerHTML.trim() === ""){
+            banner.style.display = 'none';
+            video.style.paddingBottom = '0px';
+            document.querySelector('.playlist-container').style.height = '100vh';
+            document.querySelector('.video-free-zone').style.height = '100vh';
+        }
+    }, 8000);
 
     // اعلان بداية التطبيق بعد 3 ثواني
     window.addEventListener('load', ()=>{

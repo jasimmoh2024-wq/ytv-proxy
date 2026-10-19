@@ -4,10 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MY TVIQ LIVE</title>
-
-<!-- 1. كود Social Bar - ارباحه ممتازة وما يغطي الفيديو -->
 <script type="text/javascript" src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
-
 <style>
 body{margin:0;background:#0a1931;font-family:Arial}
 #list{padding:15px;max-width:600px;margin:auto;display:flex;flex-direction:column;gap:12px;padding-bottom:120px}
@@ -21,34 +18,24 @@ body{margin:0;background:#0a1931;font-family:Arial}
 #box.show{display:block}
 #vid{width:100vw;height:100vh;object-fit:contain;background:#000}
 #close{position:absolute;top:12px;right:12px;background:#d4af37;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-size:20px;z-index:100000}
-/* بانر ثابت */
 #ad-fixed{position:fixed;bottom:0;left:0;width:100%;background:#0a1931;border-top:2px solid #d4af37;text-align:center;z-index:9998;padding:8px 0;min-height:70px;display:flex;justify-content:center;align-items:center;flex-direction:column}
 </style>
 </head>
 <body>
-
 <div class="header">MY TVIQ LIVE</div>
 <div id="list"><div class="loading">⏳ جاري جلب القنوات...</div></div>
 
-<!-- 2. كود البانر الثابت جوة -->
 <div id="ad-fixed">
   <div style="color:#d4af37;font-size:10px;margin-bottom:4px">إعلان</div>
-  <!-- كود البانر 320x50 -->
   <script type="text/javascript">
-    atOptions = {
-      'key' : '31813462',
-      'format' : 'iframe',
-      'height' : 50,
-      'width' : 320,
-      'params' : {}
-    };
+    atOptions = { 'key' : '31813462', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
   </script>
   <script type="text/javascript" src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
 </div>
 
 <div id="box">
 <button id="close" onclick="closeVid()">✕</button>
-<video id="vid" controls autoplay playsinline webkit-playsinline></video>
+<video id="vid" controls autoplay playsinline></video>
 </div>
 
 <script>
@@ -56,44 +43,51 @@ const list=document.getElementById('list');
 const box=document.getElementById('box');
 const vid=document.getElementById('vid');
 
-// يقرأ من نفس المستودع - بدون رند
 async function loadChannels(){
  try{
-  let res = await fetch('./channels.json?_=' + Date.now());
-  let channels = await res.json();
+  let res = await fetch('./channels.m3u?_=' + Date.now());
+  let text = await res.text();
+  let lines = text.split("\n");
+  let channels = [];
+  for(let i=0;i<lines.length;i++){
+    if(lines[i].includes("#EXTINF")){
+      let info = lines[i];
+      let name = info.split(",").pop().trim();
+      let logoMatch = info.match(/tvg-logo="([^"]+)"/);
+      let logo = logoMatch ? logoMatch[1] : "";
+      let url = (lines[i+1] || "").trim();
+      if(url && url.startsWith("http")){
+        channels.push({name, logo, url});
+      }
+    }
+  }
   list.innerHTML = "";
   channels.forEach(c=>{
-   let name = c.name || "قناة";
-   let logo = c.logo || "https://via.placeholder.com/55/0a1931/d4af37?text=TV";
-   let url = c.url;
-   if(!url) return;
    let d=document.createElement('div');
    d.className='card';
-   d.innerHTML=`<img class="logo" src="${logo}" onerror="this.src='https://via.placeholder.com/55/0a1931/d4af37?text=TV'"><div><div class="name">${name}</div><div class="sub">اضغط للمشاهدة</div></div>`;
-   d.onclick=()=>openVid(url);
+   d.innerHTML=`<img class="logo" src="${c.logo || 'https://via.placeholder.com/55/0a1931/d4af37?text=TV'}" onerror="this.src='https://via.placeholder.com/55/0a1931/d4af37?text=TV'"><div><div class="name">${c.name}</div><div class="sub">اضغط للمشاهدة</div></div>`;
+   d.onclick=()=>openVid(c.url);
    list.appendChild(d);
   });
+  if(channels.length==0) list.innerHTML="<div class='loading'>الملف فارغ</div>";
  }catch(e){
-  list.innerHTML = `<div class="loading">❌ ما لكيت ملف channels.json<br>خلي ملف القنوات بنفس المستودع</div>`;
+  list.innerHTML = `<div class="loading">❌ ما لكيت ملف channels.m3u<br>تأكد انه بنفس المجلد ويا index.html</div>`;
  }
 }
 
 function openVid(url){
- // اخفي البانر من يدخل فول سكرين حتى ما يخالف قوانين Adsterra
  document.getElementById('ad-fixed').style.display='none';
  box.classList.add('show');
  vid.src=url;
  vid.play().catch(()=>{});
  if(box.requestFullscreen){ box.requestFullscreen().catch(()=>{}); }
 }
-
 function closeVid(){
  box.classList.remove('show');
  vid.pause(); vid.src="";
  document.getElementById('ad-fixed').style.display='flex';
  if(document.fullscreenElement){ document.exitFullscreen().catch(()=>{}); }
 }
-
 loadChannels();
 </script>
 </body>

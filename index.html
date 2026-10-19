@@ -3,85 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
 <title>مكتبة السينما</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<!-- اعلان السوشال بار 31813251 -->
 <script src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* منع الرفرش من الجذر */
-html{
-  overscroll-behavior: none !important;
-  overscroll-behavior-y: none !important;
-  overflow: hidden;
-  height: 100%;
-  position: fixed;
-  width: 100%;
+*{box-sizing:border-box;font-family:'Cairo',system-ui}
+html,body{
+  margin:0;padding:0;width:100%;height:100%;overflow:hidden;
+  background:#000;overscroll-behavior:none!important;
+  position:fixed;top:0;left:0;
+  touch-action:none;
 }
-body{
-  margin:0;padding:0;
-  background:#000;color:#fff;
-  height:100%;width:100%;
-  overflow:hidden;
-  overscroll-behavior: none !important;
-  overscroll-behavior-y: none !important;
-  position: fixed;
-  top:0;left:0;
-  font-family:'Cairo',system-ui;
-}
-* { overscroll-behavior: none; }
-*::-webkit-scrollbar{width:0}
-
+/* الفيديو يملي الشاشة بالكامل */
 .video-background-container{
-  position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1;
-  overscroll-behavior: none !important;
-  touch-action: none;
+  position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;
+  z-index:1;background:#000;
 }
-video{width:100%;height:100%;object-fit:contain;background:#000}
-.ui-layer{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex;pointer-events:none;overscroll-behavior:none}
+video{
+  width:100%;height:100%;
+  object-fit:fill!important; /* يملي الشاشة */
+  background:#000;
+  display:block;
+}
+.ui-layer{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex;pointer-events:none}
 .playlist-container{
-  pointer-events:auto;position:absolute;top:0;right:0;width:42%!important;max-width:420px;min-width:320px;height:100dvh;
-  background:rgba(14,14,18,0.96);backdrop-filter:blur(25px);display:flex;flex-direction:column;
-  border-left:2px solid #ff003c;transition:0.4s;z-index:5;
-  overscroll-behavior: contain;
-  touch-action: pan-y;
+  pointer-events:auto;position:absolute;top:0;right:0;width:45%!important;max-width:420px;min-width:340px;height:100dvh;
+  background:rgba(12,12,16,0.97);backdrop-filter:blur(25px);display:flex;flex-direction:column;
+  border-left:2px solid #ff003c;transition:0.4s;z-index:5;touch-action:pan-y;
 }
-.playlist-container.hidden{transform:translateX(110%)}
-.video-free-zone{
-  pointer-events:auto;width:58%;height:100vh;
-  /* هذه الطبقة تمنع الرفرش */
-  overscroll-behavior: none !important;
-  touch-action: none;
-  background:transparent;
-}
+.playlist-container.hidden{transform:translateX(110%);opacity:0}
+.video-free-zone{pointer-events:auto;width:55%;height:100vh;touch-action:none}
 .top-bar{padding:20px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)}
 .header{font-size:18px;font-weight:700}.header span{color:#ff003c}
 .status{font-size:11px;color:#ff4d73;background:rgba(255,0,60,0.1);padding:6px 10px;border-radius:20px;display:inline-block;margin-top:8px}
 #searchInput{width:100%;margin-top:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 14px;color:#fff;outline:none}
-.playlist{
-  flex:1;overflow-y:auto;padding:14px 14px 100px;
-  overscroll-behavior: contain !important;
-  overscroll-behavior-y: contain !important;
-  -webkit-overflow-scrolling:touch;
-  touch-action: pan-y;
-}
+.playlist{flex:1;overflow-y:auto;padding:14px 14px 20px;touch-action:pan-y;overscroll-behavior:contain}
 .channel-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:12px;border-radius:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;cursor:pointer;min-height:64px}
 .channel-card.active{border-color:#ff003c;background:rgba(255,0,60,0.15)}
 .ch-logo-wrapper{width:48px;height:48px;min-width:48px;border-radius:12px;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ch-logo-img{width:100%;height:100%;object-fit:cover}
-.open-btn{pointer-events:auto;position:fixed;top:20px;right:20px;z-index:20;background:rgba(0,0,0,0.8);border:1px solid #ff003c;color:#fff;padding:10px 18px;border-radius:30px;cursor:pointer;display:none}
+.open-btn{pointer-events:auto;position:fixed;top:20px;right:20px;z-index:20;background:rgba(0,0,0,0.85);border:1px solid #ff003c;color:#fff;padding:10px 18px;border-radius:30px;cursor:pointer;display:none}
 .open-btn.show{display:block}
-#ad-fixed{position:fixed;bottom:0;left:0;width:100%;background:rgba(10,10,15,0.97);border-top:2px solid #ff003c;z-index:9999;padding:6px 0;min-height:68px;display:flex;justify-content:center;align-items:center;flex-direction:column}
-@media(max-width:768px){.playlist-container{width:88%!important}.video-free-zone{width:12%}}
+/* الاعلان يظهر فقط داخل القائمة وليس فوق الفيديو */
+#ad-inside-playlist{margin-top:auto;padding:10px 0;border-top:2px solid #ff003c;background:rgba(0,0,0,0.4);text-align:center;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+@media(max-width:768px){.playlist-container{width:88%!important;min-width:auto}.video-free-zone{width:12%}}
 </style>
 </head>
 <body>
 
-<div class="video-background-container" id="videoContainer">
+<div class="video-background-container">
   <video id="player" controls autoplay playsinline></video>
-  <!-- طبقة شفافة فوق الفيديو تمنع سحب الاندرويد -->
-  <div id="touchBlocker" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;touch-action:none;overscroll-behavior:none;display:none"></div>
 </div>
 
 <div class="open-btn" id="openBtn" onclick="togglePlaylist()">☰ القنوات</div>
@@ -94,44 +66,23 @@ video{width:100%;height:100%;object-fit:contain;background:#000}
       <input type="text" id="searchInput" placeholder="🔍 ابحث عن قناة...">
     </div>
     <div class="playlist" id="playlist"></div>
+    
+    <!-- اعلان البنر 31813462 - يظهر فقط هنا داخل القائمة -->
+    <div id="ad-inside-playlist">
+      <div style="color:#ff003c;font-size:9px">إعلان</div>
+      <script>atOptions={'key':'31813462','format':'iframe','height':50,'width':320,'params':{}};</script>
+      <script src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
+    </div>
   </div>
   <div class="video-free-zone" id="freeZone"></div>
 </div>
 
-<!-- اعلان البنر 31813462 -->
-<div id="ad-fixed">
-  <div style="color:#ff003c;font-size:9px;margin-bottom:2px">إعلان</div>
-  <script>atOptions={'key':'31813462','format':'iframe','height':50,'width':320,'params':{}};</script>
-  <script src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
-</div>
-
 <script>
-// === منع الرفرش للاندرويد بشكل قسري ===
-document.documentElement.style.overscrollBehavior = 'none';
-document.body.style.overscrollBehavior = 'none';
-
-// امنع اي سحب للصفحة
-window.addEventListener('scroll', () => window.scrollTo(0,0));
-
+// منع الرفرش - نسخة اندرويد النهائية
 let startY = 0;
-document.addEventListener('touchstart', (e) => {
-  startY = e.touches[0].clientY;
-}, {passive:false});
-
-document.addEventListener('touchmove', (e) => {
-  const isPlaylist = e.target.closest('.playlist');
-  if(isPlaylist) return; // اسمح للسحب داخل القائمة فقط
-  e.preventDefault();
-  e.stopPropagation();
-  return false;
-}, {passive:false});
-
-// منع السحب على الفيديو تحديدا
-document.getElementById('videoContainer').addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-}, {passive:false});
-document.getElementById('freeZone').addEventListener('touchmove', (e) => {
+document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, {passive:false});
+document.addEventListener('touchmove', e => {
+  if(e.target.closest('.playlist') || e.target.closest('#searchInput')) return;
   e.preventDefault();
 }, {passive:false});
 
@@ -139,24 +90,31 @@ const API="https://ytv-proxy.onrender.com/api/channels";
 const statusText=document.getElementById('status'), playlistDiv=document.getElementById('playlist'), playlistContainer=document.getElementById('playlistContainer'), openBtn=document.getElementById('openBtn'), video=document.getElementById('player'), searchInput=document.getElementById('searchInput');
 let channelsData=[], hls=null;
 
-function togglePlaylist(){ playlistContainer.classList.toggle('hidden'); openBtn.classList.toggle('show', playlistContainer.classList.contains('hidden')); document.getElementById('ad-fixed').style.display = playlistContainer.classList.contains('hidden') ? 'none' : 'flex'; }
+function togglePlaylist(){ 
+  playlistContainer.classList.toggle('hidden'); 
+  openBtn.classList.toggle('show', playlistContainer.classList.contains('hidden')); 
+}
 
 fetch(API).then(r=>r.json()).then(channels=>{
   channelsData=channels;
+  render(channels);
+  statusText.textContent=`تم تحميل ${channels.length} قناة`;
+});
+
+function render(list){
   playlistDiv.innerHTML='';
-  channels.forEach(ch=>{
+  list.forEach(ch=>{
     let card=document.createElement('div'); card.className='channel-card';
     let logo=ch.logo ? `<img src="${ch.logo}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">` : '🎬';
     card.innerHTML=`<div class="ch-logo-wrapper">${logo}</div><div style="flex:1;overflow:hidden"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ch.name}</div><div style="font-size:10px;color:#888">بث مباشر • HD</div></div><div>▶</div>`;
     card.onclick=()=>{ document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); play(ch); };
     playlistDiv.appendChild(card);
   });
-  statusText.textContent=`تم تحميل ${channels.length} قناة`;
-});
-
+}
 function play(ch){
   statusText.textContent=ch.name;
-  if(window.innerWidth<900){ playlistContainer.classList.add('hidden'); openBtn.classList.add('show'); }
+  playlistContainer.classList.add('hidden'); 
+  openBtn.classList.add('show');
   if(hls){ hls.destroy(); hls=null; }
   if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(ch.url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
   else { video.src=ch.url; video.play(); }
@@ -165,13 +123,7 @@ document.getElementById('freeZone').onclick=()=>togglePlaylist();
 searchInput.addEventListener('input', e=>{
   let q=e.target.value.toLowerCase();
   let filtered = !q ? channelsData : channelsData.filter(c=>c.name.toLowerCase().includes(q));
-  playlistDiv.innerHTML='';
-  filtered.forEach(ch=>{
-    let card=document.createElement('div'); card.className='channel-card';
-    card.innerHTML=`<div class="ch-logo-wrapper">${ch.logo ? `<img src="${ch.logo}" class="ch-logo-img">` : '🎬'}</div><div style="flex:1">${ch.name}</div><div>▶</div>`;
-    card.onclick=()=>play(ch);
-    playlistDiv.appendChild(card);
-  });
+  render(filtered);
 });
 </script>
 </body>

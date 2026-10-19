@@ -1,127 +1,100 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبة السينما الاحترافية</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
-        .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#000}
-        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000; padding-bottom:50px; transition:0.3s;}
-        .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
-        .playlist-container{position:absolute;top:0;right:0;width:28%!important;max-width:320px!important;min-width:180px!important;height:calc(100vh - 50px);background:rgba(10,10,15,0.85);backdrop-filter:blur(30px);padding:20px 12px;display:flex;flex-direction:column;gap:15px;border-left:2px solid rgba(255,0,60,0.2);transition:transform 0.4s ease,opacity 0.4s;z-index:5}
-        .playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
-        .video-free-zone{width:72%;height:calc(100vh - 50px);margin-right:auto;cursor:pointer}
-        .header{font-size:15px;color:#ff003c;font-weight:bold;text-align:center}
-        .status{text-align:center;font-size:11px;color:#ff4d73;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .playlist{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
-        .channel-card{position:relative;background:rgba(20,20,25,0.6);border:1px solid rgba(255,255,255,0.05);padding:10px;border-radius:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:0.25s;width:100%;height:50px;overflow:hidden}
-        .card-bg-blur{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.1;z-index:1;filter:blur(3px)}
-        .channel-card-content{position:relative;z-index:2;display:flex;align-items:center;gap:10px;width:100%}
-        .channel-card.active{border-color:#ff003c;background:rgba(255,0,60,0.15)}
-        .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
-        .ch-logo-img{width:100%;height:100%;object-fit:cover}
-        .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        #startio-banner{position:fixed;bottom:0;left:0;width:100%;height:50px;z-index:100;background:transparent;display:flex;justify-content:center;align-items:center;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MY TVIQ LIVE</title>
+
+<!-- 1. كود Social Bar - ارباحه ممتازة وما يغطي الفيديو -->
+<script type="text/javascript" src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
+
+<style>
+body{margin:0;background:#0a1931;font-family:Arial}
+#list{padding:15px;max-width:600px;margin:auto;display:flex;flex-direction:column;gap:12px;padding-bottom:120px}
+.header{color:#d4af37;text-align:center;padding:12px;border-bottom:2px solid #d4af37;font-weight:bold}
+.card{display:flex;align-items:center;background:#fff;padding:12px;border-radius:12px;cursor:pointer;border:2px solid #d4af37}
+.logo{width:55px;height:55px;border-radius:10px;margin-left:12px;background:#0a1931;object-fit:cover}
+.name{font-weight:bold;color:#0a1931}
+.sub{font-size:11px;color:#666}
+.loading{color:#fff;text-align:center;padding:40px}
+#box{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:99999;display:none}
+#box.show{display:block}
+#vid{width:100vw;height:100vh;object-fit:contain;background:#000}
+#close{position:absolute;top:12px;right:12px;background:#d4af37;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-size:20px;z-index:100000}
+/* بانر ثابت */
+#ad-fixed{position:fixed;bottom:0;left:0;width:100%;background:#0a1931;border-top:2px solid #d4af37;text-align:center;z-index:9998;padding:8px 0;min-height:70px;display:flex;justify-content:center;align-items:center;flex-direction:column}
+</style>
 </head>
 <body>
-    <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
-    <div class="ui-layer">
-        <div class="playlist-container" id="playlistContainer">
-            <div class="header">📺 قائمة القنوات</div>
-            <div class="status" id="status">جاري التحميل...</div>
-            <div class="playlist" id="playlist"></div>
-        </div>
-        <div class="video-free-zone" id="freeZone"></div>
-    </div>
 
-    <div id="startio-banner"></div>
+<div class="header">MY TVIQ LIVE</div>
+<div id="list"><div class="loading">⏳ جاري جلب القنوات...</div></div>
+
+<!-- 2. كود البانر الثابت جوة -->
+<div id="ad-fixed">
+  <div style="color:#d4af37;font-size:10px;margin-bottom:4px">إعلان</div>
+  <!-- كود البانر 320x50 -->
+  <script type="text/javascript">
+    atOptions = {
+      'key' : '31813462',
+      'format' : 'iframe',
+      'height' : 50,
+      'width' : 320,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
+</div>
+
+<div id="box">
+<button id="close" onclick="closeVid()">✕</button>
+<video id="vid" controls autoplay playsinline webkit-playsinline></video>
+</div>
 
 <script>
-    window.startapp_app_id = "209100049";
-</script>
-<script src="https://static.startappcdn.com/js/loader.js" async></script>
+const list=document.getElementById('list');
+const box=document.getElementById('box');
+const vid=document.getElementById('vid');
 
-<script>
-    const host = window.location.origin;
-    const statusText = document.getElementById('status');
-    const playlistContainer = document.getElementById('playlistContainer');
-    const freeZone = document.getElementById('freeZone');
-    const video = document.getElementById('player');
-    let channelsData = [], hls = null, wakeLock = null;
-    let clickCount = 0;
+// يقرأ من نفس المستودع - بدون رند
+async function loadChannels(){
+ try{
+  let res = await fetch('./channels.json?_=' + Date.now());
+  let channels = await res.json();
+  list.innerHTML = "";
+  channels.forEach(c=>{
+   let name = c.name || "قناة";
+   let logo = c.logo || "https://via.placeholder.com/55/0a1931/d4af37?text=TV";
+   let url = c.url;
+   if(!url) return;
+   let d=document.createElement('div');
+   d.className='card';
+   d.innerHTML=`<img class="logo" src="${logo}" onerror="this.src='https://via.placeholder.com/55/0a1931/d4af37?text=TV'"><div><div class="name">${name}</div><div class="sub">اضغط للمشاهدة</div></div>`;
+   d.onclick=()=>openVid(url);
+   list.appendChild(d);
+  });
+ }catch(e){
+  list.innerHTML = `<div class="loading">❌ ما لكيت ملف channels.json<br>خلي ملف القنوات بنفس المستودع</div>`;
+ }
+}
 
-    async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
-    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
+function openVid(url){
+ // اخفي البانر من يدخل فول سكرين حتى ما يخالف قوانين Adsterra
+ document.getElementById('ad-fixed').style.display='none';
+ box.classList.add('show');
+ vid.src=url;
+ vid.play().catch(()=>{});
+ if(box.requestFullscreen){ box.requestFullscreen().catch(()=>{}); }
+}
 
-    // اذا الاعلان ما حمل خلال 8 ثواني اخفي البنر حتى لا يبقى فراغ اسود
-    setTimeout(()=>{
-        const banner = document.getElementById('startio-banner');
-        if(banner && banner.innerHTML.trim() === ""){
-            banner.style.display = 'none';
-            video.style.paddingBottom = '0px';
-            document.querySelector('.playlist-container').style.height = '100vh';
-            document.querySelector('.video-free-zone').style.height = '100vh';
-        }
-    }, 8000);
+function closeVid(){
+ box.classList.remove('show');
+ vid.pause(); vid.src="";
+ document.getElementById('ad-fixed').style.display='flex';
+ if(document.fullscreenElement){ document.exitFullscreen().catch(()=>{}); }
+}
 
-    // اعلان بداية التطبيق بعد 3 ثواني
-    window.addEventListener('load', ()=>{
-        setTimeout(()=>{
-            if(typeof startapp !== 'undefined'){
-                try{ startapp.showSplash(); }catch(e){ try{ startapp.showInterstitial(); }catch(e2){} }
-            }
-        }, 3000);
-    });
-
-    async function loadChannels(){
-        try{
-            const tokenRes = await fetch(`${host}/api/get-token`);
-            const tokenData = await tokenRes.json();
-            const channelsRes = await fetch(`${host}/api/channels?token=${tokenData.token}`);
-            if(!channelsRes.ok) throw new Error("توكن منتهي");
-            const channels = await channelsRes.json();
-            channelsData=channels;
-            const playlistDiv=document.getElementById('playlist');
-            playlistDiv.innerHTML='';
-            channels.forEach((channel,idx)=>{
-                const card=document.createElement('div');
-                card.className='channel-card';
-                let logoUrl=channel.logo||"";
-                let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
-                card.innerHTML=`${logoUrl?`<img src="${logoUrl}" class="card-bg-blur">`:''}<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
-                card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
-                playlistDiv.appendChild(card);
-            });
-            statusText.textContent=`تم تحميل ${channels.length} قناة`;
-        }catch(e){
-            document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في التحميل</div>';
-        }
-    }
-    loadChannels();
-
-    function playChannel(idx){
-        const channel=channelsData[idx];
-        statusText.textContent=channel.name;
-        playlistContainer.classList.add('hidden');
-        requestWakeLock();
-
-        clickCount++;
-        if(clickCount % 3 === 0){
-            if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
-        }
-
-        let url;
-        try{ url = atob(channel.url); }catch(e){ url = channel.url; }
-
-        if(hls){ hls.destroy(); hls=null; }
-        if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
-        else{ video.src=url; video.play(); }
-    }
-    freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
+loadChannels();
 </script>
 </body>
 </html>

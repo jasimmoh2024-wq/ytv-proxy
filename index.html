@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <!-- اعلان السوشال بار 31813251 -->
-    <script src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
+    
+    <!-- اعلان السوشال بار الجديد 2dad716486cfb2031892dd6423eca662 -->
+    <script data-cfasync="false" src="https://www.highperformanceformat.com/2dad716486cfb2031892dd6423eca662/invoke.js"></script>
+    
     <script>window.startapp_app_id="209100049";</script>
     <script src="https://startappcdn.com" async></script>
     <style>
@@ -28,11 +30,7 @@
         .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
         .ch-logo-img{width:100%;height:100%;object-fit:cover}
         .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        /* اعلان البنر */
         #ad-banner{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,0,60,0.2);text-align:center;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-        @media screen and (orientation: landscape){
-            .video-background-container video{width:100vw!important;height:100vh!important}
-        }
     </style>
 </head>
 <body>
@@ -42,13 +40,20 @@
             <div class="header">📺 قائمة القنوات</div>
             <div class="status" id="status">جاري التحميل...</div>
             <div class="playlist" id="playlist"></div>
-            <!-- اعلان البنر 31813462 -->
+            
+            <!-- اعلان البنر الجديد a0c5287b15523633a4188d2ccd6d4241 -->
             <div id="ad-banner">
                 <div style="color:#ff003c;font-size:8px;margin-bottom:3px">إعلان</div>
                 <script>
-                  atOptions = {'key' : '31813462','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};
+                  atOptions = {
+                    'key' : 'a0c5287b15523633a4188d2ccd6d4241',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                  };
                 </script>
-                <script src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
+                <script src="https://www.highperformanceformat.com/a0c5287b15523633a4188d2ccd6d4241/invoke.js"></script>
             </div>
         </div>
         <div class="video-free-zone" id="freeZone"></div>
@@ -63,8 +68,6 @@
 
     async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
     document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
-
-    // فتح قفل التدوير التلقائي
     try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 
     fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{

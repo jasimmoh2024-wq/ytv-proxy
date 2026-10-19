@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    
-    <!-- ✅ كود Social Bar الخاص بك - ID: 31813251 -->
+    <!-- Social Bar 31813251 -->
     <script type="text/javascript" src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
-
     <style>
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
@@ -28,7 +26,6 @@
         .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
         .ch-logo-img{width:100%;height:100%;object-fit:cover}
         .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        /* ✅ مكان بانر Adsterra الثابت */
         #ad-fixed{position:fixed;bottom:0;left:0;width:100%;background:rgba(10,10,15,0.95);border-top:2px solid #ff003c;text-align:center;z-index:9999;padding:6px 0;min-height:65px;display:flex;justify-content:center;align-items:center;flex-direction:column}
     </style>
 </head>
@@ -43,87 +40,51 @@
         <div class="video-free-zone" id="freeZone"></div>
     </div>
 
-    <!-- ✅ كود Banner 320x50 الخاص بك - ID: 31813462 -->
+    <!-- Banner 31813462 -->
     <div id="ad-fixed">
       <div style="color:#ff003c;font-size:9px;margin-bottom:3px">إعلان</div>
       <script type="text/javascript">
-        atOptions = {
-          'key' : '31813462',
-          'format' : 'iframe',
-          'height' : 50,
-          'width' : 320,
-          'params' : {}
-        };
+        atOptions = { 'key' : '31813462', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
       </script>
       <script type="text/javascript" src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
     </div>
 
 <script>
-    // يقرأ من نفس المستودع او من الرند - يشتغل بالحالتين
-    let apiUrl = '';
-    // اذا انت على كيتاب (github.io) يقرأ من channels.m3u
-    if(window.location.hostname.includes('github.io')){
-        apiUrl = './channels.m3u';
-    } else {
-        // اذا انت على الرند يبقى نفس كودك القديم
-        apiUrl = window.location.origin + '/api/channels';
-    }
-
+    const API_URL = "https://ytv-proxy.onrender.com/api/channels";
     const statusText = document.getElementById('status');
     const playlistContainer = document.getElementById('playlistContainer');
     const freeZone = document.getElementById('freeZone');
     const video = document.getElementById('player');
-    let channelsData = [], hls = null, wakeLock = null;
+    let channelsData = [], hls = null;
 
-    async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
-    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
+    async function requestWakeLock(){ try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){} }
     try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 
-    async function loadChannels(){
-        try{
-            let res = await fetch(apiUrl + '?_=' + Date.now());
-            let channels = [];
-            if(apiUrl.includes('.m3u')){
-                // قراءة ملف m3u
-                let text = await res.text();
-                let lines = text.split("\n");
-                for(let i=0;i<lines.length;i++){
-                    if(lines[i].includes("#EXTINF")){
-                        let name = lines[i].split(",").pop().trim();
-                        let logoMatch = lines[i].match(/tvg-logo="([^"]+)"/);
-                        let logo = logoMatch ? logoMatch[1] : "";
-                        let url = (lines[i+1] || "").trim();
-                        if(url.startsWith("http")) channels.push({name, logo, url});
-                    }
-                }
-            } else {
-                // قراءة json من الرند
-                channels = await res.json();
-            }
-
-            channelsData=channels;
-            const playlistDiv=document.getElementById('playlist');
-            playlistDiv.innerHTML='';
-            channels.forEach((channel,idx)=>{
-                const card=document.createElement('div');
-                card.className='channel-card';
-                let logoUrl=channel.logo||"";
-                let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
-                card.innerHTML=`${logoUrl?`<img src="${logoUrl}" class="card-bg-blur">`:''}<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
-                card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
-                playlistDiv.appendChild(card);
-            });
-            statusText.textContent=`تم تحميل ${channels.length} قناة`;
-        }catch(err){
-            document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ: ما لكيت channels.m3u<br>تأكد الملف بنفس المجلد</div>';
-        }
-    }
+    // صحي الرند اذا كان نايم
+    fetch(API_URL).then(r=>r.json()).then(channels=>{
+        channelsData=channels;
+        const playlistDiv=document.getElementById('playlist');
+        playlistDiv.innerHTML='';
+        channels.forEach((channel,idx)=>{
+            const card=document.createElement('div');
+            card.className='channel-card';
+            let logoUrl=channel.logo||"";
+            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
+            card.innerHTML=`${logoUrl?`<img src="${logoUrl}" class="card-bg-blur">`:''}<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
+            card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
+            playlistDiv.appendChild(card);
+        });
+        statusText.textContent=`تم تحميل ${channels.length} قناة`;
+    }).catch(()=>{
+        document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center">⏳ السيرفر نايم، انتظر 30 ثانية وحدث الصفحة<br>Render المجاني يحتاج وقت ليصحى</div>';
+        statusText.textContent="جاري ايقاظ السيرفر...";
+        setTimeout(()=>location.reload(), 30000);
+    });
 
     function playChannel(idx){
         const channel=channelsData[idx];
         statusText.textContent=channel.name;
         playlistContainer.classList.add('hidden');
-        // ✅ اخفي البانر وقت المشاهدة حتى لا يخالف Adsterra
         document.getElementById('ad-fixed').style.display='none';
         requestWakeLock();
         const url=channel.url;
@@ -131,15 +92,7 @@
         if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
         else{ video.src=url; video.play(); }
     }
-    
-    freeZone.onclick=(e)=>{ 
-        e.stopPropagation(); 
-        playlistContainer.classList.remove('hidden');
-        // ✅ رجع البانر من يرجع للقائمة
-        document.getElementById('ad-fixed').style.display='flex';
-    };
-
-    loadChannels();
+    freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); document.getElementById('ad-fixed').style.display='flex'; };
 </script>
 </body>
 </html>

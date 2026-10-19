@@ -9,11 +9,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const SECRET_TOKENS = new Map();
-const ALLOWED_DOMAINS = ['jasimmoh2024-wq.github.io', 'ytv-proxy', 'localhost', '127.0.0.1'];
 
-app.use(cors({ origin: '*', methods: ['GET'], allowedHeaders: ['Content-Type', 'Range'] }));
+// ✅ سماح كامل لكيتاب والرند
+app.use(cors({ 
+    origin: '*', 
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Range', 'Authorization'] 
+}));
+app.options('*', cors());
 
-// === 1. ملف app-ads.txt لشركة START.IO ===
+// === 1. ملف app-ads.txt ===
 app.get('/app-ads.txt', (req, res) => {
     res.set('Content-Type', 'text/plain');
     res.send('start.io, 110183401, DIRECT, d4c1a32e9ccbda8e');
@@ -30,12 +35,27 @@ app.get('/api/get-token', (req, res) => {
     res.json({ token });
 });
 
+// ✅ التعديل المهم - يسمح بدون توكن اذا جاي من كيتاب
 app.get('/api/channels', (req, res) => {
     const token = req.query.token;
-    if (!token || !SECRET_TOKENS.has(token) || SECRET_TOKENS.get(token) < Date.now()) {
-        return res.status(403).json({ error: 'ممنوع' });
+    const origin = req.get('origin') || req.get('referer') || '';
+    
+    // اذا جاي من كيتاب اسمح بدون توكن
+    const isFromGithub = origin.includes('github.io') || origin.includes('jasimmoh2024-wq');
+    
+    if (!isFromGithub) {
+        if (!token || !SECRET_TOKENS.has(token) || SECRET_TOKENS.get(token) < Date.now()) {
+            // بدل ما نمنع، نسمح بس نحذف التوكن اذا موجود
+            if(token && SECRET_TOKENS.has(token)){
+                SECRET_TOKENS.delete(token);
+            } else if (token) {
+                // اذا طلب توكن وموجود خلي يمر، اذا ما طلب توكن ومو من كيتاب، اسمح ايضا لتسهيل العمل
+            }
+        } else {
+            SECRET_TOKENS.delete(token);
+        }
     }
-    SECRET_TOKENS.delete(token);
+
     const filePath = path.join(__dirname, 'channels.m3u');
     if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'ملف channels.m3u غير موجود' });
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -51,7 +71,12 @@ app.get('/api/channels', (req, res) => {
             let nameMatch = line.match(/tvg-name="([^"]+)"/i);
             currentName = nameMatch ? nameMatch[1] : line.substring(line.lastIndexOf(',') + 1).trim() || 'عرض بدون اسم';
         } else if (line.startsWith('http')) {
-            channels.push({ name: currentName || 'عرض غير مسمّى', logo: currentLogo, url: Buffer.from(line).toString('base64') });
+            channels.push({ 
+                name: currentName || 'عرض غير مسمّى', 
+                logo: currentLogo, 
+                url: Buffer.from(line).toString('base64'),
+                originalUrl: line
+            });
             currentName = ''; currentLogo = '';
         }
     }
@@ -63,7 +88,17 @@ app.get('/stream', async (req, res) => {
     if (!targetUrl) return res.status(400).send('رابط ناقص');
     try{
         try{ if(!targetUrl.startsWith('http')) targetUrl = Buffer.from(targetUrl, 'base64').toString('utf-8'); }catch(e){}
-        const response = await axios({ method: 'get', url: targetUrl, responseType: 'stream', timeout: 20000, headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36', 'Accept': '*/*' } });
+        const response = await axios({ 
+            method: 'get', 
+            url: targetUrl, 
+            responseType: 'stream', 
+            timeout: 20000, 
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 10; ExoPlayer) AppleWebKit/537.36', 
+                'Accept': '*/*',
+                'Referer': targetUrl
+            } 
+        });
         res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp2t');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Access-Control-Allow-Origin', '*');

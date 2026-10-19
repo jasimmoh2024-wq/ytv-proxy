@@ -1,69 +1,69 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>فحص القنوات</title>
+<title>مكتبة السينما</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<style>body{background:#000;color:#fff;font-family:system-ui;padding:15px} .log{background:#111;padding:10px;border-radius:8px;margin:10px 0;font-size:12px;white-space:pre-wrap;direction:ltr} video{width:100%;max-height:50vh;background:#000} .card{padding:10px;border:1px solid #333;margin:5px 0;border-radius:6px;cursor:pointer} .card:hover{border-color:#ff003c}</style>
+<script src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
+.video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1}
+video{width:100%;height:100%;object-fit:contain;background:#000}
+.ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
+.playlist-container{position:absolute;top:0;right:0;width:30%;max-width:320px;height:100vh;background:rgba(10,10,15,0.92);padding:20px 12px;display:flex;flex-direction:column;gap:15px;border-left:2px solid #ff003c;transition:0.4s;z-index:5}
+.playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+.video-free-zone{width:70%;height:100vh;margin-right:auto}
+.header{color:#ff003c;font-weight:bold;text-align:center}.status{text-align:center;font-size:11px;color:#ff4d73}
+.playlist{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1;padding-bottom:90px}
+.channel-card{background:rgba(20,20,25,0.6);border:1px solid rgba(255,255,255,0.05);padding:10px;border-radius:8px;display:flex;align-items:center;gap:12px;cursor:pointer;height:50px}
+.channel-card.active{border-color:#ff003c;background:rgba(255,0,60,0.15)}
+.ch-logo-wrapper{width:32px;height:32px;min-width:32px;border-radius:6px;background:#000;overflow:hidden;display:flex;justify-content:center;align-items:center}
+.ch-logo-img{width:100%;height:100%;object-fit:cover}
+#ad-fixed{position:fixed;bottom:0;left:0;width:100%;background:rgba(10,10,15,0.95);border-top:2px solid #ff003c;text-align:center;z-index:9999;padding:6px 0;min-height:65px;display:flex;justify-content:center;flex-direction:column}
+</style>
 </head>
 <body>
-<h3 style="color:#ff003c">فحص القنوات - ytv-proxy</h3>
-<video id="player" controls autoplay playsinline></video>
-<div id="logs" class="log">جاري تحميل القنوات...</div>
-<div id="list"></div>
+<div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
+<div class="ui-layer">
+<div class="playlist-container" id="playlistContainer">
+<div class="header">📺 قائمة القنوات</div><div class="status" id="status">جاري التحميل...</div><div class="playlist" id="playlist"></div>
+</div><div class="video-free-zone" id="freeZone"></div></div>
+<div id="ad-fixed"><div style="color:#ff003c;font-size:9px">إعلان</div>
+<script>atOptions={'key':'31813462','format':'iframe','height':50,'width':320,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/31813462/invoke.js"></script></div>
 <script>
-const API="https://ytv-proxy.onrender.com";
-const logEl=document.getElementById('logs'), listEl=document.getElementById('list'), video=document.getElementById('player');
-function log(t){ logEl.textContent += "\n" + t; console.log(t); }
-let hls=null;
+const API="https://ytv-proxy.onrender.com/api/channels";
+const statusText=document.getElementById('status'), playlistDiv=document.getElementById('playlist'), playlistContainer=document.getElementById('playlistContainer'), freeZone=document.getElementById('freeZone'), video=document.getElementById('player');
+let channelsData=[], hls=null;
 
-async function load(){
-  try{
-    let channels = await fetch(API+"/api/channels").then(r=>r.json());
-    log(`✅ تم تحميل ${channels.length} قناة`);
-    if(channels.length==0){ log("❌ ملف channels.m3u فارغ"); return; }
-    let first = channels[0];
-    log(`اول قناة: ${first.name}\noriginal: ${first.originalUrl}\nbase64: ${first.url.substring(0,50)}...`);
-    
-    // اختبر /stream مباشرة
-    let testUrl = API + "/stream?url=" + encodeURIComponent(first.url);
-    log(`\nجاري اختبار /stream...\n${testUrl}`);
-    let testRes = await fetch(testUrl);
-    log(`نتيجة /stream: status ${testRes.status} - Content-Type: ${testRes.headers.get('content-type')}`);
-    let text = await testRes.clone().text();
-    log(`اول 300 حرف من البث:\n${text.substring(0,300)}`);
-
-    // عرض القائمة
-    channels.slice(0,20).forEach((ch,i)=>{
-      let div=document.createElement('div'); div.className='card';
-      div.innerHTML=`${ch.name} <small style="color:#888">${ch.originalUrl.substring(0,60)}</small>`;
-      div.onclick=()=>play(ch,i);
-      listEl.appendChild(div);
-    });
-  }catch(e){ log("❌ خطأ: " + e.message); }
-}
-function play(ch){
-  log(`\n▶️ تشغيل: ${ch.name}`);
-  let proxyUrl = API + "/stream?url=" + encodeURIComponent(ch.url);
-  let directUrl = ch.originalUrl;
-  
-  // جرب البروكسي اول
-  tryPlay(proxyUrl, "بروكسي", ()=>{
-    log("⚠️ البروكسي فشل، اجرب المباشر...");
-    tryPlay(directUrl, "مباشر", null);
+fetch(API).then(r=>r.json()).then(channels=>{
+  channelsData=channels;
+  playlistDiv.innerHTML='';
+  channels.forEach((ch,i)=>{
+    let card=document.createElement('div'); card.className='channel-card';
+    let logo=ch.logo ? `<img src="${ch.logo}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">` : '🎬';
+    card.innerHTML=`<div class="ch-logo-wrapper">${logo}</div><span style="font-size:12px">${ch.name}</span>`;
+    card.onclick=()=>{ document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); play(i); };
+    playlistDiv.appendChild(card);
   });
-}
-function tryPlay(url, type, onFail){
-  log(`محاولة ${type}: ${url.substring(0,100)}...`);
+  statusText.textContent=`تم تحميل ${channels.length} قناة - اضغط للتشغيل`;
+}).catch(()=>{ statusText.textContent="فشل التحميل - حدث الصفحة"; });
+
+function play(i){
+  let ch=channelsData[i];
+  statusText.textContent=ch.name;
+  playlistContainer.classList.add('hidden');
+  document.getElementById('ad-fixed').style.display='none';
+  let url=ch.url;
   if(hls){ hls.destroy(); hls=null; }
   if(Hls.isSupported()){
-    hls=new Hls({debug:false});
+    hls=new Hls();
     hls.loadSource(url);
     hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED,()=>{ log(`✅ ${type} اشتغل!`); video.play(); });
-    hls.on(Hls.Events.ERROR,(e,data)=>{ log(`❌ خطأ ${type}: ${data.type} - ${data.details}`); if(data.fatal && onFail) onFail(); });
-  } else { video.src=url; video.play().then(()=>log(`✅ ${type} اشتغل`)).catch(e=>{ log(`❌ فشل ${type}: ${e.message}`); if(onFail) onFail(); }); }
+    hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
+    hls.on(Hls.Events.ERROR,(e,data)=>{ console.log(data); if(data.fatal){ statusText.textContent="هذا المصدر لا يعمل جرب قناة ثانية"; } });
+  } else { video.src=url; video.play(); }
 }
-load();
+freeZone.onclick=()=>{ playlistContainer.classList.remove('hidden'); document.getElementById('ad-fixed').style.display='flex'; };
 </script>
 </body>
 </html>

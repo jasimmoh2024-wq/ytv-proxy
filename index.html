@@ -1,138 +1,100 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>مكتبة السينما</title>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;font-family:'Cairo',system-ui}
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;position:fixed;top:0;left:0;overscroll-behavior:none}
-
-/* فيديو محسن - صورة نظيفة وحادة */
-.video-background-container{
-  position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;
-  display:flex;align-items:center;justify-content:center;
-}
-video{
-  width:100%;height:100%;
-  object-fit:contain;object-position:center;
-  background:#000;
-  /* تحسين الصورة */
-  filter: contrast(1.08) brightness(1.06) saturate(1.15);
-  -webkit-filter: contrast(1.08) brightness(1.06) saturate(1.15);
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
-
-.ui-layer{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex;pointer-events:none}
-
-/* قائمة بدون خيال - خلفية صلبة ونظيفة */
-.playlist-container{
-  pointer-events:auto;position:absolute;top:0;right:0;
-  width:46%!important;max-width:440px;min-width:360px;height:100dvh;
-  background:#15151c; /* لون صلب بدون شفافية حتى لا يصير خيال */
-  display:flex;flex-direction:column;
-  border-left:3px solid #ff003c;
-  box-shadow:-15px 0 50px rgba(0,0,0,0.9);
-  transition:0.35s;z-index:5;touch-action:pan-y;
-}
-.playlist-container.hidden{transform:translateX(110%)}
-.video-free-zone{pointer-events:auto;width:54%;height:100vh;touch-action:none}
-
-.top-bar{padding:20px;background:#15151c;border-bottom:1px solid #252530}
-.header{font-size:19px;font-weight:700;color:#fff}.header span{color:#ff003c}
-.status{font-size:11px;color:#fff;background:#ff003c;padding:5px 12px;border-radius:20px;display:inline-block;margin-top:10px;font-weight:600}
-#searchInput{width:100%;margin-top:14px;background:#1e1e28;border:1px solid #2a2a38;border-radius:10px;padding:11px 14px;color:#fff;outline:none;font-size:13px}
-#searchInput:focus{border-color:#ff003c}
-
-/* القائمة - بدون شفافية وبدون خيال */
-.playlist{flex:1;overflow-y:auto;padding:12px;background:#15151c;touch-action:pan-y}
-.channel-card{
-  background:#1e1e28;
-  border:1px solid #2a2a38;
-  padding:12px 14px;border-radius:12px;
-  display:flex;align-items:center;gap:14px;margin-bottom:8px;
-  cursor:pointer;min-height:66px;
-  transition:0.2s;
-}
-.channel-card:hover{background:#252530;border-color:#3a3a4a}
-.channel-card.active{background:#2a1020;border-color:#ff003c;box-shadow:0 0 15px rgba(255,0,60,0.2)}
-
-.ch-logo-wrapper{
-  width:50px;height:50px;min-width:50px;
-  border-radius:10px;background:#000;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;border:1px solid #2a2a38;
-}
-.ch-logo-img{width:100%;height:100%;object-fit:cover;display:block}
-
-.ch-info{flex:1;min-width:0;display:flex;flex-direction:column}
-.ch-name{
-  font-size:14px;font-weight:700;color:#fff;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  line-height:1.3;
-  text-shadow:none!important; /* الغاء الخيال */
-}
-.ch-meta{font-size:10px;color:#8a8a9a;margin-top:2px}
-
-.play-btn{width:32px;height:32px;border-radius:50%;background:#2a2a38;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0}
-.channel-card.active .play-btn{background:#ff003c}
-
-.open-btn{pointer-events:auto;position:fixed;top:20px;right:20px;z-index:20;background:#15151c;border:2px solid #ff003c;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;display:none;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,0.5)}
-.open-btn.show{display:block}
-
-#ad-inside-playlist{padding:12px 0;background:#0e0e13;border-top:2px solid #ff003c;text-align:center;min-height:70px}
-@media(max-width:768px){.playlist-container{width:88%!important;min-width:auto}.video-free-zone{width:12%}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>مكتبة السينما الاحترافية</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- اعلان السوشال بار 31813251 -->
+    <script src="https://www.highperformanceformat.com/31813251/socialbar.js"></script>
+    <script>window.startapp_app_id="209100049";</script>
+    <script src="https://startappcdn.com" async></script>
+    <style>
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
+        .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#000}
+        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000}
+        .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
+        .playlist-container{position:absolute;top:0;right:0;width:28%!important;max-width:320px!important;min-width:180px!important;height:100vh;background:rgba(10,10,15,0.85);backdrop-filter:blur(30px);padding:20px 12px;display:flex;flex-direction:column;gap:15px;border-left:2px solid rgba(255,0,60,0.2);transition:transform 0.4s ease,opacity 0.4s;z-index:5}
+        .playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+        .video-free-zone{width:72%;height:100vh;margin-right:auto;cursor:pointer}
+        .header{font-size:15px;color:#ff003c;font-weight:bold;text-align:center}
+        .status{text-align:center;font-size:11px;color:#ff4d73;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .playlist{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
+        .channel-card{position:relative;background:rgba(20,20,25,0.6);border:1px solid rgba(255,255,255,0.05);padding:10px;border-radius:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:0.25s;width:100%;height:50px;overflow:hidden}
+        .card-bg-blur{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.1;z-index:1;filter:blur(3px)}
+        .channel-card-content{position:relative;z-index:2;display:flex;align-items:center;gap:10px;width:100%}
+        .channel-card.active{border-color:#ff003c;background:rgba(255,0,60,0.15)}
+        .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
+        .ch-logo-img{width:100%;height:100%;object-fit:cover}
+        .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        /* اعلان البنر */
+        #ad-banner{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,0,60,0.2);text-align:center;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        @media screen and (orientation: landscape){
+            .video-background-container video{width:100vw!important;height:100vh!important}
+        }
+    </style>
 </head>
 <body>
-<div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
-<div class="open-btn" id="openBtn" onclick="togglePlaylist()">☰ القنوات</div>
-<div class="ui-layer">
-  <div class="playlist-container" id="playlistContainer">
-    <div class="top-bar">
-      <div class="header">📺 <span>مكتبة</span> السينما</div>
-      <div class="status" id="status">جاري التحميل...</div>
-      <input type="text" id="searchInput" placeholder="🔍 ابحث عن قناة...">
+    <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
+    <div class="ui-layer">
+        <div class="playlist-container" id="playlistContainer">
+            <div class="header">📺 قائمة القنوات</div>
+            <div class="status" id="status">جاري التحميل...</div>
+            <div class="playlist" id="playlist"></div>
+            <!-- اعلان البنر 31813462 -->
+            <div id="ad-banner">
+                <div style="color:#ff003c;font-size:8px;margin-bottom:3px">إعلان</div>
+                <script>
+                  atOptions = {'key' : '31813462','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};
+                </script>
+                <script src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
+            </div>
+        </div>
+        <div class="video-free-zone" id="freeZone"></div>
     </div>
-    <div class="playlist" id="playlist"></div>
-    <div id="ad-inside-playlist">
-      <div style="color:#ff003c;font-size:9px;margin-bottom:4px">إعلان</div>
-      <script>atOptions={'key':'31813462','format':'iframe','height':50,'width':320,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/31813462/invoke.js"></script>
-    </div>
-  </div>
-  <div class="video-free-zone" id="freeZone"></div>
-</div>
 <script>
-document.addEventListener('touchmove', e => { if(e.target.closest('.playlist') || e.target.closest('#searchInput')) return; e.preventDefault(); }, {passive:false});
-const API="https://ytv-proxy.onrender.com/api/channels";
-const statusText=document.getElementById('status'), playlistDiv=document.getElementById('playlist'), playlistContainer=document.getElementById('playlistContainer'), openBtn=document.getElementById('openBtn'), video=document.getElementById('player'), searchInput=document.getElementById('searchInput');
-let channelsData=[], hls=null;
-function togglePlaylist(){ playlistContainer.classList.toggle('hidden'); openBtn.classList.toggle('show', playlistContainer.classList.contains('hidden')); }
-fetch(API).then(r=>r.json()).then(channels=>{ channelsData=channels; render(channels); statusText.textContent=`تم تحميل ${channels.length} قناة`; });
-function render(list){
-  playlistDiv.innerHTML='';
-  list.forEach(ch=>{
-    let card=document.createElement('div'); card.className='channel-card';
-    let logo=ch.logo ? `<img src="${ch.logo}" class="ch-logo-img" loading="lazy">` : '🎬';
-    card.innerHTML=`<div class="ch-logo-wrapper">${logo}</div><div class="ch-info"><div class="ch-name">${ch.name}</div><div class="ch-meta">بث مباشر • HD • مباشر</div></div><div class="play-btn">▶</div>`;
-    card.onclick=()=>{ document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); play(ch); };
-    playlistDiv.appendChild(card);
-  });
-}
-function play(ch){
-  statusText.textContent=ch.name;
-  playlistContainer.classList.add('hidden'); openBtn.classList.add('show');
-  if(hls){ hls.destroy(); hls=null; }
-  if(Hls.isSupported()){ hls=new Hls({enableWorker:true, highBufferWatchdogPeriod:1}); hls.loadSource(ch.url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
-  else { video.src=ch.url; video.play(); }
-}
-document.getElementById('freeZone').onclick=()=>togglePlaylist();
-searchInput.addEventListener('input', e=>{ let q=e.target.value.toLowerCase(); let f=!q?channelsData:channelsData.filter(c=>c.name.toLowerCase().includes(q)); render(f); });
+    const host = window.location.origin;
+    const statusText = document.getElementById('status');
+    const playlistContainer = document.getElementById('playlistContainer');
+    const freeZone = document.getElementById('freeZone');
+    const video = document.getElementById('player');
+    let channelsData = [], hls = null, wakeLock = null;
+
+    async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
+    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
+
+    // فتح قفل التدوير التلقائي
+    try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
+
+    fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
+        channelsData=channels;
+        const playlistDiv=document.getElementById('playlist');
+        playlistDiv.innerHTML='';
+        channels.forEach((channel,idx)=>{
+            const card=document.createElement('div');
+            card.className='channel-card';
+            let logoUrl=channel.logo||"";
+            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
+            card.innerHTML=`${logoUrl?`<img src="${logoUrl}" class="card-bg-blur">`:''}<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
+            card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
+            playlistDiv.appendChild(card);
+        });
+        statusText.textContent=`تم تحميل ${channels.length} قناة`;
+    }).catch(()=>{ document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في الاتصال بـ API</div>'; });
+
+    function playChannel(idx){
+        const channel=channelsData[idx];
+        statusText.textContent=channel.name;
+        playlistContainer.classList.add('hidden');
+        requestWakeLock();
+        if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
+        const url=channel.url;
+        if(hls){ hls.destroy(); hls=null; }
+        if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
+        else{ video.src=url; video.play(); }
+    }
+    freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
 </script>
 </body>
 </html>

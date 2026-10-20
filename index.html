@@ -26,14 +26,19 @@
         .ch-logo-wrapper{width:32px!important;height:32px!important;min-width:32px!important;border-radius:6px;background:rgba(0,0,0,0.5);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:13px}
         .ch-logo-img{width:100%;height:100%;object-fit:cover}
         .ch-title-name{font-size:12px;font-weight:bold;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:50px;background:#000;z-index:999999;display:flex;justify-content:center;align-items:center;border-top:1px solid rgba(255,0,60,0.3);}
-        /* زر ملئ الشاشة */
-        #fullscreen-btn{position:fixed;top:15px;left:15px;z-index:10;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:8px 14px;border-radius:8px;font-size:16px;cursor:pointer;backdrop-filter:blur(10px)}
-        #fullscreen-btn:active{transform:scale(0.95)}
+        /* البنر ثابت اسفل */
+        #adsterra-banner-fixed{
+          position:fixed;bottom:0;left:0;width:100%;height:50px;
+          background:#000;z-index:999999;
+          display:flex;justify-content:center;align-items:center;
+          border-top:1px solid rgba(255,0,60,0.3);
+        }
+        @media screen and (orientation: landscape){
+            .video-background-container video{width:100vw!important;height:100vh!important}
+        }
     </style>
 </head>
 <body>
-    <button id="fullscreen-btn" onclick="toggleFullscreen()">⛶ ملئ الشاشة</button>
     <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
@@ -43,6 +48,8 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
+    
+    <!-- مكان البنر -->
     <div id="adsterra-banner-fixed"></div>
 
 <script>
@@ -53,23 +60,7 @@
     const video = document.getElementById('player');
     let channelsData = [], hls = null, wakeLock = null;
 
-    // ملئ الشاشة
-    function toggleFullscreen(){
-        let elem = document.documentElement;
-        if(!document.fullscreenElement){
-            if(elem.requestFullscreen) elem.requestFullscreen();
-            else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-            document.getElementById('fullscreen-btn').innerText = "✕ خروج";
-        }else{
-            if(document.exitFullscreen) document.exitFullscreen();
-            document.getElementById('fullscreen-btn').innerText = "⛶ ملئ الشاشة";
-        }
-    }
-    document.addEventListener('fullscreenchange',()=>{
-        if(!document.fullscreenElement) document.getElementById('fullscreen-btn').innerText = "⛶ ملئ الشاشة";
-    });
-
-    // عداد البار كل 4
+    // ===== عداد اعلان البار كل 4 ضغطات =====
     let channelClicks = parseInt(localStorage.getItem('ad_clicks') || '0');
     function showBarAd(){
         let old = document.querySelector('script[src*="2dad716486cfb2031892dd6423eca662"]');
@@ -82,7 +73,7 @@
         channelClicks = 0;
     }
 
-    // البنر
+    // ===== البنر ثابت اسفل =====
     let bannerDiv = document.getElementById('adsterra-banner-fixed');
     atOptions = { 'key' : 'a0c5287b15523633a4188d2ccd6d4241', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
     let s1 = document.createElement('script');
@@ -91,6 +82,7 @@
 
     async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
     document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
+
     try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 
     fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
@@ -107,11 +99,14 @@
             playlistDiv.appendChild(card);
         });
         statusText.textContent=`تم تحميل ${channels.length} قناة`;
-    });
+    }).catch(()=>{ document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في الاتصال بـ API</div>'; });
 
     function playChannel(idx){
-        channelClicks++; localStorage.setItem('ad_clicks', channelClicks);
+        // حساب ضغطات البار
+        channelClicks++;
+        localStorage.setItem('ad_clicks', channelClicks);
         if(channelClicks >= 4){ showBarAd(); }
+
         const channel=channelsData[idx];
         statusText.textContent=channel.name;
         playlistContainer.classList.add('hidden');

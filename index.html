@@ -103,5 +103,67 @@
     }
     freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
 </script>
+
+    <style>
+#adsterra-banner-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: #000000;
+  z-index: 999999;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+body { padding-bottom: 55px !important; }
+</style>
+
+<div id="adsterra-banner-fixed"></div>
+
+<script>
+// ===== البنر ثابت اسفل =====
+var bannerDiv = document.getElementById('adsterra-banner-fixed');
+atOptions = {
+    'key' : 'a0c5287b15523633a4188d2ccd6d4241',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+};
+var s1 = document.createElement('script');
+s1.src = "https://www.highperformanceformat.com/a0c5287b15523633a4188d2ccd6d4241/invoke.js";
+bannerDiv.appendChild(s1);
+
+// ===== البار كل 4 ضغطات على القنوات =====
+let channelClicks = 0;
+
+function showBarAd() {
+  // امسح البار القديم اذا موجود حتى يرجع يظهر
+  let oldBar = document.querySelector('script[src*="2dad716486cfb2031892dd6423eca662"]');
+  if(oldBar) oldBar.remove();
+  
+  let s2 = document.createElement('script');
+  s2.setAttribute('data-cfasync', 'false');
+  s2.src = "https://czernik.org/14/2dad716486cfb2031892dd6423eca662/invoke.js";
+  document.body.appendChild(s2);
+}
+
+// احسب الضغطات على القنوات - يشتغل وية اي قائمة عندك
+document.addEventListener('click', function(e) {
+  // اذا ضغط على قناة
+  if (e.target.closest('li, .channel-item, .channel, a, [data-channel]')) {
+    channelClicks++;
+    console.log('عدد الضغطات: ' + channelClicks);
+    
+    if (channelClicks >= 4) {
+      showBarAd();
+      channelClicks = 0; // صفر العداد
+    }
+  }
+});
+</script>
 </body>
 </html>

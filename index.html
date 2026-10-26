@@ -39,21 +39,10 @@
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
-
     <div id="adsterra-banner-fixed">
-        <script>
-          atOptions = {
-            'key' : 'a0c5287b15523633a4188d2ccd6d4241',
-            'format' : 'iframe',
-            'height' : 50,
-            'width' : 320,
-            'params' : {}
-          };
-        </script>
+        <script> atOptions = { 'key' : 'a0c5287b15523633a4188d2ccd6d4241', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} }; </script>
         <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
-
-    <script data-cfasync="false" src="https://czernik.org/14/2dad716486cfb2031892dd6423eca662"></script>
 
 <script>
     const host = window.location.origin;
@@ -62,6 +51,20 @@
     const freeZone = document.getElementById('freeZone');
     const video = document.getElementById('player');
     let channelsData = [], hls = null;
+
+    // دالة اظهار اعلان البار
+    function showBarAd(){
+        // نحذف الاعلان القديم اذا موجود
+        let old = document.getElementById('bar-ad-script');
+        if(old) old.remove();
+        let oldBar = document.querySelector('.social-bar, #social-bar, [id^="social"]');
+        // نضيف سكربت جديد كل مرة تغير قناة
+        var barScript = document.createElement('script');
+        barScript.id = 'bar-ad-script';
+        barScript.setAttribute('data-cfasync', 'false');
+        barScript.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
+        document.body.appendChild(barScript);
+    }
 
     fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
         channelsData=channels;
@@ -80,6 +83,9 @@
     });
 
     function playChannel(idx){
+        // === اعلان البار يظهر مع كل تغيير قناة ===
+        showBarAd();
+
         const channel=channelsData[idx];
         statusText.textContent=channel.name;
         playlistContainer.classList.add('hidden');

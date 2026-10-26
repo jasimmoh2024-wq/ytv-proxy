@@ -2,48 +2,54 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>window.startapp_app_id="209100049";</script>
     <script src="https://startappcdn.com" async></script>
     <style>
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        body{margin:0;padding:0;background:#1c1c2e;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
-        .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#1c1c2e}
-        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#1c1c2e}
+        body{margin:0;padding:0;background:#1e1e32;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
+        .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:radial-gradient(circle at 50% 30%, #2a2a4a 0%, #1e1e32 70%)}
+        .video-background-container video{width:100%;height:100%;object-fit:contain;background:transparent}
 
-        /* ازرار التحكم */
-        #btn-show-list{position:fixed;top:15px;left:15px;z-index:10;background:rgba(255,0,60,0.9);color:#fff;border:none;width:45px;height:45px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
-        #btn-close{position:fixed;top:15px;right:15px;z-index:10;background:rgba(0,0,0,0.6);color:#fff;border:1px solid rgba(255,255,255,0.2);width:45px;height:45px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+        #btn-show-list{position:fixed;top:18px;left:18px;z-index:10;background:linear-gradient(135deg, #ff003c, #ff4d6d);color:#fff;border:none;width:48px;height:48px;border-radius:14px;font-size:22px;cursor:pointer;box-shadow:0 4px 15px rgba(255,0,60,0.4);display:flex;align-items:center;justify-content:center}
+        #btn-close{position:fixed;top:18px;right:18px;z-index:10;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);color:#fff;border:1px solid rgba(255,255,255,0.15);width:48px;height:48px;border-radius:14px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
         .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
-        .playlist-container{position:absolute;top:0;right:0;width:34%!important;max-width:380px!important;min-width:280px!important;height:100vh;background:rgba(25,25,40,0.98);backdrop-filter:blur(30px);padding:16px 10px;display:flex;flex-direction:column;gap:12px;border-left:2px solid rgba(255,0,60,0.3);transition:transform 0.4s ease,opacity 0.4s;z-index:5;padding-bottom:70px}
-        .playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
-        .video-free-zone{width:66%;height:100vh;margin-right:auto;cursor:pointer}
-        .header{font-size:15px;color:#ff003c;font-weight:bold;text-align:center;margin-top:10px}
-        .status{text-align:center;font-size:11px;color:#ff4d73;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .playlist{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
-        .channel-card{background:#fff;border:1px solid #e5e5e5;padding:0 12px;border-radius:14px;display:flex;align-items:center;height:84px;min-height:84px;cursor:pointer;width:100%}
-        .channel-card.active{border:2px solid #ff003c;background:#111}
+        .playlist-container{position:absolute;top:0;right:0;width:36%!important;max-width:380px!important;min-width:300px!important;height:100vh;background:rgba(20,20,35,0.96);backdrop-filter:blur(25px);padding:20px 14px;display:flex;flex-direction:column;gap:16px;border-left:1px solid rgba(255,255,255,0.08);transition:all 0.4s cubic-bezier(0.4,0,0.2,1);z-index:5;padding-bottom:80px;box-shadow:-10px 0 40px rgba(0,0,0,0.5)}
+        .playlist-container.hidden{transform:translateX(100%);opacity:0}
+        .video-free-zone{width:64%;height:100vh;margin-right:auto}
+        .header{font-size:16px;color:#fff;font-weight:800;text-align:center;letter-spacing:0.5px}
+        .header span{color:#ff003c}
+        .status{text-align:center;font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.3px}
+
+        /* === القائمة الجميلة القديمة === */
+        .playlist{display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1;padding:4px}
+        .playlist::-webkit-scrollbar{width:4px}
+        .playlist::-webkit-scrollbar-thumb{background:rgba(255,0,60,0.3);border-radius:10px}
+        .channel-card{position:relative;background:#ffffff;border:none;padding:0 14px;border-radius:18px;display:flex;align-items:center;height:86px;min-height:86px;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:all 0.25s ease}
+        .channel-card:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 8px 20px rgba(0,0,0,0.15)}
+        .channel-card.active{background:linear-gradient(135deg, #111 0%, #222 100%);box-shadow:0 8px 20px rgba(255,0,60,0.25);border:1px solid #ff003c}
         .channel-card.active .ch-title-name{color:#fff}
-        .channel-card-content{display:flex;align-items:center;gap:12px;width:100%}
-        .ch-logo-wrapper{width:60px!important;height:60px!important;min-width:60px!important;border-radius:12px;background:#fff;border:1px solid #eee;overflow:hidden;display:flex;justify-content:center;align-items:center;padding:6px}
+        .channel-card-content{display:flex;align-items:center;gap:14px;width:100%}
+        .ch-logo-wrapper{width:62px!important;height:62px!important;min-width:62px!important;border-radius:16px;background:#f8f8f8;border:1px solid #f0f0f0;overflow:hidden;display:flex;justify-content:center;align-items:center;padding:8px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05)}
+        .channel-card.active .ch-logo-wrapper{background:#fff;border-color:#fff}
         .ch-logo-img{width:100%;height:100%;object-fit:contain!important}
-        .ch-title-name{font-size:14px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#11101a;z-index:99999;display:flex;justify-content:center;align-items:center;border-top:1px solid rgba(255,255,255,0.08)}
+        .ch-title-name{font-size:14.5px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.2px}
+
+        #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:62px;background:rgba(15,15,25,0.95);backdrop-filter:blur(10px);z-index:99999;display:flex;justify-content:center;align-items:center;border-top:1px solid rgba(255,255,255,0.06)}
     </style>
 </head>
 <body>
 
-    <!-- الازرار الي اختفت رجعتها -->
     <button id="btn-show-list">☰</button>
     <button id="btn-close">✕</button>
 
     <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
-            <div class="header">📺 قائمة القنوات</div>
+            <div class="header">📺 <span>قائمة</span> القنوات</div>
             <div class="status" id="status">جاري التحميل...</div>
             <div class="playlist" id="playlist"></div>
         </div>
@@ -59,26 +65,25 @@
     const host = window.location.origin;
     const statusText = document.getElementById('status');
     const playlistContainer = document.getElementById('playlistContainer');
-    const freeZone = document.getElementById('freeZone');
-    const video = document.getElementById('player');
     const btnShow = document.getElementById('btn-show-list');
     const btnClose = document.getElementById('btn-close');
+    const freeZone = document.getElementById('freeZone');
+    const video = document.getElementById('player');
     let channelsData = [], hls = null;
 
     function showBarAd(){
         let old = document.getElementById('bar-ad-script');
         if(old) old.remove();
-        var barScript = document.createElement('script');
-        barScript.id = 'bar-ad-script';
-        barScript.setAttribute('data-cfasync', 'false');
-        barScript.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
-        document.body.appendChild(barScript);
+        var s = document.createElement('script');
+        s.id = 'bar-ad-script';
+        s.setAttribute('data-cfasync','false');
+        s.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
+        document.body.appendChild(s);
     }
 
-    // ازرار التحكم
-    btnShow.onclick = (e) => { e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
-    btnClose.onclick = () => { if(document.fullscreenElement) document.exitFullscreen(); video.pause(); playlistContainer.classList.remove('hidden'); };
-    freeZone.onclick = (e) => { e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
+    btnShow.onclick = (e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
+    btnClose.onclick = ()=>{ if(document.fullscreenElement) document.exitFullscreen(); video.pause(); playlistContainer.classList.remove('hidden'); };
+    freeZone.onclick = ()=>{ playlistContainer.classList.remove('hidden'); };
 
     fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
         channelsData=channels;
@@ -90,7 +95,6 @@
             let logoUrl=channel.logo||"";
             let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
             card.innerHTML=`<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><span class="ch-title-name">${channel.name}</span></div>`;
-            // === تصليح تشغيل كل القنوات ===
             card.addEventListener('click', (e)=>{
                 e.stopPropagation();
                 document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active'));
@@ -99,10 +103,9 @@
             });
             playlistDiv.appendChild(card);
         });
-        statusText.textContent=`تم تحميل ${channels.length} قناة`;
-        // شغل اول قناة تلقائيا
+        statusText.textContent=`تم تحميل ${channels.length} قناة • HD`;
         if(channels.length>0){ document.querySelector('.channel-card')?.classList.add('active'); playChannel(0); }
-    }).catch(()=>{ document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center">خطأ في API</div>'; });
+    });
 
     function playChannel(idx){
         if(!channelsData[idx]) return;
@@ -114,15 +117,11 @@
         const url=channel.url;
         if(hls){ hls.destroy(); hls=null; }
         if(Hls.isSupported()){
-            hls=new Hls({enableWorker:true});
+            hls=new Hls();
             hls.loadSource(url);
             hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED,()=>{ video.play().catch(()=>{}); });
-            hls.on(Hls.Events.ERROR, (event,data)=>{ console.log(data); });
-        } else {
-            video.src=url;
-            video.play().catch(()=>{});
-        }
+            hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play().catch(()=>{}));
+        } else { video.src=url; video.play().catch(()=>{}); }
     }
 </script>
 </body>

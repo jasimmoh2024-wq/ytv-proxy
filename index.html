@@ -9,36 +9,41 @@
     <script src="https://startappcdn.com" async></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap');
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
         body{font-family:'Tajawal',system-ui;background:#050507;color:#fff;height:100vh;overflow:hidden}
         .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:radial-gradient(ellipse at center,#1a1a22 0%,#000 70%)}
         .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000}
         .show-menu-btn{position:fixed;top:20px;right:20px;z-index:10;background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.15);width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.3s}
         .show-menu-btn:hover{background:rgba(255,0,64,0.2);border-color:#ff0040}
-        .show-menu-btn i{font-size:20px;color:#fff}
         .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:5;display:flex;pointer-events:none}
-        .playlist-container{pointer-events:all;position:absolute;top:0;right:0;width:380px;max-width:85vw;height:100vh;background:rgba(12,12,18,0.92);backdrop-filter:blur(40px) saturate(180%);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;transition:transform 0.45s cubic-bezier(0.16,1,0.3,1);z-index:6;box-shadow:-20px 0 60px rgba(0,0,0,0.8)}
+        .playlist-container{pointer-events:all;position:absolute;top:0;right:0;width:400px;max-width:90vw;height:100vh;background:rgba(10,10,15,0.96);backdrop-filter:blur(40px) saturate(180%);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;transition:transform 0.45s cubic-bezier(0.16,1,0.3,1);z-index:6;box-shadow:-20px 0 60px rgba(0,0,0,0.9)}
         .playlist-container.hidden{transform:translateX(100%)}
-        .menu-header{padding:22px 18px 14px;background:linear-gradient(180deg,rgba(255,0,64,0.15) 0%,transparent 100%);border-bottom:1px solid rgba(255,255,255,0.06)}
+        .menu-header{padding:20px 16px 12px;background:linear-gradient(180deg,rgba(255,0,64,0.18) 0%,transparent 100%);border-bottom:1px solid rgba(255,255,255,0.06)}
         .menu-title{display:flex;align-items:center;justify-content:space-between}
-        .menu-title h2{font-size:20px;font-weight:800;display:flex;gap:10px;align-items:center}
+        .menu-title h2{font-size:21px;font-weight:800;display:flex;gap:10px;align-items:center}
         .menu-title h2 span{color:#ff0040}
         .close-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.06);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
-        .status-line{margin-top:10px;font-size:12px;color:#ff4d7a;background:rgba(255,0,64,0.1);border:1px solid rgba(255,0,64,0.15);padding:7px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
-        .playlist{flex:1;overflow-y:auto;padding:16px 12px 90px;display:flex;flex-direction:column;gap:10px}
+        .search-box{margin-top:14px;position:relative}
+        .search-box input{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 38px 10px 12px;color:#fff;font-family:'Tajawal';outline:none;transition:0.2s}
+        .search-box input:focus{border-color:#ff0040;background:rgba(255,255,255,0.09)}
+        .search-box i{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#888}
+        .status-line{margin-top:12px;font-size:12px;color:#ff8da8;background:rgba(255,0,64,0.1);border:1px solid rgba(255,0,64,0.15);padding:7px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
+        .playlist{flex:1;overflow-y:auto;padding:14px 12px 90px;display:flex;flex-direction:column;gap:10px}
         .playlist::-webkit-scrollbar{width:4px}
         .playlist::-webkit-scrollbar-thumb{background:rgba(255,0,64,0.3);border-radius:10px}
-        .channel-card{position:relative;background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.06);padding:12px;border-radius:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.25s ease;overflow:hidden}
-        .channel-card:hover{background:linear-gradient(135deg,rgba(255,255,255,0.1) 0%,rgba(255,255,255,0.04) 100%);border-color:rgba(255,255,255,0.12);transform:translateX(-4px)}
-        .channel-card.active{background:linear-gradient(135deg,rgba(255,0,64,0.25) 0%,rgba(255,0,64,0.08) 100%);border-color:#ff0040;box-shadow:0 8px 25px rgba(255,0,64,0.25)}
-        .ch-logo-wrapper{width:48px;height:48px;min-width:48px;border-radius:12px;background:linear-gradient(135deg,#1a1a22,#0f0f12);overflow:hidden;display:flex;justify-content:center;align-items:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);position:relative}
-        .ch-logo-img{width:100%;height:100%;object-fit:cover}
-        .live-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;background:#00ff88;border-radius:50%;border:2px solid #0c0c12;box-shadow:0 0 8px #00ff88}
-        .ch-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-        .ch-title-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .ch-meta{font-size:11px;color:#888;display:flex;gap:8px;align-items:center}
-        .play-icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;transition:0.25s}
+        /* الكارد الجديد المحسن */
+        .channel-card{position:relative;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:10px 12px;border-radius:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.25s ease}
+        .channel-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);transform:translateY(-1px)}
+        .channel-card.active{background:linear-gradient(135deg,rgba(255,0,64,0.28) 0%,rgba(255,0,64,0.12) 100%);border-color:#ff0040;box-shadow:0 8px 25px rgba(255,0,64,0.25)}
+        .ch-logo-wrapper{width:56px;height:56px;min-width:56px;border-radius:14px;background:#fff;overflow:hidden;display:flex;justify-content:center;align-items:center;border:1px solid rgba(255,255,255,0.12);position:relative;padding:4px}
+        .ch-logo-img{width:100%;height:100%;object-fit:contain; /* اهم تعديل */}
+        .live-dot{position:absolute;top:-4px;right:-4px;width:12px;height:12px;background:#00ff88;border-radius:50%;border:2px solid #101014;box-shadow:0 0 10px #00ff88}
+        .ch-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+        .ch-title-name{font-size:15px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.2px}
+        .ch-meta{font-size:11px;color:#aaa;display:flex;gap:6px;align-items:center}
+        .ch-meta .badge{background:rgba(0,255,136,0.12);color:#00ff88;border:1px solid rgba(0,255,136,0.2);padding:2px 8px;border-radius:20px;font-size:10px}
+        .play-icon{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;transition:0.25s;flex-shrink:0}
         .channel-card:hover .play-icon{background:#ff0040;color:#fff}
         .channel-card.active .play-icon{background:#ff0040}
         .video-free-zone{width:100%;height:100vh;cursor:pointer;pointer-events:all}
@@ -59,6 +64,7 @@
                     <h2><i class="fa-solid fa-tv" style="color:#ff0040"></i> مكتبة <span>السينما</span></h2>
                     <button class="close-btn" id="closeBtn"><i class="fa-solid fa-xmark"></i></button>
                 </div>
+                <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="searchInput" placeholder="ابحث عن قناة..."></div>
                 <div class="status-line" id="status"><i class="fa-solid fa-circle-notch fa-spin"></i> جاري التحميل...</div>
             </div>
             <div class="playlist" id="playlist"></div>
@@ -72,15 +78,15 @@
     const playlistContainer = document.getElementById('playlistContainer');
     const freeZone = document.getElementById('freeZone');
     const video = document.getElementById('player');
+    const searchInput = document.getElementById('searchInput');
     let channelsData = [], hls = null, wakeLock = null;
     let channelClicks = parseInt(localStorage.getItem('ad_clicks') || '0');
 
     async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
     document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
-    try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 
     let bannerDiv = document.getElementById('adsterra-banner-fixed');
-    atOptions = { 'key' : 'a0c5287b15523633a4188d2ccd6d4241', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+    let atOptions = { 'key' : 'a0c5287b15523633a4188d2ccd6d4241', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
     let s1 = document.createElement('script');
     s1.src = "https://www.highperformanceformat.com/a0c5287b15523633a4188d2ccd6d4241/invoke.js";
     bannerDiv.appendChild(s1);
@@ -89,38 +95,43 @@
     document.getElementById('showBtn').onclick = ()=> playlistContainer.classList.remove('hidden');
     freeZone.onclick = ()=> playlistContainer.classList.remove('hidden');
 
-    fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
-        channelsData=channels;
+    function renderChannels(filter=''){
         const playlistDiv=document.getElementById('playlist');
         playlistDiv.innerHTML='';
-        channels.forEach((channel,idx)=>{
+        const filtered = channelsData.filter(c=> c.name.toLowerCase().includes(filter.toLowerCase()));
+        filtered.forEach((channel)=>{
+            const realIdx = channelsData.indexOf(channel);
             const card=document.createElement('div');
             card.className='channel-card';
             let logoUrl=channel.logo||"";
-            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'"><div class="live-dot"></div>`:'🎬';
+            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='🎬'"><div class="live-dot"></div>`:'🎬';
             card.innerHTML=`
                 <div class="ch-logo-wrapper">${logoVisual}</div>
                 <div class="ch-info">
                     <span class="ch-title-name">${channel.name}</span>
-                    <div class="ch-meta"><i class="fa-solid fa-circle" style="color:#00ff88;font-size:7px"></i> مباشر</div>
+                    <div class="ch-meta"><span class="badge">مباشر HD</span> <i class="fa-solid fa-satellite-dish" style="color:#ff0040"></i> LIVE</div>
                 </div>
                 <div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px;margin-left:2px"></i></div>
             `;
-            card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
+            card.onclick=()=>{ document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(realIdx); };
             playlistDiv.appendChild(card);
         });
+    }
+
+    fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
+        channelsData=channels;
+        renderChannels();
         statusText.innerHTML = `<i class="fa-solid fa-check" style="color:#00ff88"></i> تم تحميل ${channels.length} قناة`;
+        searchInput.addEventListener('input', (e)=> renderChannels(e.target.value));
     });
 
     function playChannel(idx){
-        channelClicks++;
-        localStorage.setItem('ad_clicks', channelClicks);
+        channelClicks++; localStorage.setItem('ad_clicks', channelClicks);
         if(channelClicks >= 4){
             let s2 = document.createElement('script');
             s2.src = "https://czernik.org/14/2dad716486cfb2031892dd6423eca662/invoke.js";
             document.body.appendChild(s2);
-            channelClicks = 0;
-            localStorage.setItem('ad_clicks', '0');
+            channelClicks = 0; localStorage.setItem('ad_clicks', '0');
         }
         const channel=channelsData[idx];
         statusText.innerHTML = `<i class="fa-solid fa-satellite-dish" style="color:#ff0040"></i> ${channel.name}`;
@@ -129,8 +140,11 @@
         if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
         const url=channel.url;
         if(hls){ hls.destroy(); hls=null; }
-        if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
-        else{ video.src=url; video.play(); }
+        if(Hls.isSupported()){
+            hls=new Hls({enableWorker:true, lowLatencyMode:true});
+            hls.loadSource(url); hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
+        } else{ video.src=url; video.play(); }
     }
 </script>
 </body>

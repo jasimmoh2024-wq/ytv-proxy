@@ -40,7 +40,7 @@
     </style>
 </head>
 <body>
-    <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
+    <div class="video-background-container"><video id="player" controls autoplay playsinline preload="auto"></video></div>
     <div class="show-menu-btn" id="showBtn"><i class="fa-solid fa-bars-staggered" style="color:#fff"></i></div>
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
@@ -54,15 +54,7 @@
     </div>
 
     <div id="adsterra-banner-fixed">
-        <script>
-            atOptions = {
-                'key' : 'a0c5287b15523633a4188d2ccd6d4241',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
+        <script>atOptions={'key':'a0c5287b15523633a4188d2ccd6d4241','format':'iframe','height':50,'width':320,'params':{}};</script>
         <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
 
@@ -96,23 +88,42 @@
         statusText.innerHTML = `${channels.length} قناة ✓`;
     });
 
-    function playChannel(idx){
-        // اعلان البار يظهر مع كل قناة
+    function showBarAd(){
+        // حذف القديم + اظهار الجديد بدون ما يأخر الفيديو
         let old = document.getElementById('bar-ad-script');
         if(old) old.remove();
-        var s2 = document.createElement('script');
-        s2.id = 'bar-ad-script';
-        s2.setAttribute('data-cfasync','false');
-        s2.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
-        document.body.appendChild(s2);
+        const s = document.createElement('script');
+        s.id = 'bar-ad-script';
+        s.async = true;
+        s.setAttribute('data-cfasync','false');
+        s.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
+        document.body.appendChild(s);
+    }
 
+    function playChannel(idx){
         const channel=channelsData[idx];
+        if(!channel) return;
+        
         statusText.innerHTML = channel.name;
         playlistContainer.classList.add('hidden');
-        if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
+        
+        // 1. شغل القناة فورا بدون انتظار
         if(hls){ hls.destroy(); hls=null; }
-        if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(channel.url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
-        else{ video.src=channel.url; video.play(); }
+        if(Hls.isSupported()){
+            hls=new Hls({enableWorker:true, lowLatencyMode:true, maxBufferLength:10});
+            hls.loadSource(channel.url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED,()=>{ video.play().catch(()=>{}); });
+        } else {
+            video.src=channel.url;
+            video.play().catch(()=>{});
+        }
+
+        // 2. بعد ما اشتغل الفيديو، اظهر الاعلانات (حتى ما يصير تأخير)
+        setTimeout(()=>{
+            showBarAd();
+            if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
+        }, 300);
     }
 </script>
 </body>

@@ -54,8 +54,8 @@
     </div>
 
     <div id="adsterra-banner-fixed">
-        <script type="text/javascript">
-            var atOptions = {
+        <script>
+            atOptions = {
                 'key' : 'a0c5287b15523633a4188d2ccd6d4241',
                 'format' : 'iframe',
                 'height' : 50,
@@ -63,7 +63,8 @@
                 'params' : {}
             };
         </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/a0c5287b15523633a4188d2ccd6d4241/invoke.js"></script>
+        <!-- تم التصليح: czernik.org بدل highperformanceformat -->
+        <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
 
 <script>
@@ -87,7 +88,11 @@
             let logoUrl=channel.logo||"";
             let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='⚽'">`:'⚽';
             card.innerHTML=`<div class="ch-logo-wrapper">${logoVisual}</div><span class="ch-title-name">${channel.name}</span><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px"></i></div>`;
-            card.onclick=()=>{ document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
+            card.addEventListener('click', ()=>{
+                document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); 
+                card.classList.add('active'); 
+                playChannel(idx); 
+            });
             playlistDiv.appendChild(card);
         });
         statusText.innerHTML = `${channels.length} قناة ✓`;
@@ -96,10 +101,14 @@
     function playChannel(idx){
         channelClicks++;
         localStorage.setItem('ad_clicks', channelClicks);
+        // تم التصليح: اعلان البار يظهر كل 4 قنوات
         if(channelClicks >= 4){
+            let old = document.getElementById('bar-ad-script');
+            if(old) old.remove();
             var s2 = document.createElement('script');
-            s2.type = 'text/javascript';
-            s2.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662/invoke.js';
+            s2.id = 'bar-ad-script';
+            s2.setAttribute('data-cfasync','false');
+            s2.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
             document.body.appendChild(s2);
             channelClicks = 0;
             localStorage.setItem('ad_clicks', '0');

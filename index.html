@@ -2,116 +2,93 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبة السينما</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>مكتبة السينما الاحترافية</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>window.startapp_app_id="209100049";</script>
     <script src="https://startappcdn.com" async></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-        body{font-family:'Tajawal';background:#000;color:#fff;height:100vh;overflow:hidden}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        body{margin:0;padding:0;background:#000;color:#fff;font-family:system-ui;height:100vh;overflow:hidden}
         .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#000}
         .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000}
-        .show-menu-btn{position:fixed;top:20px;right:20px;z-index:10;background:#ff0040;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 15px rgba(255,0,64,0.4)}
-        .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:5;display:flex;pointer-events:none}
-        .playlist-container{pointer-events:all;position:absolute;top:0;right:0;width:400px;max-width:90vw;height:100vh;background:#f8f8f9;display:flex;flex-direction:column;transition:transform 0.4s ease;z-index:6}
-        .playlist-container.hidden{transform:translateX(100%)}
-        .menu-header{padding:16px;background:#fff;border-bottom:1px solid #e5e5e5}
-        .menu-title{display:flex;justify-content:space-between;align-items:center}
-        .menu-title h2{font-size:19px;font-weight:800;color:#111}
-        .menu-title h2 span{color:#ff0040}
-        .close-btn{width:34px;height:34px;border-radius:10px;background:#f0f0f0;border:none;color:#111;cursor:pointer}
-        .status-line{margin-top:10px;font-size:12px;color:#fff;background:#111;padding:6px 12px;border-radius:20px;display:inline-flex}
-        .playlist{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#f8f8f9;padding-bottom:80px}
-        .channel-card{width:100%;height:96px;min-height:96px;background:#fff;border:1px solid #e8e8e8;border-radius:16px;display:flex;align-items:center;gap:14px;padding:12px 16px;cursor:pointer;transition:0.2s}
-        .channel-card:hover{border-color:#ff0040}
-        .channel-card.active{background:#111;border-color:#111}
+        .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:2;display:flex}
+        .playlist-container{position:absolute;top:0;right:0;width:32%!important;max-width:360px!important;min-width:260px!important;height:100vh;background:rgba(10,10,15,0.92);backdrop-filter:blur(30px);padding:16px 10px;display:flex;flex-direction:column;gap:12px;border-left:2px solid rgba(255,0,60,0.2);transition:transform 0.4s ease,opacity 0.4s;z-index:5}
+        .playlist-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+        .video-free-zone{width:68%;height:100vh;margin-right:auto;cursor:pointer}
+        .header{font-size:15px;color:#ff003c;font-weight:bold;text-align:center}
+        .status{text-align:center;font-size:11px;color:#ff4d73;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        
+        /* === تصليح القائمة فقط === */
+        .playlist{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1;padding-right:2px}
+        .playlist::-webkit-scrollbar{width:3px}
+        .playlist::-webkit-scrollbar-thumb{background:rgba(255,0,60,0.3);border-radius:10px}
+        .channel-card{position:relative;background:#fff;border:1px solid #e5e5e5;padding:0 12px;border-radius:14px;display:flex;align-items:center;height:84px;min-height:84px;cursor:pointer;transition:0.2s;width:100%;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+        .channel-card:hover{border-color:#ff003c;transform:translateX(-2px)}
+        .channel-card.active{border-color:#ff003c;background:#111}
         .channel-card.active .ch-title-name{color:#fff}
-        .ch-logo-wrapper{width:72px;height:72px;min-width:72px;border-radius:14px;background:#fff;border:1px solid #eee;display:flex;justify-content:center;align-items:center;padding:6px}
-        .ch-logo-img{width:100%;height:100%;object-fit:contain}
-        .ch-title-name{font-size:15px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .play-icon{margin-right:auto;width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center}
-        .channel-card.active .play-icon{background:#ff0040;color:#fff}
-        .video-free-zone{width:100%;height:100vh;pointer-events:all}
-        #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center;border-top:1px solid #222}
-        @media(max-width:600px){.playlist-container{width:100%}.show-menu-btn{top:auto;bottom:70px;right:16px}}
+        .card-bg-blur{display:none} /* شلنا البلور الي كان يخرب الوضوح */
+        .channel-card-content{position:relative;z-index:2;display:flex;align-items:center;gap:12px;width:100%}
+        .ch-logo-wrapper{width:60px!important;height:60px!important;min-width:60px!important;border-radius:12px;background:#fff;border:1px solid #eee;overflow:hidden;display:flex;justify-content:center;align-items:center;padding:6px}
+        .ch-logo-img{width:100%;height:100%;object-fit:contain!important}
+        .ch-info-box{flex:1;min-width:0}
+        .ch-title-name{font-size:14px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:1.2}
+
+        @media screen and (orientation: landscape){
+            .video-background-container video{width:100vw!important;height:100vh!important}
+        }
     </style>
 </head>
 <body>
     <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
-    <div class="show-menu-btn" id="showBtn"><i class="fa-solid fa-bars-staggered" style="color:#fff"></i></div>
     <div class="ui-layer">
         <div class="playlist-container" id="playlistContainer">
-            <div class="menu-header">
-                <div class="menu-title"><h2>مكتبة <span>السينما</span></h2><button class="close-btn" id="closeBtn"><i class="fa-solid fa-xmark"></i></button></div>
-                <div class="status-line" id="status">جاري التحميل...</div>
-            </div>
+            <div class="header">📺 قائمة القنوات</div>
+            <div class="status" id="status">جاري التحميل...</div>
             <div class="playlist" id="playlist"></div>
         </div>
         <div class="video-free-zone" id="freeZone"></div>
     </div>
-
-    <div id="adsterra-banner-fixed">
-        <script type="text/javascript">
-            var atOptions = {
-                'key' : 'a0c5287b15523633a4188d2ccd6d4241',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/a0c5287b15523633a4188d2ccd6d4241/invoke.js"></script>
-    </div>
-
 <script>
     const host = window.location.origin;
     const statusText = document.getElementById('status');
     const playlistContainer = document.getElementById('playlistContainer');
+    const freeZone = document.getElementById('freeZone');
     const video = document.getElementById('player');
-    let channelsData = [], hls = null;
-    let channelClicks = parseInt(localStorage.getItem('ad_clicks') || '0');
+    let channelsData = [], hls = null, wakeLock = null;
 
-    document.getElementById('closeBtn').onclick = ()=> playlistContainer.classList.add('hidden');
-    document.getElementById('showBtn').onclick = ()=> playlistContainer.classList.remove('hidden');
-    document.getElementById('freeZone').onclick = ()=> playlistContainer.classList.remove('hidden');
+    async function requestWakeLock(){ try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){} }
+    document.addEventListener('visibilitychange', async()=>{ if(wakeLock!==null && document.visibilityState==='visible') await requestWakeLock(); });
+    try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
 
     fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
         channelsData=channels;
         const playlistDiv=document.getElementById('playlist');
         playlistDiv.innerHTML='';
         channels.forEach((channel,idx)=>{
-            const card=document.createElement('div'); card.className='channel-card';
+            const card=document.createElement('div');
+            card.className='channel-card';
             let logoUrl=channel.logo||"";
-            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='⚽'">`:'⚽';
-            card.innerHTML=`<div class="ch-logo-wrapper">${logoVisual}</div><span class="ch-title-name">${channel.name}</span><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px"></i></div>`;
-            card.onclick=()=>{ document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
+            let logoVisual=logoUrl?`<img src="${logoUrl}" class="ch-logo-img" onerror="this.parentElement.innerHTML='🎬'">`:'🎬';
+            card.innerHTML=`<div class="channel-card-content"><div class="ch-logo-wrapper">${logoVisual}</div><div class="ch-info-box"><span class="ch-title-name">${channel.name}</span></div></div>`;
+            card.onclick=(e)=>{ e.stopPropagation(); document.querySelectorAll('.channel-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); playChannel(idx); };
             playlistDiv.appendChild(card);
         });
-        statusText.innerHTML = `${channels.length} قناة ✓`;
-    });
+        statusText.textContent=`تم تحميل ${channels.length} قناة`;
+    }).catch(()=>{ document.getElementById('playlist').innerHTML='<div style="padding:10px;color:#ff003c;text-align:center;font-size:11px;">خطأ في الاتصال بـ API</div>'; });
 
     function playChannel(idx){
-        channelClicks++;
-        localStorage.setItem('ad_clicks', channelClicks);
-        if(channelClicks >= 4){
-            var s2 = document.createElement('script');
-            s2.type = 'text/javascript';
-            s2.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662/invoke.js';
-            document.body.appendChild(s2);
-            channelClicks = 0;
-            localStorage.setItem('ad_clicks', '0');
-        }
         const channel=channelsData[idx];
-        statusText.innerHTML = channel.name;
+        statusText.textContent=channel.name;
         playlistContainer.classList.add('hidden');
+        requestWakeLock();
         if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
+        const url=channel.url;
         if(hls){ hls.destroy(); hls=null; }
-        if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(channel.url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
-        else{ video.src=channel.url; video.play(); }
+        if(Hls.isSupported()){ hls=new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
+        else{ video.src=url; video.play(); }
     }
+    freeZone.onclick=(e)=>{ e.stopPropagation(); playlistContainer.classList.remove('hidden'); };
 </script>
 </body>
 </html>

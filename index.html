@@ -63,7 +63,6 @@
                 'params' : {}
             };
         </script>
-        <!-- تم التصليح: czernik.org بدل highperformanceformat -->
         <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
 
@@ -73,7 +72,6 @@
     const playlistContainer = document.getElementById('playlistContainer');
     const video = document.getElementById('player');
     let channelsData = [], hls = null;
-    let channelClicks = parseInt(localStorage.getItem('ad_clicks') || '0');
 
     document.getElementById('closeBtn').onclick = ()=> playlistContainer.classList.add('hidden');
     document.getElementById('showBtn').onclick = ()=> playlistContainer.classList.remove('hidden');
@@ -99,20 +97,15 @@
     });
 
     function playChannel(idx){
-        channelClicks++;
-        localStorage.setItem('ad_clicks', channelClicks);
-        // تم التصليح: اعلان البار يظهر كل 4 قنوات
-        if(channelClicks >= 4){
-            let old = document.getElementById('bar-ad-script');
-            if(old) old.remove();
-            var s2 = document.createElement('script');
-            s2.id = 'bar-ad-script';
-            s2.setAttribute('data-cfasync','false');
-            s2.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
-            document.body.appendChild(s2);
-            channelClicks = 0;
-            localStorage.setItem('ad_clicks', '0');
-        }
+        // اعلان البار يظهر مع كل قناة
+        let old = document.getElementById('bar-ad-script');
+        if(old) old.remove();
+        var s2 = document.createElement('script');
+        s2.id = 'bar-ad-script';
+        s2.setAttribute('data-cfasync','false');
+        s2.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
+        document.body.appendChild(s2);
+
         const channel=channelsData[idx];
         statusText.innerHTML = channel.name;
         playlistContainer.classList.add('hidden');

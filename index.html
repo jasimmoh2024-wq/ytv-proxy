@@ -88,26 +88,33 @@
         statusText.innerHTML = `${channels.length} قناة ✓`;
     });
 
-    function showBarAd(){
-        // حذف القديم + اظهار الجديد بدون ما يأخر الفيديو
-        let old = document.getElementById('bar-ad-script');
-        if(old) old.remove();
-        const s = document.createElement('script');
-        s.id = 'bar-ad-script';
-        s.async = true;
-        s.setAttribute('data-cfasync','false');
-        s.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
-        document.body.appendChild(s);
+    function showBarAdIfNeeded(){
+        const lastShown = parseInt(localStorage.getItem('bar_last_shown') || '0');
+        const now = Date.now();
+        const twoHours = 2 * 60 * 60 * 1000; // ساعتين بالميلي ثانية
+
+        if(now - lastShown > twoHours){
+            console.log("اظهار اعلان البار - مرت ساعتين");
+            let old = document.getElementById('bar-ad-script');
+            if(old) old.remove();
+            const s = document.createElement('script');
+            s.id = 'bar-ad-script';
+            s.setAttribute('data-cfasync','false');
+            s.src = 'https://czernik.org/14/2dad716486cfb2031892dd6423eca662';
+            document.body.appendChild(s);
+            localStorage.setItem('bar_last_shown', now.toString());
+        } else {
+            let remaining = Math.ceil((twoHours - (now - lastShown))/60000);
+            console.log(`اعلان البار يظهر بعد ${remaining} دقيقة`);
+        }
     }
 
     function playChannel(idx){
         const channel=channelsData[idx];
         if(!channel) return;
-        
         statusText.innerHTML = channel.name;
         playlistContainer.classList.add('hidden');
         
-        // 1. شغل القناة فورا بدون انتظار
         if(hls){ hls.destroy(); hls=null; }
         if(Hls.isSupported()){
             hls=new Hls({enableWorker:true, lowLatencyMode:true, maxBufferLength:10});
@@ -118,13 +125,17 @@
             video.src=channel.url;
             video.play().catch(()=>{});
         }
-
-        // 2. بعد ما اشتغل الفيديو، اظهر الاعلانات (حتى ما يصير تأخير)
-        setTimeout(()=>{
-            showBarAd();
-            if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
-        }, 300);
+        
+        if(typeof startapp!=='undefined'){ try{ startapp.showInterstitial(); }catch(e){} }
+        
+        // افحص اذا صار ساعتين واظهر البار
+        showBarAdIfNeeded();
     }
+
+    // اول ما يفتح الموقع افحص ايضا
+    window.addEventListener('load', ()=>{
+        setTimeout(showBarAdIfNeeded, 2000);
+    });
 </script>
 </body>
 </html>

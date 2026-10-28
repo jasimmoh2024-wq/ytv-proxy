@@ -39,8 +39,6 @@ http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1226184.m3u8
 http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1226183.m3u8
 #EXTINF:-1 tvg-id="beindrama.qa" tvg-name="BEIN| BEIN DRAMA HD" tvg-logo="https://lo1.in/beinn/beindra0.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN DRAMA HD
 http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/97398.m3u8
-#EXTINF:-1 tvg-id="beinseries1.qa" tvg-name="BEIN| BEIN SERIES 1 FHD" tvg-logo="https://lo1.in/beinn/beinser100.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN SERIES 1 FHD
-http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/22785.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="BEIN| BEIN SERIES 1 HEVC" tvg-logo="https://lo1.in/beinn/beinser100.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN SERIES 1 HEVC
 http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1287696.m3u8
 #EXTINF:-1 tvg-id="beinseries2.qa" tvg-name="BEIN| BEIN SERIES 2 FHD" tvg-logo="https://lo1.in/beinn/beinser20.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN SERIES 2 FHD
@@ -59,20 +57,18 @@ http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1287690.m3u8
 http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1287692.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="BEIN| BEIN DRAMA HEVC" tvg-logo="https://lo1.in/FCB/beinet.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN DRAMA HEVC
 http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1287694.m3u8
-#EXTINF:-1 tvg-id="" tvg-name="✦●✦ DOCUMENTRIES✦●✦" tvg-logo="https://lo1.in/FCB/beinet1.png" group-title="AR | BEIN ENTERTAINMENT",✦●✦ DOCUMENTRIES✦●✦
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/33320
 #EXTINF:-1 tvg-id="bbcearthenglish.qa" tvg-name="BEIN| BEIN BBC EARTH FHD" tvg-logo="https://lo1.in/FCB/bbcearth.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN BBC EARTH FHD
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/151526
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/151526.m3u8
 #EXTINF:-1 tvg-id="gourmet.qa" tvg-name="BEIN| BEIN GOURMET HD" tvg-logo="https://lo1.in/beinn/gourmet1.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN GOURMET HD
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/22788
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/22788.m3u8
 #EXTINF:-1 tvg-id="fatafeat.qa" tvg-name="BEIN| BEIN FATAFEAT HD" tvg-logo="https://lo1.in/beinn/fatafeat10.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN FATAFEAT HD
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/22790
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/22790.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="BEIN| BEIN FATAFEAT HEVC" tvg-logo="https://lo1.in/beinn/fatafeat0.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN FATAFEAT HEVC
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1149
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1149.m3u8
 #EXTINF:-1 tvg-id="outdoorchannel.qa" tvg-name="BEIN| BEIN OUTDOOR HD" tvg-logo="https://lo1.in/FCB/outdoor.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN OUTDOOR HD
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/97399
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/97399.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="AR| BEIN FOOD NETWORK HD" tvg-logo="https://lo1.in/uk/fodnet.png" group-title="AR | BEIN ENTERTAINMENT",AR| BEIN FOOD NETWORK HD
-http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/1142064
+http://jbfgrjbn.fhkadvnp.com:80/live/7901885855/7610043061/1142064.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="✦●✦ BEIN-KIDS ✦●✦" tvg-logo="https://lo1.in/FCB/beinet1.png" group-title="AR | BEIN ENTERTAINMENT",✦●✦ BEIN-KIDS ✦●✦
 http://jbfgrjbn.fhkadvnp.com:80/7901885855/7610043061/33316
 #EXTINF:-1 tvg-id="" tvg-name="BEIN| BEIN BOOBMRANG HD" tvg-logo="https://lo1.in/beinn/bomr.png" group-title="AR | BEIN ENTERTAINMENT",BEIN| BEIN BOOBMRANG HD

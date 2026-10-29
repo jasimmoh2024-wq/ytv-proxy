@@ -32,9 +32,9 @@
         .play-icon{margin-right:auto;width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center}
         .channel-card.active .play-icon{background:#ff0040;color:#fff}
         #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center}
-        /* هذا يخفي الفراغات الاصفره اللي بالصورة نهائيا */
-        .ad-card{display:none !important;}
-        #bg-ads{position:fixed;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
+        /* اخفاء الفراغات نهائيا */
+        .ad-card{display:none !important; height:0 !important; padding:0 !important; margin:0 !important; border:none !important;}
+        #bg-ads{position:fixed;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;visibility:hidden}
     </style>
 </head>
 <body>
@@ -49,11 +49,18 @@
             <div class="playlist" id="playlist"></div>
         </div>
     </div>
+
+    <!-- البنر ثابت تحت -->
     <div id="adsterra-banner-fixed">
         <script>atOptions={'key':'a0c5287b15523633a4188d2ccd6d4241','format':'iframe','height':50,'width':320,'params':{}};</script>
         <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
-    <div id="bg-ads"><div id="container-914c67497b303301c17090d5dc99c4fa"></div></div>
+
+    <!-- كل الاعلانات بالخلفية -->
+    <div id="bg-ads">
+        <div id="container-914c67497b303301c17090d5dc99c4fa"></div>
+    </div>
+
 <script>
     const host = window.location.origin;
     const statusText = document.getElementById('status');
@@ -63,8 +70,10 @@
     const SMARTLINK = 'https://budgetezy.org/4/47d5d46e15325430fb3f960b248b7c3e';
     const NATIVE_KEY = '914c67497b303301c17090d5dc99c4fa';
     let clickCount = parseInt(localStorage.getItem('cinema_clicks')||'0');
+
     document.getElementById('closeBtn').onclick = ()=> playlistContainer.classList.add('hidden');
     document.getElementById('showBtn').onclick = ()=> playlistContainer.classList.remove('hidden');
+
     fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
         channelsData=channels;
         const pl=document.getElementById('playlist');
@@ -82,12 +91,19 @@
         });
         statusText.innerHTML = `${channels.length} قناة ✓`;
     });
+
     function playChannel(idx){
         const ch=channelsData[idx];
         statusText.innerHTML=ch.name;
         playlistContainer.classList.add('hidden');
-        clickCount++; localStorage.setItem('cinema_clicks', clickCount);
-        if(clickCount % 5 === 0){ window.open(SMARTLINK, '_blank'); }
+        
+        // الاعلان كل 3 نقرات بالخلفية
+        clickCount++;
+        localStorage.setItem('cinema_clicks', clickCount);
+        if(clickCount % 3 === 0){
+            window.open(SMARTLINK, '_blank');
+        }
+
         if(hls){hls.destroy();hls=null;}
         if(Hls.isSupported()){
             hls=new Hls({lowLatencyMode:true});
@@ -96,15 +112,20 @@
             hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
         }else{ video.src=ch.url; video.play(); }
     }
+
+    // النيتف بالخلفية بدون فراغات - يتحدث كل 90 ثانية
     function loadNative(){
       const old = document.getElementById('native-loader');
       if(old) old.remove();
+      const container = document.getElementById('container-914c67497b303301c17090d5dc99c4fa');
+      if(container) container.innerHTML = '';
       const s=document.createElement('script');
       s.id='native-loader'; s.async=true; s.dataset.cfasync="false";
       s.src="https://czernik.org/21/"+NATIVE_KEY+"?v="+Date.now();
       document.body.appendChild(s);
     }
-    loadNative(); setInterval(loadNative, 90000);
+    loadNative();
+    setInterval(loadNative, 90000);
 </script>
 </body>
 </html>

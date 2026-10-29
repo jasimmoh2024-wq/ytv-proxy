@@ -34,8 +34,8 @@
         .play-icon{margin-right:auto;width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center}
         .channel-card.active .play-icon{background:#ff0040;color:#fff}
         #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center}
-        /* حاوية الاعلانات الخلفية - مخفية لكنها شغالة */
-        #bg-ads{position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0.01}
+        /* الاعلان بالخلفية مخفي 100% بدون فراغات */
+        #bg-ads{position:fixed;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;visibility:hidden}
     </style>
 </head>
 <body>
@@ -56,7 +56,7 @@
         <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
 
-    <!-- الاعلانات بالخلفية -->
+    <!-- النيتف بالخلفية بدون فراغات -->
     <div id="bg-ads">
         <div id="container-914c67497b303301c17090d5dc99c4fa"></div>
     </div>
@@ -97,10 +97,10 @@
         statusText.innerHTML=ch.name;
         playlistContainer.classList.add('hidden');
         
-        // Smartlink بالخلفية كل 3 نقرات
+        // Smartlink بالخلفية كل 5 نقرات حتى ما يزعج
         clickCount++;
         localStorage.setItem('cinema_clicks', clickCount);
-        if(clickCount % 3 === 0){
+        if(clickCount % 5 === 0){
             window.open(SMARTLINK, '_blank');
         }
 
@@ -114,11 +114,21 @@
         if(typeof startapp!=='undefined'){try{startapp.showInterstitial();}catch(e){}}
     }
 
-    // تحميل Native Banner بالخلفية
-    const s=document.createElement('script');
-    s.async=true; s.dataset.cfasync="false";
-    s.src="https://czernik.org/21/"+NATIVE_KEY;
-    document.body.appendChild(s);
+    // Native Banner بالخلفية بدون ازعاج - يتحدث كل 90 ثانية
+    function loadNative(){
+      const old = document.getElementById('native-loader');
+      if(old) old.remove();
+      const container = document.getElementById('container-914c67497b303301c17090d5dc99c4fa');
+      if(container) container.innerHTML = '';
+      const s=document.createElement('script');
+      s.id='native-loader';
+      s.async=true; 
+      s.dataset.cfasync="false";
+      s.src="https://czernik.org/21/"+NATIVE_KEY+"?v="+Date.now();
+      document.body.appendChild(s);
+    }
+    loadNative();
+    setInterval(loadNative, 90000);
 </script>
 </body>
 </html>

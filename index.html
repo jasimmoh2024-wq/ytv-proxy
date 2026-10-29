@@ -33,9 +33,9 @@
         .ch-title-name{font-size:15px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .play-icon{margin-right:auto;width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center}
         .channel-card.active .play-icon{background:#ff0040;color:#fff}
-        .ad-card{background:#fffbe6!important;border:1px dashed #ffb700!important}
         #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center}
-        #container-914c67497b303301c17090d5dc99c4fa{width:100%;min-height:120px}
+        /* حاوية الاعلانات الخلفية - مخفية لكنها شغالة */
+        #bg-ads{position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0.01}
     </style>
 </head>
 <body>
@@ -56,6 +56,11 @@
         <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
     </div>
 
+    <!-- الاعلانات بالخلفية -->
+    <div id="bg-ads">
+        <div id="container-914c67497b303301c17090d5dc99c4fa"></div>
+    </div>
+
 <script>
     const host = window.location.origin;
     const statusText = document.getElementById('status');
@@ -63,6 +68,7 @@
     const video = document.getElementById('player');
     let channelsData = [], hls = null;
     const SMARTLINK = 'https://budgetezy.org/4/47d5d46e15325430fb3f960b248b7c3e';
+    const NATIVE_KEY = '914c67497b303301c17090d5dc99c4fa';
     let clickCount = parseInt(localStorage.getItem('cinema_clicks')||'0');
 
     document.getElementById('closeBtn').onclick = ()=> playlistContainer.classList.add('hidden');
@@ -82,23 +88,8 @@
                 playChannel(idx); 
             });
             pl.appendChild(card);
-
-            // كل 6 قنوات اضف اعلان Native Banner
-            if((idx+1) % 6 === 0){
-                const adCard = document.createElement('div');
-                adCard.className='channel-card ad-card';
-                adCard.innerHTML=`<div id="container-914c67497b303301c17090d5dc99c4fa-${idx}"></div>`;
-                // نستنسخ اعلان Native داخلها
-                pl.appendChild(adCard);
-            }
         });
         statusText.innerHTML = `${channels.length} قناة ✓`;
-
-        // حمل سكربت Native Banner مرة واحدة وهو يملي كل الحاويات
-        const s=document.createElement('script');
-        s.async=true; s.dataset.cfasync="false";
-        s.src="https://czernik.org/21/914c67497b303301c17090d5dc99c4fa";
-        document.body.appendChild(s);
     });
 
     function playChannel(idx){
@@ -106,7 +97,7 @@
         statusText.innerHTML=ch.name;
         playlistContainer.classList.add('hidden');
         
-        // Smartlink كل 3 نقرات
+        // Smartlink بالخلفية كل 3 نقرات
         clickCount++;
         localStorage.setItem('cinema_clicks', clickCount);
         if(clickCount % 3 === 0){
@@ -122,6 +113,12 @@
         }else{ video.src=ch.url; video.play(); }
         if(typeof startapp!=='undefined'){try{startapp.showInterstitial();}catch(e){}}
     }
+
+    // تحميل Native Banner بالخلفية
+    const s=document.createElement('script');
+    s.async=true; s.dataset.cfasync="false";
+    s.src="https://czernik.org/21/"+NATIVE_KEY;
+    document.body.appendChild(s);
 </script>
 </body>
 </html>

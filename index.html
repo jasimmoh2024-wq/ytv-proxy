@@ -1,131 +1,54 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبة السينما</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Tajawal';background:#000;color:#fff;height:100vh;overflow:hidden}
-        .video-background-container{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:1;background:#000}
-        .video-background-container video{width:100%;height:100%;object-fit:contain;background:#000}
-        .show-menu-btn{position:fixed;top:20px;right:20px;z-index:10;background:#ff0040;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-        .ui-layer{position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:5;display:flex;pointer-events:none}
-        .playlist-container{pointer-events:all;position:absolute;top:0;right:0;width:400px;max-width:90vw;height:100vh;background:#f8f8f9;display:flex;flex-direction:column;transition:transform 0.4s ease;z-index:6}
-        .playlist-container.hidden{transform:translateX(100%)}
-        .menu-header{padding:16px;background:#fff;border-bottom:1px solid #e5e5e5}
-        .menu-title{display:flex;justify-content:space-between;align-items:center}
-        .menu-title h2{font-size:19px;font-weight:800;color:#111}
-        .menu-title h2 span{color:#ff0040}
-        .close-btn{width:34px;height:34px;border-radius:10px;background:#f0f0f0;border:none;color:#111;cursor:pointer}
-        .status-line{margin-top:10px;font-size:12px;color:#fff;background:#111;padding:6px 12px;border-radius:20px;display:inline-flex}
-        .playlist{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#f8f8f9;padding-bottom:80px}
-        .channel-card{width:100%;height:96px;background:#fff;border:1px solid #e8e8e8;border-radius:16px;display:flex;align-items:center;gap:14px;padding:12px 16px;cursor:pointer}
-        .channel-card.active{background:#111;border-color:#111}
-        .channel-card.active .ch-title-name{color:#fff}
-        .ch-logo-wrapper{width:72px;height:72px;min-width:72px;border-radius:14px;background:#fff;border:1px solid #eee;display:flex;justify-content:center;align-items:center;padding:6px}
-        .ch-logo-img{width:100%;height:100%;object-fit:contain}
-        .ch-title-name{font-size:15px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .play-icon{margin-right:auto;width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center}
-        .channel-card.active .play-icon{background:#ff0040;color:#fff}
-        #adsterra-banner-fixed{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center}
-        /* اخفاء الفراغات نهائيا */
-        .ad-card{display:none !important; height:0 !important; padding:0 !important; margin:0 !important; border:none !important;}
-        #bg-ads{position:fixed;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;visibility:hidden}
-    </style>
-</head>
-<body>
-    <div class="video-background-container"><video id="player" controls autoplay playsinline></video></div>
-    <div class="show-menu-btn" id="showBtn"><i class="fa-solid fa-bars-staggered" style="color:#fff"></i></div>
-    <div class="ui-layer">
-        <div class="playlist-container" id="playlistContainer">
-            <div class="menu-header">
-                <div class="menu-title"><h2>مكتبة <span>السينما</span></h2><button class="close-btn" id="closeBtn"><i class="fa-solid fa-xmark"></i></button></div>
-                <div class="status-line" id="status">جاري التحميل...</div>
-            </div>
-            <div class="playlist" id="playlist"></div>
-        </div>
-    </div>
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const compression = require('compression');
 
-    <!-- البنر ثابت تحت -->
-    <div id="adsterra-banner-fixed">
-        <script>atOptions={'key':'a0c5287b15523633a4188d2ccd6d4241','format':'iframe','height':50,'width':320,'params':{}};</script>
-        <script src="https://czernik.org/22/a0c5287b15523633a4188d2ccd6d4241"></script>
-    </div>
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    <!-- كل الاعلانات بالخلفية -->
-    <div id="bg-ads">
-        <div id="container-914c67497b303301c17090d5dc99c4fa"></div>
-    </div>
+app.use(compression());
+app.use(cors({ origin: '*' }));
+app.use(express.static(__dirname, { maxAge: '1d', etag: true }));
 
-<script>
-    const host = window.location.origin;
-    const statusText = document.getElementById('status');
-    const playlistContainer = document.getElementById('playlistContainer');
-    const video = document.getElementById('player');
-    let channelsData = [], hls = null;
-    const SMARTLINK = 'https://budgetezy.org/4/47d5d46e15325430fb3f960b248b7c3e';
-    const NATIVE_KEY = '914c67497b303301c17090d5dc99c4fa';
-    let clickCount = parseInt(localStorage.getItem('cinema_clicks')||'0');
+app.get('/', (req,res)=> {
+  res.set('Cache-Control','public, max-age=3600');
+  res.sendFile(path.join(__dirname,'index.html'));
+});
 
-    document.getElementById('closeBtn').onclick = ()=> playlistContainer.classList.add('hidden');
-    document.getElementById('showBtn').onclick = ()=> playlistContainer.classList.remove('hidden');
+app.get('/app-ads.txt', (req,res)=>{
+  res.type('text/plain');
+  res.set('Cache-Control','public, max-age=86400');
+  res.send('start.io, 110183401, DIRECT, d4c1a32e9ccbda8e');
+});
 
-    fetch(`${host}/api/channels`).then(r=>r.json()).then(channels=>{
-        channelsData=channels;
-        const pl=document.getElementById('playlist');
-        pl.innerHTML='';
-        channels.forEach((c,idx)=>{
-            const card=document.createElement('div'); card.className='channel-card';
-            let lg=c.logo?`<img src="${c.logo}" class="ch-logo-img">`:'⚽';
-            card.innerHTML=`<div class="ch-logo-wrapper">${lg}</div><span class="ch-title-name">${c.name}</span><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px"></i></div>`;
-            card.addEventListener('click',()=>{ 
-                document.querySelectorAll('.channel-card').forEach(x=>x.classList.remove('active')); 
-                card.classList.add('active'); 
-                playChannel(idx); 
-            });
-            pl.appendChild(card);
-        });
-        statusText.innerHTML = `${channels.length} قناة ✓`;
-    });
+app.get('/api/channels', (req,res)=>{
+  // منع الفتح المباشر من المتصفح بدون تطبيقك
+  const ref = req.headers.referer || '';
+  const ua = req.headers['user-agent'] || '';
+  if(!ref && req.headers['sec-fetch-mode'] === 'navigate' && !ua.includes('Android')){
+     return res.status(403).send('App only');
+  }
 
-    function playChannel(idx){
-        const ch=channelsData[idx];
-        statusText.innerHTML=ch.name;
-        playlistContainer.classList.add('hidden');
-        
-        // الاعلان كل 3 نقرات بالخلفية
-        clickCount++;
-        localStorage.setItem('cinema_clicks', clickCount);
-        if(clickCount % 3 === 0){
-            window.open(SMARTLINK, '_blank');
-        }
-
-        if(hls){hls.destroy();hls=null;}
-        if(Hls.isSupported()){
-            hls=new Hls({lowLatencyMode:true});
-            hls.loadSource(ch.url);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
-        }else{ video.src=ch.url; video.play(); }
+  res.set('Cache-Control','public, max-age=300');
+  const file = path.join(__dirname,'channels.m3u');
+  if(!fs.existsSync(file)) return res.status(404).json([]);
+  const content = fs.readFileSync(file,'utf-8');
+  const lines = content.split('\n');
+  const channels=[];
+  let name='', logo='';
+  for(let line of lines){
+    line=line.trim(); if(!line) continue;
+    if(line.startsWith('#EXTINF:')){
+      const l = line.match(/tvg-logo="([^"]+)"/i); logo = l ? l[1] : '';
+      const n = line.match(/tvg-name="([^"]+)"/i); name = n ? n[1] : line.split(',').pop().trim();
+    } else if(line.startsWith('http')){
+      let fixedUrl = line.replace('/live7901885855','/live/7901885855').replace('/live10675785266958','/live/10675785266958');
+      channels.push({ name: name || 'قناة', logo, url: fixedUrl });
+      name=''; logo='';
     }
+  }
+  res.json(channels);
+});
 
-    // النيتف بالخلفية بدون فراغات - يتحدث كل 90 ثانية
-    function loadNative(){
-      const old = document.getElementById('native-loader');
-      if(old) old.remove();
-      const container = document.getElementById('container-914c67497b303301c17090d5dc99c4fa');
-      if(container) container.innerHTML = '';
-      const s=document.createElement('script');
-      s.id='native-loader'; s.async=true; s.dataset.cfasync="false";
-      s.src="https://czernik.org/21/"+NATIVE_KEY+"?v="+Date.now();
-      document.body.appendChild(s);
-    }
-    loadNative();
-    setInterval(loadNative, 90000);
-</script>
-</body>
-</html>
+app.listen(PORT, ()=>console.log('Running '+PORT));
